@@ -9,16 +9,6 @@
 The BibTex references bellow refer to papers in `papers/` directory.
 
 - ```
-  @inproceedings{john2016fast,
-    title={Fast road scene segmentation using deep learning and scene-based models},
-    author={John, Vijay and Kidono, Kiyosumi and Guo, Chunzhao and Tehrani, Hossein and Mita, Seiichi and Ishimaru, Kasuhiza},
-    booktitle={Pattern Recognition (ICPR), 2016 23rd International Conference on},
-    pages={3763--3768},
-    year={2016},
-    organization={IEEE}
-  }
-  ```
-- ```
   @article{panboonyuen2017road,
     title={Road Segmentation of Remotely-Sensed Images Using Deep Convolutional Neural Networks with Landscape Metrics and Conditional Random Fields},
     author={Panboonyuen, Teerapong and Jitkajornwanich, Kulsawasd and Lawawirojwong, Siam and Srestasathiern, Panu and Vateekul, Peerapon},
