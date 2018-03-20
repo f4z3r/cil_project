@@ -54,3 +54,27 @@ The BibTex references bellow refer to papers in `papers/` directory.
     publisher={American Society for Photogrammetry and Remote Sensing}
   }
   ```
+- ```
+  @article{kingma2014adam,
+    title={Adam: A method for stochastic optimization},
+    author={Kingma, Diederik P and Ba, Jimmy},
+    journal={arXiv preprint arXiv:1412.6980},
+    year={2014}
+  }
+  ```
+- ```
+  @article{xu2015empirical,
+    title={Empirical evaluation of rectified activations in convolutional network},
+    author={Xu, Bing and Wang, Naiyan and Chen, Tianqi and Li, Mu},
+    journal={arXiv preprint arXiv:1505.00853},
+    year={2015}
+  }
+  ```
+- ```
+  @article{bittel2015pixel,
+    title={Pixel-wise segmentation of street with neural networks},
+    author={Bittel, Sebastian and Kaiser, Vitali and Teichmann, Marvin and Thoma, Martin},
+    journal={arXiv preprint arXiv:1511.00513},
+    year={2015}
+  }
+  ```
