@@ -5,6 +5,19 @@
 
 [This paper](http://www.mdpi.com/2072-4292/8/4/329/html) does more broad per-pixel segmentation by using satellite images to classify complete regions. However, this is also applicable for road segmentation.
 
+## Main current ideas:
+
+CNN + 4 filters (computation allowing): 
+
+- vertical lines (https://www.coursera.org/learn/convolutional-neural-networks/lecture/4Trod/edge-detection-example)
+- horizontal lines (same above link) -> learn horizontal features
+- diagonal lines filter (same above link) -> learn diagonal features as streets
+- color (third dimension) -> learn a color threshold given the background
+
+Objective: learn the features as independent ones.
+->  threshold on top of the layers mixing all channels. 
+
+
 ## Papers
 The BibTex references bellow refer to papers in `papers/` directory.
 
@@ -102,3 +115,4 @@ The BibTex references bellow refer to papers in `papers/` directory.
     publisher={Elsevier}
   }
   ```
+
