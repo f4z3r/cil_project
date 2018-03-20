@@ -9,10 +9,11 @@
 
 CNN + 4 filters (computation allowing): 
 
-- vertical lines (https://www.coursera.org/learn/convolutional-neural-networks/lecture/4Trod/edge-detection-example)
-- horizontal lines (same above link) -> learn horizontal features
+- vertical lines (https://www.coursera.org/learn/convolutional-neural-networks/lecture/4Trod/edge-detection-example) -> learn vertical features as streets
+- horizontal lines (same above link) -> learn horizontal features as streets
 - diagonal lines filter (same above link) -> learn diagonal features as streets
-- color (third dimension) -> learn a color threshold given the background
+- color (third dimension) -> learn a color threshold given the background possibly (Bayesian estimation)
+
 
 Objective: learn the features as independent ones.
 ->  threshold on top of the layers mixing all channels. 
