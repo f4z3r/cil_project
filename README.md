@@ -78,3 +78,27 @@ The BibTex references bellow refer to papers in `papers/` directory.
     year={2015}
   }
   ```
+- ```
+  @article{zhang2006benefit,
+    title={Benefit of the angular texture signature for the separation of parking lots and roads on high resolution multi-spectral imagery},
+    author={Zhang, Qiaoping and Couloigner, Isabelle},
+    journal={Pattern recognition letters},
+    volume={27},
+    number={9},
+    pages={937--946},
+    year={2006},
+    publisher={Elsevier}
+  }
+  ```
+- ```
+  @article{mena2005automatic,
+    title={An automatic method for road extraction in rural and semi-urban areas starting from high resolution satellite imagery},
+    author={Mena, Juan B and Malpica, Jos{\'e} A},
+    journal={Pattern recognition letters},
+    volume={26},
+    number={9},
+    pages={1201--1220},
+    year={2005},
+    publisher={Elsevier}
+  }
+  ```
