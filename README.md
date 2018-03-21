@@ -1,5 +1,27 @@
 # `cil_project`
 
+## Implementation Details
+The current required libraries are the following:
+
+- `numpy`
+- `matplotlib`
+- `tensorflow` or `theano` or `keras` (Francesco)
+- Pillow for `PIL`
+
+### Project Structure
+```
+- assets
+  | - test
+  |   | all data required for testing
+- papers
+  | all relevant papers for this project
+- src
+  |   test.py       -> contains all unit tests
+  |   utility.py    -> contains all utility functions
+- README.md         -> this file
+```
+
+
 ## Resources
 [This](https://github.com/dariopavllo/road-segmentation) is an example of exactly what we are supposed to do. The technique used can be read in the report within the git repo.
 
@@ -7,7 +29,7 @@
 
 ## Main current ideas:
 
-CNN + 4 filters (computation allowing): 
+CNN + 4 filters (computation allowing):
 
 - vertical lines (https://www.coursera.org/learn/convolutional-neural-networks/lecture/4Trod/edge-detection-example) -> learn vertical features as streets
 - horizontal lines (same above link) -> learn horizontal features as streets
@@ -16,7 +38,7 @@ CNN + 4 filters (computation allowing):
 
 
 Objective: learn the features as independent ones.
-->  threshold on top of the layers mixing all channels. 
+->  threshold on top of the layers mixing all channels.
 
 
 ## Papers
