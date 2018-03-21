@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Tester module. This should implement unit tests for any important functionalities.
+"""Tester module. This should implement unit tests for any important functionalities."""
 
 import os, sys
 import unittest

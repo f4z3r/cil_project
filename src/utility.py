@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-# Utility module containing helper functions.
+"""Utility module containing helper functions."""
 
 import numpy as np
-import os
-import sys
-import glob
+import os, sys, glob
 import matplotlib.image as mpimg
 from PIL import Image
 
