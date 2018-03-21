@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 # Utility module containing helper functions.
-#
-# Requires Pillow,
 
 import numpy as np
 import os
