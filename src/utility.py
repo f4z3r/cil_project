@@ -40,7 +40,8 @@ def augment_img_set(path):
 
         # Generate 4 rotated and flipped copies
         flip_img = img.transpose(Image.FLIP_TOP_BOTTOM)
-        for idx in range(3, 7):
+        flip_img.save("{}_{}.jpg".format(filepath_no_ext, 3))
+        for idx in range(4, 7):
             flip_img = flip_img.rotate(90)
             flip_img.save("{}_{}.jpg".format(filepath_no_ext, idx))
 
