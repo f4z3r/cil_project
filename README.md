@@ -16,8 +16,8 @@ The current required libraries are the following:
 - papers
   | all relevant papers for this project
 - src
-  |   test.py       -> contains all unit tests
-  |   utility.py    -> contains all utility functions
+  | test.py         -> contains all unit tests
+  | utility.py      -> contains all utility functions
 - README.md         -> this file
 ```
 
