@@ -25,6 +25,8 @@ The current required libraries are the following:
 ## Resources
 [This](https://github.com/dariopavllo/road-segmentation) is an example of exactly what we are supposed to do. The technique used can be read in the report within the git repo.
 
+[This](https://github.com/mahmoudmohsen213/airs) is another repo using `tensorflow` to implement the same problem.
+
 [This paper](http://www.mdpi.com/2072-4292/8/4/329/html) does more broad per-pixel segmentation by using satellite images to classify complete regions. However, this is also applicable for road segmentation.
 
 ## Main current ideas:
@@ -138,4 +140,23 @@ The BibTex references bellow refer to papers in `papers/` directory.
     publisher={Elsevier}
   }
   ```
-
+- ```
+  @article{henry2018road,
+    title={Road Segmentation in SAR Satellite Images with Deep Fully-Convolutional Neural Networks},
+    author={Henry, Corentin and Azimi, Seyed Majid and Merkle, Nina},
+    journal={arXiv preprint arXiv:1802.01445},
+    year={2018}
+  }
+  ```
+- ```
+  @article{kaiser2017learning,
+    title={Learning Aerial Image Segmentation from Online Maps},
+    author={Kaiser, Pascal and Wegner, Jan Dirk and Lucchi, Aur{\'e}lien and Jaggi, Martin and Hofmann, Thomas and Schindler, Konrad},
+    journal={IEEE Transactions on Geoscience and Remote Sensing},
+    volume={55},
+    number={11},
+    pages={6054--6068},
+    year={2017},
+    publisher={IEEE}
+  }
+  ```
