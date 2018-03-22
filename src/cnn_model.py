@@ -30,12 +30,12 @@ class CNN_keras:
 	def load_data(self):
 
 		#example for testing
-	    self.images=[]
-	    image= img.imread("./assets/test/test_img.jpg")	
-	    print (image.shape)
-	    self.images.append(image)
-	    #preprocess_data()
-	    #run_model(self)
+		self.images=[]
+		image= img.imread("./assets/test/test_img.jpg")	
+		print (image.shape)
+		self.images.append(image)
+		#preprocess_data()
+		#run_model(self)
 
 
 
@@ -51,7 +51,7 @@ class CNN_keras:
 		input_shape=input_data.shape
 
 		self.model= Sequential()
-	    #Stacking first convolutional layer"""
+		#Stacking first convolutional layer"""
 		#self.model.add(convolution2D(64, self.filters[0], border_mode='same', input_shape=input_shape))
 		#self.model.add(LeakyReLU(alpha=0.1))
 		input_shape = Input(shape=(rows, cols, 1))
