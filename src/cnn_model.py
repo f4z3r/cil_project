@@ -9,8 +9,7 @@ class CNN_keras:
 
 	def __init__(self,network):
 		self.net=network
-		
-
+	
 
 
 	def preprocess_data(self):
@@ -18,19 +17,13 @@ class CNN_keras:
 		self.processed_images=[]
 
 		for image in self.images:
-
-			
-			
+	
 			#apply the 3x3 mean filter on the image"""
 			kernel = np.ones((3,3),np.float32)/9
-			processed_image = cv2.filter2D(image,-1,kernel)
-			
+			processed_image = cv2.filter2D(image,-1,kernel)			
 			#display image"""
-			
 			self.processed_images.append(processed_image)
-
 			#cv2.imshow('Mean Filter Processing', processed_image)
-
 			print(processed_image)
 
 
@@ -40,9 +33,7 @@ class CNN_keras:
 	    self.images=[]
 	    image= img.imread("./assets/test/test_img.jpg")	
 	    print (image.shape)
-
 	    self.images.append(image)
-
 	    #preprocess_data()
 	    #run_model(self)
 
@@ -51,11 +42,9 @@ class CNN_keras:
 	def model_setup(input_data):
 
 		num_classes=2
-
 		input_data=self.processed_images[0]
 
 		self.filters=[]
-
 		self.filters[0]=[16,16,3]
 		self.filters[1]=[20,20,3]
 
@@ -64,12 +53,8 @@ class CNN_keras:
 		self.model= Sequential()
 	    #Stacking first convolutional layer"""
 		#self.model.add(convolution2D(64, self.filters[0], border_mode='same', input_shape=input_shape))
-
 		#self.model.add(LeakyReLU(alpha=0.1))
-
 		input_shape = Input(shape=(rows, cols, 1))
-
-		
 		#filter of different sizes to have higher final accuracy in classification
 		kernel_size=[]
 		kernel_size.add([16, 16, 3])
@@ -81,47 +66,44 @@ class CNN_keras:
 		nb_filters_convl_3=20
 
 		max_pooling_window=[1,8,1]
-    	#keras.layers.Conv3D(filters, kernel_size, strides=(1, 1, 1), padding='valid', data_format=None, dilation_rate=(1, 1, 1), activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-    	channel_1 = Conv3D(nb_filters_convl_1, kernel_size[0], padding='same', activation='relu', strides=1)(input_shape) 
-    	#z1_1=[[(800-kernel_size(0,0)]/stride)+1,([800-kernel_size(0,1)]/stride)+1,([3-kernel_size(0,2)]/stride)+1]
-    	channel_1 = MaxPooling3D(max_pooling_window, strides=(1, 1), padding='same')(channel_1)
-
-    	max_pooling_window2=max_pooling_window
-    	max_pooling_window2[1]=max_pooling_window+kernel_size[0][1]-kernel_size[1][1]
-    	channel_2 = Conv3D(nb_filters_convl_1, kernel_size[1], padding='same', activation='relu', strides=1)(input_shape)
-    	channel_2 = MaxPooling3D((1, max_pooling_window2), strides=(1, 1), padding='same')(channel_2)
-
-    	max_pooling_window3=max_pooling_window
-    	max_pooling_window3[1]=max_pooling_window[0][1]+kernel_size[0][1]-kernel_size[2][1]
-    	channel_3 = Conv3D(nb_filters_convl_1, kernel_size[2], padding='same', activation='relu',strides=1)(input_shape)
-    	channel_3 = MaxPooling3D((1, max_pooling_window3), strides=(1, 1), padding='same')(channel_3)
-
-    	#the three differently filtered inputs concatenated
-    	merged = keras.layers.concatenate([channel_1, channel_2, channel_3], axis=1)
-    	print("merged shape ",merged.shape)
-
-    	self.model.add(merged)
-    	self.model.add(Dropout(0.25))
-
- 		self.model.add(LeakyReLU(alpha=0.1))
-
-
-
- 		#z1_dimensions=?
- 		self.model.add(Convolution3D(nb_filters_convl_2,kernel_size[1],border_mode='same'))
-        self.model.add(LeakyReLU(alpha=0.1))
-        self.model.add(MaxPooling2D(pool_size=pool_size, border_mode='same'))
-        self.model.add(Dropout(0.25))
+		#keras.layers.Conv3D(filters, kernel_size, strides=(1, 1, 1), padding='valid', data_format=None, dilation_rate=(1, 1, 1), activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+		channel_1 = Conv3D(nb_filters_convl_1, kernel_size[0], padding='same', activation='relu', strides=1)(input_shape) 
+		#z1_1=[[(800-kernel_size(0,0)]/stride)+1,([800-kernel_size(0,1)]/stride)+1,([3-kernel_size(0,2)]/stride)+1]
+		channel_1 = MaxPooling3D(max_pooling_window, strides=(1, 1), padding='same')(channel_1)
 		
+		max_pooling_window2=max_pooling_window
+		max_pooling_window2[1]=max_pooling_window+kernel_size[0][1]-kernel_size[1][1]
+		channel_2 = Conv3D(nb_filters_convl_1, kernel_size[1], padding='same', activation='relu', strides=1)(input_shape)
+		channel_2 = MaxPooling3D((1, max_pooling_window2), strides=(1, 1), padding='same')(channel_2)
+
+		max_pooling_window3=max_pooling_window
+		max_pooling_window3[1]=max_pooling_window[0][1]+kernel_size[0][1]-kernel_size[2][1]
+		channel_3 = Conv3D(nb_filters_convl_1, kernel_size[2], padding='same', activation='relu',strides=1)(input_shape)
+		channel_3 = MaxPooling3D((1, max_pooling_window3), strides=(1, 1), padding='same')(channel_3)
+
+		#the three differently filtered inputs concatenated
+		merged = keras.layers.concatenate([channel_1, channel_2, channel_3], axis=1)
+		print("merged shape ",merged.shape)
+
+		self.model.add(merged)
+		self.model.add(Dropout(0.25))
+		self.model.add(LeakyReLU(alpha=0.1))
+
+		#z1_dimensions=?
+		self.model.add(Convolution3D(nb_filters_convl_2,kernel_size[1],border_mode='same'))
+		self.model.add(LeakyReLU(alpha=0.1))
+		self.model.add(MaxPooling2D(pool_size=pool_size, border_mode='same'))
+		self.model.add(Dropout(0.25))
+
 		#vectorize all the previous multidimensional output to input everythong nto a dense final layer
  		self.model.add(Flatten())
 
-    	out = Dense(input_to_be_determined, activation='relu')
-    	out = Dense(num_classes, activation='softmax')(out)
+ 		out = Dense(input_to_be_determined, activation='relu')
+ 		out = Dense(num_classes, activation='softmax')(out)
 
-    	model = Model(input_shape, out)
-    	plot_model(model, to_file=img_path)
-    	return model
+ 		model = Model(input_shape, out)
+ 		plot_model(model, to_file=img_path)
+ 		return model
 
 
 
