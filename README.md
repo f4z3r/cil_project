@@ -20,3 +20,5 @@ The currently required libraries are the following:
   | utility.py      -> contains all utility functions
 - README.md         -> this file
 ```
+
+Please check the project and the issues for discussions.
