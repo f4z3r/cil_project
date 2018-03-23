@@ -27,7 +27,7 @@ def augment_img_set(path):
     Returns:
         Nothing.
     """
-    for file in glob.glob(os.path.join(path, "*.jpg")):
+    for file in glob.glob(os.path.join(path, "*.png")):
         filename_no_ext = "".join(os.path.basename(file).split(".")[:-1])
         filepath_no_ext = os.path.join(path, filename_no_ext)
         img = Image.open(file)
@@ -36,14 +36,14 @@ def augment_img_set(path):
         # Generate 3 rotated copies
         for idx in range(3):
             cpy_img = cpy_img.rotate(90)
-            cpy_img.save("{}_{}.jpg".format(filepath_no_ext, idx))
+            cpy_img.save("{}_{}.png".format(filepath_no_ext, idx))
 
         # Generate 4 rotated and flipped copies
         flip_img = img.transpose(Image.FLIP_TOP_BOTTOM)
-        flip_img.save("{}_{}.jpg".format(filepath_no_ext, 3))
+        flip_img.save("{}_{}.png".format(filepath_no_ext, 3))
         for idx in range(4, 7):
             flip_img = flip_img.rotate(90)
-            flip_img.save("{}_{}.jpg".format(filepath_no_ext, idx))
+            flip_img.save("{}_{}.png".format(filepath_no_ext, idx))
 
 def generate_patches_with_pad(img, size, stride, pad):
     """Creates patches of size (size + pad, size+ pad) pixels from image img and shifting by stride. Note that the
