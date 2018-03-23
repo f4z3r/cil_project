@@ -45,6 +45,9 @@ verbosity_group.add_argument("-v", "--verbose",
 verbosity_group.add_argument("-vv", "--very_verbose",
                     help="provide even more verbose output",
                     action="store_true")
+verbosity_group.add_argument("-q", "--quiet",
+                    help="provide next to no output to console",
+                    action="store_true")
 
 args = parser.parse_args()
 
@@ -73,8 +76,10 @@ if args.very_verbose:
     console.setLevel(logging.DEBUG)
 elif args.verbose:
     console.setLevel(logging.INFO)
-else:
+elif not args.quiet:
     console.setLevel(logging.WARNING)
+else:
+    console.setLevel(logging.ERROR)
 
 logger.addHandler(console)
 logger.addHandler(logfile)
@@ -111,7 +116,7 @@ if args.augment:
 if args.train:
     if args.model == "naive":
         model = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"))
-        model.train(args.verbose or args.very_verbose)
+        model.train(not args.quiet)
         model.save("first_test.h5")
 
 if args.run:

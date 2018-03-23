@@ -36,7 +36,7 @@ The currently required libraries are the following:
 
 ### Usage
 ```
-usage: run.py [-h] [-m {naive}] [-g] [-t] [-r] [-c] [-v | -vv]
+usage: run.py [-h] [-m {naive}] [-g] [-t] [-r] [-c] [-v | -vv | -q]
 
 Control program to launch all actions related to this project.
 
@@ -51,6 +51,7 @@ optional arguments:
                         additional optional arguments
   -v, --verbose         provide verbose output
   -vv, --very_verbose   provide even more verbose output
+  -q, --quiet           provide next to no output to console
 ```
 
 Right now simply run `run.py -v -g` in order to augment the training set on your local machine.
