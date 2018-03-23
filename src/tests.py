@@ -40,9 +40,9 @@ class TestUtilities(unittest.TestCase):
         with self.assertRaises(TypeError):
             utility.generate_patches_with_pad(img_fail, 2, 2, 0)
         # Check for grayscale image
-        patch_list_2d = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        patch_list_2d = [[[1]], [[2]], [[3]], [[4]], [[5]], [[6]], [[7]], [[8]], [[9]]]
         patch_list_2d_res = utility.generate_patches_with_pad(img_2d, 1, 1, 0)
-        self.assertEqual(patch_list_2d, patch_list_2d_res)
+        self.assertEqual(np.testing.assert_equal(patch_list_2d, patch_list_2d_res), None)
         # Check for RGB image
         patch_list_3d = [
             np.array([[[5,5,5], [4,4,4], [5,5,5]],
@@ -81,7 +81,7 @@ class TestModels(unittest.TestCase):
 
     def test_model_generation(self):
         """Test the model generations."""
-        cnn_model1 = cnn_lr_d.Model()
+        cnn_model1 = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"))
         self.assertNotEqual(cnn_model1, None)
 
 
