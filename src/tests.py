@@ -4,7 +4,7 @@
 
 import os, sys
 import unittest
-import glob
+import glob, logging
 import numpy as np
 
 import utility
@@ -79,5 +79,5 @@ class TestCnnModel(unittest.TestCase):
     """Class testing the CNN model."""
 
 
-if __name__ == "__main__":
-    unittest.main()
+def run():
+    unittest.main(module="tests")

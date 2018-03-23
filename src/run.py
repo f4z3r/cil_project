@@ -6,6 +6,7 @@ import logging
 
 
 import utility
+import tests
 
 
 ###########################################################################################
@@ -27,6 +28,10 @@ parser.add_argument("-t", "--train",
                     action="store_true")
 parser.add_argument("-r", "--run",
                     help="run a trained version of a given CNN",
+                    action="store_true")
+parser.add_argument("-c", "--code_check",
+                    help="run code tests, can be run only with unittest additional optional"
+                    " arguments",
                     action="store_true")
 
 
@@ -74,6 +79,13 @@ logger.addHandler(logfile)
 ###########################################################################################
 # RUN.PY: action implementation
 ###########################################################################################
+if args.code_check:
+    # Run code tests and exit
+    logger.info("Running tests ...")
+    tests.run()
+    sys.exit(0)
+
+
 if args.augment:
     # Augment data set
     if len(glob.glob(os.path.join(file_path, "../assets/training/data/*.png"))) == 100:

@@ -38,7 +38,7 @@ The currently required libraries are the following:
 
 ### Usage
 ```
-usage: run.py [-h] [-m {naive}] [-g] [-t] [-r] [-v | -vv]
+usage: run.py [-h] [-m {naive}] [-g] [-t] [-r] [-c] [-v | -vv]
 
 Control program to launch all actions related to this project.
 
@@ -49,6 +49,8 @@ optional arguments:
   -g, --augment         augment training image set
   -t, --train           train the given CNN
   -r, --run             run a trained version of a given CNN
+  -c, --code_check      run code tests, can be run only with unittest
+                        additional optional arguments
   -v, --verbose         provide verbose output
   -vv, --very_verbose   provide even more verbose output
 ```
