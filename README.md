@@ -19,9 +19,8 @@ The currently required libraries are the following:
   | - validation
   |   | - data      -> all validation imagery
   |   | - verify    -> verification images for validation
-  | - test
-  |   | - data      -> all test imagery
-  |   | - verify    -> verification images for test
+  | - tests
+  |   | all test cases used to check performance of solution
 - logs
   | run.log         -> log file for warning detection
 - papers
