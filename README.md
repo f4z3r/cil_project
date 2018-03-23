@@ -38,7 +38,7 @@ The currently required libraries are the following:
 
 ### Usage
 ```
-usage: run.py [-h] (-v | -vv) (-g | -t | -a | -u | -r) {naive}
+usage: run.py [-h] [-g] [-t] [-r] (-v | -vv) {naive}
 
 Control program to launch all actions related to this project.
 
@@ -47,13 +47,11 @@ positional arguments:
 
 optional arguments:
   -h, --help           show this help message and exit
-  -v, --verbose        provide verbose output
-  -vv, --very_verbose  provide even more verbose output
   -g, --augment        augment training image set
   -t, --train          train the given CNN
-  -a, --all            augment, train and run test for the given CNN
-  -u, --train_run      train and run test for the given CNN
-  -r, --run            run tests of a given CNN
+  -r, --run            run a trained version of a given CNN
+  -v, --verbose        provide verbose output
+  -vv, --very_verbose  provide even more verbose output
 ```
 
 Right now simply run `run.py -v -g naive` in order to augment the training set on your local machine.
