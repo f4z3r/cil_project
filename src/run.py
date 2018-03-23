@@ -82,6 +82,7 @@ logger.addHandler(logfile)
 if args.c:
     # Run code tests and exit
     logger.info("Running tests ...")
+    console.setLevel(logging.WARNING)
     tests.run()
     sys.exit(0)
 
