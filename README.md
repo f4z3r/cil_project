@@ -22,6 +22,8 @@ The currently required libraries are the following:
   | - test
   |   | - data      -> all test imagery
   |   | - verify    -> verification images for test
+- logs
+  | run.log         -> log file for warning detection
 - papers
   | all relevant papers for this project
 - src
@@ -53,4 +55,7 @@ optional arguments:
   -r, --run         run tests of a given CNN
 ```
 
+Right now simply run `run.py -v -g naive` in order to augment the training set on your local machine.
+
+### Discussions
 Please check the project and the issues for discussions.
