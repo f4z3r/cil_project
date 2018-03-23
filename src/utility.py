@@ -3,9 +3,11 @@
 """Utility module containing helper functions."""
 
 import numpy as np
-import os, sys, glob
+import os, sys, glob, logging
 import matplotlib.image as mpimg
 from PIL import Image
+
+logger = logging.getLogger("cil_project.utility")
 
 def load_image(filepath):
     """Loads an image from disk and return it as a 2D pixel array.
@@ -28,6 +30,8 @@ def augment_img_set(path):
         Nothing.
     """
     for file in glob.glob(os.path.join(path, "*.png")):
+        logger.info("Augmenting image: {}".format(file))
+
         filename_no_ext = "".join(os.path.basename(file).split(".")[:-1])
         filepath_no_ext = os.path.join(path, filename_no_ext)
         img = Image.open(file)
