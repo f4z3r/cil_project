@@ -4,7 +4,7 @@ from keras.models import Sequential
 from keras.layers.core import Dense,Dropout, Flatten
 import matplotlib.image as img
 import cv2
-
+from utility import *
 class CNN_keras:
 
     def __init__(self,network):
@@ -14,51 +14,45 @@ class CNN_keras:
 
     def preprocess_data(self):
 
-        self.processed_images=[]
+        self.images_filtered=[]
 
         for image in self.images:
 
-            #apply the 3x3 mean filter on the image"""
-            kernel = np.ones((3,3),np.float32)/9
-            processed_image = cv2.filter2D(image,-1,kernel)			
-            #display image"""
-            self.processed_images.append(processed_image)
-            #cv2.imshow('Mean Filter Processing', processed_image)
-            print(processed_image)
-
+            filtered_image=generate_patches_with_pad(image, 16, 16, 0)
+            self.images_filtered.append(filtered_image)
 
     def load_data(self):
 
-        #example for testing
+        """ Load data into array"""
         self.images=[]
-        image= img.imread("./assets/test/test_img.jpg")	
-        print (image.shape)
+        image= img.imread("../assets/test/test_img.jpg")	
+        print ("Original images are shaped ",image.shape)
         self.images.append(image)
-        #preprocess_data()
-        #run_model(self)
+        """for i=0;i<=6;i++:
+            image= img.imread("../assets/test/test_img"+i".jpg")
+            self.images.append(image)"""
 
-
-    def model_setup(input_data):
+    def model_setup(self):
 
         num_classes=2
-        input_data=self.processed_images[0]
+        input_data=self.images_filtered[0][0]
+        input_shape=input_data.shape
 
         self.filters=[]
         self.filters[0]=[16,16,3]
         self.filters[1]=[20,20,3]
 
-        input_shape=input_data.shape
 
         self.model= Sequential()
-        #Stacking first convolutional layer"""7
+        #Stacking first convolutional layer"""
         #self.model.add(convolution2D(64, self.filters[0], border_mode='same', input_shape=input_shape))
         #self.model.add(LeakyReLU(alpha=0.1))
         input_shape = Input(shape=(rows, cols, 1))
         #filter of different sizes to have higher final accuracy in classification
-        kernel_size=[]
-        kernel_size.add([16, 16, 3])
-        kernel_size.add([16,10,3])
-        kernel_size.add([16,20,3])
+        #kernel_size=[]
+        #kernel_size.add([16, 16, 3])
+        #kernel_size.add([16,10,3])
+        #kernel_size.add([16,20,3])
 
         nb_filters_convl_1=30
         nb_filters_convl_2=40
@@ -110,8 +104,8 @@ model=CNN_keras("CNN")
 model.load_data()
 #print(model.images)
 model.preprocess_data()
-print(model.processed_images[0].shape)
-#model.model_setup()
+print(model.images_filtered[0][0].shape)
+model.model_setup()
 
 
 
