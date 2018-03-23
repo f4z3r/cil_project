@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os, sys
 import argparse, glob
 import logging
 
@@ -13,11 +14,11 @@ import utility
 parser = argparse.ArgumentParser(description="Control program to launch all actions related to"
                                  " this project.")
 
-parser.add_argument("model", action="store",
+parser.add_argument("-m", "--model", action="store",
                     choices=["naive"],
                     default="naive",
                     type=str,
-                    help="The CNN model to be used")
+                    help="The CNN model to be used, defaults to naive")
 parser.add_argument("-g", "--augment",
                     help="augment training image set",
                     action="store_true")
@@ -29,7 +30,7 @@ parser.add_argument("-r", "--run",
                     action="store_true")
 
 
-verbosity_group = parser.add_mutually_exclusive_group(required=True)
+verbosity_group = parser.add_mutually_exclusive_group()
 verbosity_group.add_argument("-v", "--verbose",
                     help="provide verbose output",
                     action="store_true")
@@ -45,7 +46,8 @@ args = parser.parse_args()
 logger = logging.getLogger("cil_project")
 logger.setLevel(logging.DEBUG)
 console = logging.StreamHandler()
-logfile = logging.FileHandler("../logs/run.log", 'a')
+path = os.path.dirname(os.path.abspath(__file__))
+logfile = logging.FileHandler(os.path.join(path, "../logs/run.log"), 'a')
 console_formatter = logging.Formatter("%(message)s")
 logfile_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
@@ -62,7 +64,6 @@ else:
 
 logger.addHandler(console)
 logger.addHandler(logfile)
-
 
 ###########################################################################################
 # RUN.PY: action implementation
