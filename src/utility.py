@@ -25,9 +25,6 @@ def augment_img_set(path):
 
     Args:
         path (str): path to image folder.
-
-    Returns:
-        Nothing.
     """
     for file in glob.glob(os.path.join(path, "*.png")):
         logger.debug("Augmenting image: {}".format(file))
@@ -50,8 +47,9 @@ def augment_img_set(path):
             flip_img.save("{}_{}.png".format(filepath_no_ext, idx))
 
 def generate_patches_with_pad(img, size, stride, pad):
-    """Creates patches of size (size + pad, size+ pad) pixels from image img and shifting by stride. Note that the
-    stride is not allowed to be larger than size as this would entail missing pixels.
+    """Creates patches of size (size + 2 * pad, size + 2 * pad) pixels from image img and shifting
+    by stride. Note that the stride is not allowed to be larger than size as this would entail
+    missing pixels.
 
     Args:
         img (numpy.ndarray): the image used to generate the patches.
@@ -60,7 +58,7 @@ def generate_patches_with_pad(img, size, stride, pad):
         pad (int): padding to be added on each size of the patch.
 
     Returns:
-        [numpy.ndarray]: a list of pixel matrices corresponding to the patches.
+        numpy.ndarray: an array of pixel matrices corresponding to the patches.
     """
     assert stride <= size, "Stride should not be larger than size."
     patch_list = []
@@ -78,8 +76,47 @@ def generate_patches_with_pad(img, size, stride, pad):
     for h in range(pad, img_height + pad, stride):
         for w in range(pad, img_width + pad, stride):
             if len(img.shape) == 3:
-                patch = img_padded[h - pad: h + size + pad, w - pad: w + size + pad, :]
+                patch = img_padded[h - pad:h + size + pad, w - pad:w + size + pad, :]
             else:
-                patch = img_padded[h - pad: h + size + pad, w - pad: w + size + pad]
+                patch = img_padded[h - pad:h + size + pad, w - pad:w + size + pad]
             patch_list.append(patch)
-    return patch_list
+    return np.asarray(patch_list)
+
+def get_random_image_patch(img_path, size, stride, pad):
+    """Creates a random patches of size (size + 2 * pad, size + 2 * pad) pixels from image in
+    img_path and returns it with the corresponding verification patch.
+
+    Args:
+        img_path (str): path to training data sets.
+        size (int): the size of interior window of the patches.
+        stride (int): the amount of pixels to shift between patches.
+        pad (int): padding to be added on each size of the patch.
+
+    Returns:
+        numpy.ndarray: the patch with padding.
+        numpy.ndarray: the corresponding verifier patch (note this has total size (size x size).
+    """
+    assert stride <= size, "Stride should not be larger than size."
+    data_file = np.random.choice(glob.glob(os.path.join(img_path, "*.png")))
+    verifier_file = data_file.replace("assets/trainig/data", "assets/trainig/verify")
+    data_img = load_image(data_file)
+    verifier_img = load_image(verifier_file)
+
+    if len(data_img.shape) == 3:
+        img_padded = np.pad(data_img, ((pad, pad), (pad, pad), (0,0)), mode="reflect")
+    elif len(data_img.shape) == 2:
+        img_padded = np.pad(data_img, ((pad, pad), (pad, pad)), mode="reflect")
+    else:
+        raise TypeError("The image provided should be a 2 or 3 dimensional array.")
+
+    h = np.random.choice(data_img.shape[1]) // stride
+    w = np.random.choice(data_img.shape[0]) // stride
+
+    if len(img.shape) == 3:
+        data_patch = img_padded[h - pad:h + size + pad, w - pad:w + size + pad, :]
+    else:
+        data_patch = img_padded[h - pad:h + size + pad, w - pad:w + size + pad]
+
+    verifier_patch = verifier_img[h:h + size, w:w + size]
+
+    return data_patch, verifier_patch
