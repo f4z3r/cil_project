@@ -27,6 +27,8 @@ The currently required libraries are the following:
 - src
   | test.py         -> contains all unit tests
   | utility.py      -> contains all utility functions
+  | cnn_model.py    -> the CNN model
+  | run.py          -> control file used to launch the application
 - README.md         -> this file
 ```
 
