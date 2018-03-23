@@ -30,7 +30,7 @@ def augment_img_set(path):
         Nothing.
     """
     for file in glob.glob(os.path.join(path, "*.png")):
-        logger.info("Augmenting image: {}".format(file))
+        logger.debug("Augmenting image: {}".format(file))
 
         filename_no_ext = "".join(os.path.basename(file).split(".")[:-1])
         filepath_no_ext = os.path.join(path, filename_no_ext)

@@ -12,14 +12,20 @@ import utility
 ###########################################################################################
 parser = argparse.ArgumentParser(description="Control program to launch all actions related to"
                                  " this project.")
-parser.add_argument("-v", "--verbose",
-                    help="provide verbose output",
-                    action="store_true")
+
 parser.add_argument("model", action="store",
                     choices=["naive"],
                     default="naive",
                     type=str,
                     help="The CNN model to be used")
+
+verbosity_group = parser.add_mutually_exclusive_group(required=True)
+verbosity_group.add_argument("-v", "--verbose",
+                    help="provide verbose output",
+                    action="store_true")
+verbosity_group.add_argument("-vv", "--very_verbose",
+                    help="provide even more verbose output",
+                    action="store_true")
 
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-g", "--augment",
@@ -54,7 +60,9 @@ console.setFormatter(console_formatter)
 logfile.setFormatter(logfile_formatter)
 
 logfile.setLevel(logging.WARNING)
-if args.verbose:
+if args.very_verbose:
+    console.setLevel(logging.DEBUG)
+elif args.verbose:
     console.setLevel(logging.INFO)
 else:
     console.setLevel(logging.WARNING)
