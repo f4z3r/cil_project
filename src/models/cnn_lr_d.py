@@ -14,6 +14,8 @@ import utility
 
 logger = logging.getLogger("cil_project.models.cnn_lr_d")
 
+file_path = os.path.dirname(os.path.abspath(__file__))
+
 class Model:
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
@@ -96,30 +98,53 @@ class Model:
 
         logger.info("Done")
 
-    def train(self, data, verifier):
+    def train(self, verbosity):
         """Train the model.
 
         Args:
-            data (numpy.ndarray): input data to the model.
-            verifier (numpy.ndarray): verifier data for the model.
+            verbosity (bool): if the training should be verbose.
         """
         logger.info("Preparing training ...")
+        if verbosity:
+            verbosity = 1
+        else:
+            verbosity = 0
 
         self.model.compile(loss=keras.losses.categorical_crossentropy,
                            optimizer=keras.optimizers.Adam,
                            metrics=["accuracy"])
 
-        # TODO finish
+        lr_callback = keras.callbacks.ReduceLROnPlateau(monitor="acc",
+                                                        factor=0.5,
+                                                        patience=0.5,
+                                                        verbose=0,
+                                                        epsilon=0.0001,
+                                                        cooldoan=0,
+                                                        min_lr=0)
+        stop_callback = keras.callbacks.EarlyStopping(monitor="acc",
+                                                      min_delta=0.0001,
+                                                      patience=11,
+                                                      verbose=0,
+                                                      mode="auto")
+
+        logger.info("Starting training ...")
+
+        try:
+            self.model.fit_generator(self._create_batch(),
+                                     samples_per_epoch=250_000,     # 25 x 25 x 400
+                                     verbose=verbosity,
+                                     callbacks=[lr_callback, stop_callback])
+        except KeyboardInterrupt:
+            pass
+
+        logger.info("Training completed")
 
 
-
-    def _create_batch(self, batch_size, data, verifier):
+    def _create_batch(self, batch_size=100):
         """Create a batch to feed to the neural network for training.
 
         Args:
             batch_size (int): size of each batch.
-            data (numpy.ndarray): input data to create batch.
-            verifier (numpy.ndarray): verifier data to create batch.
         """
         while True:
             batch_data = np.empty((batch_size, self.window_size, self.window_size, 3))
@@ -140,3 +165,10 @@ class Model:
             yield (batch_data, verifier_data)
 
 
+    def save(self, filename):
+        """Save the weights of the trained model.
+
+        Args:
+            filename (str): filename for the weights.
+        """
+        self.model.save_weights(os.path.join(file_path, "../../results/weights", filename))
