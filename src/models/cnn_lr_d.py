@@ -110,8 +110,9 @@ class Model:
         else:
             verbosity = 0
 
+        optimiser = keras.optimizers.Adam()
         self.model.compile(loss=keras.losses.categorical_crossentropy,
-                           optimizer=keras.optimizers.Adam,
+                           optimizer=optimiser,
                            metrics=["accuracy"])
 
         lr_callback = keras.callbacks.ReduceLROnPlateau(monitor="acc",
@@ -119,7 +120,7 @@ class Model:
                                                         patience=0.5,
                                                         verbose=0,
                                                         epsilon=0.0001,
-                                                        cooldoan=0,
+                                                        cooldown=0,
                                                         min_lr=0)
         stop_callback = keras.callbacks.EarlyStopping(monitor="acc",
                                                       min_delta=0.0001,
@@ -131,7 +132,7 @@ class Model:
 
         try:
             self.model.fit_generator(self._create_batch(),
-                                     samples_per_epoch=250_000,     # 25 x 25 x 400
+                                     steps_per_epoch=250_000,     # 25 x 25 x 400
                                      verbose=verbosity,
                                      callbacks=[lr_callback, stop_callback])
         except KeyboardInterrupt:
@@ -148,7 +149,7 @@ class Model:
         """
         while True:
             batch_data = np.empty((batch_size, self.window_size, self.window_size, 3))
-            batch_verifier = np.empty((batch_size))
+            batch_verifier = np.empty((batch_size, 2))
 
             for idx in range(batch_size):
                 data_patch, verifier_patch = utility.get_random_image_patch(self.train_path,
@@ -156,13 +157,14 @@ class Model:
                                                                             self.patch_size,
                                                                             self.context_padding)
                 label = (np.mean(verifier_patch) > 0.25) * 1
+                label = keras.utils.to_categorical(label, num_classes=2)
                 batch_data[idx] = data_patch
                 batch_verifier[idx] = label
 
             if keras.backend.image_dim_ordering() == "th":
                 batch_data = np.rollaxis(batch_data, 3, 1)
 
-            yield (batch_data, verifier_data)
+            yield (batch_data, batch_verifier)
 
 
     def save(self, filename):
@@ -172,3 +174,4 @@ class Model:
             filename (str): filename for the weights.
         """
         self.model.save_weights(os.path.join(file_path, "../../results/weights", filename))
+        logger.info("Weights saved to results/weights/{}".format(filename))

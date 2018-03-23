@@ -109,14 +109,14 @@ def get_random_image_patch(img_path, size, stride, pad):
     else:
         raise TypeError("The image provided should be a 2 or 3 dimensional array.")
 
-    h = np.random.choice(data_img.shape[1]) // stride
-    w = np.random.choice(data_img.shape[0]) // stride
+    h = (np.random.choice(data_img.shape[1]) // stride) * stride + pad
+    w = (np.random.choice(data_img.shape[0]) // stride) * stride + pad
 
-    if len(img.shape) == 3:
+    if len(data_img.shape) == 3:
         data_patch = img_padded[h - pad:h + size + pad, w - pad:w + size + pad, :]
     else:
         data_patch = img_padded[h - pad:h + size + pad, w - pad:w + size + pad]
 
-    verifier_patch = verifier_img[h:h + size, w:w + size]
+    verifier_patch = verifier_img[h - pad:h + size - pad, w - pad:w + size - pad]
 
     return data_patch, verifier_patch

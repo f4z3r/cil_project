@@ -7,8 +7,10 @@ import logging
 
 import utility
 import tests
-import models
+from models import cnn_lr_d
 
+# Remove tensorflow CPU instruction information.
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 ###########################################################################################
 # USAGE: argument parser
@@ -107,8 +109,10 @@ if args.augment:
 
 
 if args.train:
-    # Train CNN model
-    logger.warning("Training is not implemented yet")
+    if args.model == "naive":
+        model = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"))
+        model.train(args.verbose or args.very_verbose)
+        model.save("first_test.h5")
 
 if args.run:
     # Test CNN model
