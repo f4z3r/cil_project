@@ -79,7 +79,3 @@ def generate_patches_with_pad(img, size, stride, pad):
                 patch = img_padded[h - pad: h + size + pad, w - pad: w + size + pad]
             patch_list.append(patch)
     return patch_list
-
-
-
-

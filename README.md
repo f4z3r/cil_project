@@ -11,8 +11,17 @@ The currently required libraries are the following:
 ### Project Structure
 ```
 - assets
-  | - test
+  | - testing
   |   | all data required for testing
+  | - training
+  |   | - data      -> all training imagery
+  |   | - verify    -> verification images for training
+  | - validation
+  |   | - data      -> all validation imagery
+  |   | - verify    -> verification images for validation
+  | - test
+  |   | - data      -> all test imagery
+  |   | - verify    -> verification images for test
 - papers
   | all relevant papers for this project
 - src
