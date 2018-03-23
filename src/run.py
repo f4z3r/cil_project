@@ -43,11 +43,12 @@ args = parser.parse_args()
 ###########################################################################################
 # LOGGER: Setup
 ###########################################################################################
+file_path = os.path.dirname(os.path.abspath(__file__))
+
 logger = logging.getLogger("cil_project")
 logger.setLevel(logging.DEBUG)
 console = logging.StreamHandler()
-path = os.path.dirname(os.path.abspath(__file__))
-logfile = logging.FileHandler(os.path.join(path, "../logs/run.log"), 'a')
+logfile = logging.FileHandler(os.path.join(file_path, "../logs/run.log"), 'a')
 console_formatter = logging.Formatter("%(message)s")
 logfile_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
@@ -72,14 +73,14 @@ if args.augment:
     # Augment data set
     if len(glob.glob("../assets/training/data/*.png")) == 100:
         logger.info("Augmenting training data ...")
-        utility.augment_img_set("../assets/training/data")
+        utility.augment_img_set(os.path.join(file_path, "../assets/training/data"))
     else:
         logger.warning("Skipped. Please ensure only the 100 original images are contained in the"
                        " `assets/training/data` folder")
 
     if len(glob.glob("../assets/training/verify/*.png")) == 100:
         logger.info("Augmenting training verification data ...")
-        utility.augment_img_set("../assets/training/verify")
+        utility.augment_img_set(os.path.join(file_path, "../assets/training/verify"))
     else:
         logger.warning("Skipped. Please ensure only the 100 original images are contained in the"
                        " `assets/training/data` folder")
