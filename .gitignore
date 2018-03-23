@@ -3,4 +3,4 @@ __pycache__/
 *.pyc
 assets/training/data/*.png
 assets/training/verify/*.png
-logs/run.log
+logs/*.log

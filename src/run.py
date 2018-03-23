@@ -45,6 +45,11 @@ args = parser.parse_args()
 ###########################################################################################
 file_path = os.path.dirname(os.path.abspath(__file__))
 
+try:
+    os.mkdir(os.path.join(file_path, "../logs"))
+except OSError:
+    pass
+
 logger = logging.getLogger("cil_project")
 logger.setLevel(logging.DEBUG)
 console = logging.StreamHandler()
