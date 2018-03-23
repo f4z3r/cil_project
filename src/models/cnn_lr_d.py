@@ -136,9 +136,9 @@ class Model:
                                      verbose=verbosity,
                                      callbacks=[lr_callback, stop_callback])
         except KeyboardInterrupt:
-            pass
-
-        logger.info("Training completed")
+            logger.warning("\nTraining interrupted")
+        else:
+            logger.info("Training completed")
 
 
     def _create_batch(self, batch_size=100):
