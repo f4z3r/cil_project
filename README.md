@@ -5,7 +5,7 @@ The currently required libraries are the following:
 
 - `numpy`
 - `matplotlib`
-- `tensorflow` or `theano` or `keras` (Francesco)
+- `keras` (dependent on `tensorflow` and `h5py`)
 - Pillow for `PIL`
 
 ### Project Structure
