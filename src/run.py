@@ -71,14 +71,14 @@ logger.addHandler(logfile)
 ###########################################################################################
 if args.augment:
     # Augment data set
-    if len(glob.glob("../assets/training/data/*.png")) == 100:
+    if len(glob.glob(os.path.join(file_path, "../assets/training/data/*.png"))) == 100:
         logger.info("Augmenting training data ...")
         utility.augment_img_set(os.path.join(file_path, "../assets/training/data"))
     else:
         logger.warning("Skipped. Please ensure only the 100 original images are contained in the"
                        " `assets/training/data` folder")
 
-    if len(glob.glob("../assets/training/verify/*.png")) == 100:
+    if len(glob.glob(os.path.join(file_path, "../assets/training/verify/*.png"))) == 100:
         logger.info("Augmenting training verification data ...")
         utility.augment_img_set(os.path.join(file_path, "../assets/training/verify"))
     else:
