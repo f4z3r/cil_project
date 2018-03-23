@@ -8,6 +8,7 @@ import glob, logging
 import numpy as np
 
 import utility
+from models import cnn_lr_d
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -75,8 +76,15 @@ class TestUtilities(unittest.TestCase):
         patch_list_3d_res = utility.generate_patches_with_pad(img_3d, 1, 1, 1)
         self.assertEqual(np.testing.assert_equal(patch_list_3d, patch_list_3d_res), None)
 
-class TestCnnModel(unittest.TestCase):
-    """Class testing the CNN model."""
+class TestModels(unittest.TestCase):
+    """Class testing the models."""
+
+    def test_model_generation(self):
+        """Test the model generations."""
+        cnn_model1 = cnn_lr_d.Model()
+        self.assertNotEqual(cnn_model1, None)
+
+
 
 
 def run():

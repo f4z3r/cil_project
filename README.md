@@ -47,7 +47,7 @@ optional arguments:
   -g, --augment         augment training image set
   -t, --train           train the given CNN
   -r, --run             run a trained version of a given CNN
-  -c, --code_check      run code tests, can be run only with unittest
+  -c                    run code tests, can be run only with unittest
                         additional optional arguments
   -v, --verbose         provide verbose output
   -vv, --very_verbose   provide even more verbose output

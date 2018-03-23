@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 -W ignore::DeprecationWarning
 
 import os, sys
 import argparse, glob
@@ -29,7 +29,7 @@ parser.add_argument("-t", "--train",
 parser.add_argument("-r", "--run",
                     help="run a trained version of a given CNN",
                     action="store_true")
-parser.add_argument("-c", "--code_check",
+parser.add_argument("-c",
                     help="run code tests, can be run only with unittest additional optional"
                     " arguments",
                     action="store_true")
@@ -79,7 +79,7 @@ logger.addHandler(logfile)
 ###########################################################################################
 # RUN.PY: action implementation
 ###########################################################################################
-if args.code_check:
+if args.c:
     # Run code tests and exit
     logger.info("Running tests ...")
     tests.run()
