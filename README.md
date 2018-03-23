@@ -29,6 +29,8 @@ The currently required libraries are the following:
   | utility.py      -> contains all utility functions
   | cnn_model.py    -> the CNN model
   | run.py          -> control file used to launch the application
+  | - models        -> all CNN models implemented
+  |   | cnn_model.py
 - README.md         -> this file
 ```
 
