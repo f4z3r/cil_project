@@ -58,46 +58,53 @@ class CNN_keras:
         nb_filters_convl_2=40
         nb_filters_convl_3=20
 
-        max_pooling_window=[1,8,1]
+        max_pooling_window=[4,4,30]
         #keras.layers.Conv3D(filters, kernel_size, strides=(1, 1, 1), padding='valid', data_format=None, dilation_rate=(1, 1, 1), activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-        channel_1 = Conv3D(nb_filters_convl_1, kernel_size[0], padding='same', activation='relu', strides=1)(input_shape) 
+        channel_1 = Conv3D(nb_filters_convl_1, input_shape, padding='same', activation='relu', strides=1)(input_shape) 
         #z1_1=[[(800-kernel_size(0,0)]/stride)+1,([800-kernel_size(0,1)]/stride)+1,([3-kernel_size(0,2)]/stride)+1]
         channel_1 = MaxPooling3D(max_pooling_window, strides=(1, 1), padding='same')(channel_1)
 
-        max_pooling_window2=max_pooling_window
-        max_pooling_window2[1]=max_pooling_window+kernel_size[0][1]-kernel_size[1][1]
-        channel_2 = Conv3D(nb_filters_convl_1, kernel_size[1], padding='same', activation='relu', strides=1)(input_shape)
-        channel_2 = MaxPooling3D((1, max_pooling_window2), strides=(1, 1), padding='same')(channel_2)
+        #max_pooling_window2=max_pooling_window
+        #max_pooling_window2[1]=max_pooling_window+kernel_size[0][1]-kernel_size[1][1]
+        #channel_2 = Conv3D(nb_filters_convl_1, input_shape, padding='same', activation='relu', strides=1)(input_shape)
+        #channel_2 = MaxPooling3D((1, max_pooling_window2), strides=(1, 1), padding='same')(channel_2)
 
-        max_pooling_window3=max_pooling_window
-        max_pooling_window3[1]=max_pooling_window[0][1]+kernel_size[0][1]-kernel_size[2][1]
-        channel_3 = Conv3D(nb_filters_convl_1, kernel_size[2], padding='same', activation='relu',strides=1)(input_shape)
-        channel_3 = MaxPooling3D((1, max_pooling_window3), strides=(1, 1), padding='same')(channel_3)
+        #max_pooling_window3=max_pooling_window
+        #max_pooling_window3[1]=max_pooling_window[0][1]+kernel_size[0][1]-kernel_size[2][1]
+        #channel_3 = Conv3D(nb_filters_convl_1, kernel_size[2], padding='same', activation='relu',strides=1)(input_shape)
+        #channel_3 = MaxPooling3D((1, max_pooling_window3), strides=(1, 1), padding='same')(channel_3)
 
         #the three differently filtered inputs concatenated
-        merged = keras.layers.concatenate([channel_1, channel_2, channel_3], axis=1)
-        print("merged shape ",merged.shape)
+        #merged = keras.layers.concatenate([channel_1, channel_2, channel_3], axis=1)
+        #print("merged shape ",merged.shape)
 
-        self.model.add(merged)
+        #self.model.add(merged)
+        self.model.add(channel_1)
         self.model.add(Dropout(0.25))
         self.model.add(LeakyReLU(alpha=0.1))
 
-        #z1_dimensions=?
-        self.model.add(Convolution3D(nb_filters_convl_2,kernel_size[1],border_mode='same'))
-        self.model.add(LeakyReLU(alpha=0.1))
-        self.model.add(MaxPooling2D(pool_size=pool_size, border_mode='same'))
-        self.model.add(Dropout(0.25))
+        #z1_dimensions=channel_1._keras_shape
+        #max_pooling_window=[4,4,40]
+        #self.model.add(Convolution3D(nb_filters_convl_2,[3,3,1],border_mode='same'))
+        #self.model.add(LeakyReLU(alpha=0.1))
+        #self.model.add(MaxPooling3D(pool_size=max_pooling_window, border_mode='same'))
+        #self.model.add(Dropout(0.25))
 
         #vectorize all the previous multidimensional output to input everythong nto a dense final layer
         self.model.add(Flatten())
 
         out = Dense(input_to_be_determined, activation='relu')
         out = Dense(num_classes, activation='softmax')(out)
-
-        model = Model(input_shape, out)
-        plot_model(model, to_file=img_path)
+        self.model.add(input_shap,out)
+        # Compile model
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        #model = Model(input_shape, out)
+        plot_model(self.model, to_file=img_path)
         return model
 
+        def fit_model(self):
+
+        	self.model.fit(self.images[0], Y, epochs=150, batch_size=10)
 
 
 model=CNN_keras("CNN")
