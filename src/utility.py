@@ -97,7 +97,6 @@ def get_random_image_patch(data_img, verifier_img, size, stride, pad):
         numpy.ndarray: the patch with padding.
         numpy.ndarray: the corresponding verifier patch (note this has total size (size x size).
     """
-    assert stride <= size, "Stride should not be larger than size."
 
     if len(data_img.shape) == 3:
         img_padded = np.pad(data_img, ((pad, pad), (pad, pad), (0,0)), mode="reflect")
@@ -126,9 +125,15 @@ def load_training_set(img_path):
         path (str): path to the training set. Note that the folder structure must follow the
                     guidelines given in README.md.
     """
+    logger.info("Loading image sets into memory ...")
     data_files = glob.glob(os.path.join(img_path, "*.png"))
     image_count = len(data_files)
     first = load_image(data_files[0])
+
+    logger.info("Found {} images with {}x{} resolution.".format(image_count,
+                                                                first.shape[1],
+                                                                first.shape[0]))
+
     data_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
     verifier_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
 
@@ -137,6 +142,10 @@ def load_training_set(img_path):
         verifier_file = file.replace(os.path.normpath("assets/trainig/data"),
                                      os.path.normpath("assets/trainig/verify"))
         verifier_set[idx] = load_image(verifier_file)
+
+        logger.debug("Loading image {}".format(file))
+
+    logger.info("Done")
 
     return data_set, verifier_set
 
