@@ -63,12 +63,7 @@ def generate_patches_with_pad(img, size, stride, pad):
     assert stride <= size, "Stride should not be larger than size."
     patch_list = []
 
-    if len(img.shape) == 3:
-        img_padded = np.pad(img, ((pad, pad), (pad, pad), (0,0)), mode="reflect")
-    elif len(img.shape) == 2:
-        img_padded = np.pad(img, ((pad, pad), (pad, pad)), mode="reflect")
-    else:
-        raise TypeError("The image provided should be a 2 or 3 dimensional array.")
+    img_padded = pad_image(img, pad)
 
     img_width = img.shape[0]
     img_height = img.shape[1]
@@ -97,13 +92,7 @@ def get_random_image_patch(data_img, verifier_img, size, stride, pad):
         numpy.ndarray: the patch with padding.
         numpy.ndarray: the corresponding verifier patch (note this has total size (size x size).
     """
-
-    if len(data_img.shape) == 3:
-        img_padded = np.pad(data_img, ((pad, pad), (pad, pad), (0,0)), mode="reflect")
-    elif len(data_img.shape) == 2:
-        img_padded = np.pad(data_img, ((pad, pad), (pad, pad)), mode="reflect")
-    else:
-        raise TypeError("The image provided should be a 2 or 3 dimensional array.")
+    img_padded = pad_image(data_img, pad)
 
     h = (np.random.choice(data_img.shape[1]) // stride) * stride + pad
     w = (np.random.choice(data_img.shape[0]) // stride) * stride + pad
@@ -151,9 +140,29 @@ def load_training_set(img_path):
     return data_set, verifier_set
 
 
+def pad_image(img, pad):
+    """Pad image `img` by padding `pad`.
+
+    Args:
+        img (numpy.ndarray): the image to be padded.
+        pad (int): the padding to be added on each side of the image.
+    """
+    assert pad >= 0, "Padding should be positive."
+
+    if len(img.shape) == 3:
+        img_padded = np.pad(img, ((pad, pad), (pad, pad), (0,0)), mode="reflect")
+    elif len(img.shape) == 2:
+        img_padded = np.pad(img, ((pad, pad), (pad, pad)), mode="reflect")
+    else:
+        raise TypeError("The image provided should be a 2 or 3 dimensional array.")
+
+    return img_padded
 
 
 
+####################################################################################################
+# PROGRESS BAR
+####################################################################################################
 class ProgressBar:
     """
     Object that when printed to the terminal window prints a progress bar.
