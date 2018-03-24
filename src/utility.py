@@ -159,24 +159,22 @@ class ProgressBar:
     Object that when printed to the terminal window prints a progress bar.
 
     Available methods:
-        - __init__(total, prefix='', suffix='', decimals=1, length=50,
-                   fill='█')
+        - __init__(total, prefix='', suffix='', decimals=1, length=50, fill='█')
         - print()
         - increment()
         - inc_and_print()
     """
-    def __init__(self, total, prefix='', suffix='', decimals=1, length=50,
-        fill='█'):
+    def __init__(self, total, prefix='', suffix='', decimals=1, length=50, fill='█'):
         """
         Creates a ProgressBar object.
 
         Args:
-            (int)total:     (required) Total iterations.
-            (str)prefix:    (default: '') Prefix string.
-            (str)suffix:    (default: '') Suffix string
-            (int)decimals:  (default: 1) Percentage precision parameter.
-            (int)length     (default: 50) Character length of bar.
-            (str)fill:      (default: '█') Bar fill character.
+            total (int): Total iterations.
+            prefix (str): (default: '') Prefix string.
+            suffix (str): (default: '') Suffix string
+            decimals (int): (default: 1) Percentage precision parameter.
+            length (int): (default: 50) Character length of bar.
+            fill (str): (default: '█') Bar fill character.
         """
         self._iteration = 0
         self._total = total
