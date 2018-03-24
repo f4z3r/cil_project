@@ -37,6 +37,9 @@ class Model:
         self.context_padding = context_padding
         self.window_size = patch_size + 2 * context_padding
 
+        # Preload the images
+        self.data_set, self.verifier_set = utility.load_training_set(self.train_path)
+
         # The following can be set using a config file in ~/.keras/keras.json
         if keras.backend.image_dim_ordering() == "tf":
             # Keras is using Tensorflow as backend
@@ -104,7 +107,7 @@ class Model:
         Args:
             verbosity (bool): if the training should be verbose.
         """
-        logger.info("Preparing training ...")
+        logger.info("Preparing training, compiling model ...")
         if verbosity:
             verbosity = 1
         else:
@@ -148,21 +151,18 @@ class Model:
         Args:
             batch_size (int): size of each batch.
         """
-        # Preload the images
-        data_set, verifier_set = utility.load_training_set(self.train_path)
-
         while True:
             batch_data = np.empty((batch_size, self.window_size, self.window_size, 3))
             batch_verifier = np.empty((batch_size, 2))
 
             for idx in range(batch_size):
-                img_num = np.random.choice(data_set.shape[0])
-                data_patch, verifier_patch = utility.get_random_image_patch(data_set[img_num],
-                                                                            verifier_set[img_num],
-                                                                            self.patch_size,
-                                                                            self.patch_size,
-                                                                            self.context_padding)
-                label = (np.mean(verifier_patch) > 0.25) * 1
+                img_num = np.random.choice(self.data_set.shape[0])
+                data_patch, veri_patch = utility.get_random_image_patch(self.data_set[img_num],
+                                                                        self.verifier_set[img_num],
+                                                                        self.patch_size,
+                                                                        self.patch_size,
+                                                                        self.context_padding)
+                label = (np.mean(veri_patch) > 0.25) * 1
                 label = keras.utils.to_categorical(label, num_classes=2)
                 batch_data[idx] = data_patch
                 batch_verifier[idx] = label

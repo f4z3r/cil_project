@@ -118,7 +118,8 @@ if args.augment:
 
 if args.train:
     if args.model == "naive":
-        model = cnn_lr_d.Model(os.path.join(os.path.dirname(file_path), os.path.normpath("assets/training/data")))
+        model = cnn_lr_d.Model(os.path.join(os.path.dirname(file_path),
+                                            os.path.normpath("assets/training/data")))
         model.train(not args.quiet)
         model.save("first_test.h5")
 

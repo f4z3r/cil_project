@@ -137,16 +137,80 @@ def load_training_set(img_path):
     data_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
     verifier_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
 
+    prog_bar = ProgressBar(image_count)
+    prog_bar.print()
+
     for idx, file in enumerate(data_files):
         data_set[idx] = load_image(file)
         verifier_file = file.replace(os.path.normpath("assets/trainig/data"),
                                      os.path.normpath("assets/trainig/verify"))
         verifier_set[idx] = load_image(verifier_file)
 
-        logger.debug("Loading image {}".format(file))
-
-    logger.info("Done")
+        prog_bar.inc_and_print()
 
     return data_set, verifier_set
 
 
+
+
+
+class ProgressBar:
+    """
+    Object that when printed to the terminal window prints a progress bar.
+
+    Available methods:
+        - __init__(total, prefix='', suffix='', decimals=1, length=50,
+                   fill='█')
+        - print()
+        - increment()
+        - inc_and_print()
+    """
+    def __init__(self, total, prefix='', suffix='', decimals=1, length=50,
+        fill='█'):
+        """
+        Creates a ProgressBar object.
+
+        Args:
+            (int)total:     (required) Total iterations.
+            (str)prefix:    (default: '') Prefix string.
+            (str)suffix:    (default: '') Suffix string
+            (int)decimals:  (default: 1) Percentage precision parameter.
+            (int)length     (default: 50) Character length of bar.
+            (str)fill:      (default: '█') Bar fill character.
+        """
+        self._iteration = 0
+        self._total = total
+        self._prefix = prefix
+        self._suffix = suffix
+        self._decimals = decimals
+        self._length = length
+        self._fill = fill
+
+    def print(self):
+        """
+        Prints the progress bar. Note that the cursor is moved back to
+        the beginning of the line to overwrite the progress bar next time it is
+        printed.
+        """
+        percent = ("{0:." + str(self._decimals) + "f}").format(100 *
+                  (self._iteration / float(self._total)))
+        filled_length = int(self._length * self._iteration // self._total)
+        bar = self._fill * filled_length + '-' * (self._length - filled_length)
+        print('\r%s |%s| %s%% %s' % (self._prefix, bar, percent, self._suffix), end = '\r')
+
+        # Print New Line on complete
+        if self._iteration >= self._total:
+            print()
+
+    def increment(self):
+        """
+        Increments the iteration.
+        """
+        self._iteration += 1
+
+    def inc_and_print(self):
+        """
+        Increments the iteration and prints the progress bar to the screen.
+        """
+        self.increment()
+        self.print()
