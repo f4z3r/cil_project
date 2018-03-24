@@ -104,6 +104,11 @@ def _setup_logger(args=None):
 
 ###########################################################################################
 # Functions for jupyter notebook
+
+
+# This is not required
+
+# Simply write `%run run.py -t -v` to train network in the jupyter notebook.
 ###########################################################################################
 
 def train(model, verbosity=1):
@@ -113,6 +118,9 @@ def train(model, verbosity=1):
         model (str): the model to train. Use `run.py -h` to see available models.
         verbosity (int): default=1 - verbosity of output
     """
+    import utility
+    import tests
+    from models import cnn_lr_d
 
     # Initialise logger
     logger = _setup_logger()
