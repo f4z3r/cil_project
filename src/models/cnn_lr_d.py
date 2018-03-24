@@ -131,10 +131,11 @@ class Model:
         logger.info("Starting training ...")
 
         try:
-            self.model.fit_generator(self._create_batch(),
+            hist = self.model.fit_generator(self._create_batch(),
                                      steps_per_epoch=2500,     # 25 x 25 x 400 / 100
                                      verbose=verbosity,
                                      callbacks=[lr_callback, stop_callback])
+            print(hist.history)
         except KeyboardInterrupt:
             logger.warning("\nTraining interrupted")
         else:
