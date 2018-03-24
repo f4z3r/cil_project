@@ -5,7 +5,7 @@ import numpy as np
 
 # Silence import message
 stderr = sys.stderr
-sys.stderr = open('/dev/null', 'w')
+#sys.stderr = open(os.devnull, 'w')
 import keras
 sys.stderr = stderr
 

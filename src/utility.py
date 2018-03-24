@@ -98,7 +98,7 @@ def get_random_image_patch(img_path, size, stride, pad):
     """
     assert stride <= size, "Stride should not be larger than size."
     data_file = np.random.choice(glob.glob(os.path.join(img_path, "*.png")))
-    verifier_file = data_file.replace("assets/trainig/data", "assets/trainig/verify")
+    verifier_file = data_file.replace(os.path.normpath("assets/trainig/data"), os.path.normpath("assets/trainig/verify"))
     data_img = load_image(data_file)
     verifier_img = load_image(verifier_file)
 
