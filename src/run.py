@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 -W ignore::DeprecationWarning
 
 import os, sys
 import argparse, glob
@@ -7,7 +7,10 @@ import logging
 
 import utility
 import tests
+from models import cnn_lr_d
 
+# Remove tensorflow CPU instruction information.
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 ###########################################################################################
 # USAGE: argument parser
@@ -29,7 +32,7 @@ parser.add_argument("-t", "--train",
 parser.add_argument("-r", "--run",
                     help="run a trained version of a given CNN",
                     action="store_true")
-parser.add_argument("-c", "--code_check",
+parser.add_argument("-c",
                     help="run code tests, can be run only with unittest additional optional"
                     " arguments",
                     action="store_true")
@@ -41,6 +44,9 @@ verbosity_group.add_argument("-v", "--verbose",
                     action="store_true")
 verbosity_group.add_argument("-vv", "--very_verbose",
                     help="provide even more verbose output",
+                    action="store_true")
+verbosity_group.add_argument("-q", "--quiet",
+                    help="provide next to no output to console",
                     action="store_true")
 
 args = parser.parse_args()
@@ -70,8 +76,10 @@ if args.very_verbose:
     console.setLevel(logging.DEBUG)
 elif args.verbose:
     console.setLevel(logging.INFO)
-else:
+elif not args.quiet:
     console.setLevel(logging.WARNING)
+else:
+    console.setLevel(logging.ERROR)
 
 logger.addHandler(console)
 logger.addHandler(logfile)
@@ -79,9 +87,10 @@ logger.addHandler(logfile)
 ###########################################################################################
 # RUN.PY: action implementation
 ###########################################################################################
-if args.code_check:
+if args.c:
     # Run code tests and exit
     logger.info("Running tests ...")
+    console.setLevel(logging.WARNING)
     tests.run()
     sys.exit(0)
 
@@ -105,8 +114,10 @@ if args.augment:
 
 
 if args.train:
-    # Train CNN model
-    logger.warning("Training is not implemented yet")
+    if args.model == "naive":
+        model = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"))
+        model.train(not args.quiet)
+        model.save("first_test.h5")
 
 if args.run:
     # Test CNN model
