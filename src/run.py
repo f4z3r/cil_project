@@ -4,6 +4,9 @@ import os, sys
 import argparse, glob
 import logging
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
 import utility
 import tests
