@@ -6,3 +6,6 @@ assets/training/verify/*.png
 assets/validation/data/*.png
 assets/validation/verify/*.png
 logs/*.log
+
+# pycharm
+.idea/*
