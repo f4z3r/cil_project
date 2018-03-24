@@ -80,7 +80,8 @@ class TestUtilities(unittest.TestCase):
         """Test the image set loader utility function"""
         utility.load_training_set(os.path.join(file_path,
                                                os.path.normpath("../assets/training/data")),
-                                  28)
+                                  28,
+                                  suppress_output=True)
 
 class TestModels(unittest.TestCase):
     """Class testing the models."""

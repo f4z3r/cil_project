@@ -8,10 +8,6 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
-import utility
-import tests
-from models import cnn_lr_d
-
 # Remove tensorflow CPU instruction information.
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -124,11 +120,11 @@ def train(model, verbosity=1):
     verbose = False
     if verbosity > 0:
         verbose = True
-        console.setLevel(logging.INFO)
+        logger.handlers[0].setLevel(logging.INFO)
     elif verbosity > 1:
-        console.setLevel(logging.DEBUG)
+        logger.handlers[0].setLevel(logging.DEBUG)
     else:
-        console.setLevel(logging.WARNING)
+        logger.handlers[0].setLevel(logging.WARNING)
 
     if model == "naive":
         model = cnn_lr_d.Model(os.path.join(os.path.dirname(file_path),
@@ -145,10 +141,15 @@ if __name__ == "__main__":
 
     args = _setup_argparser()
     logger = _setup_logger(args)
+
+    import utility
+    import tests
+    from models import cnn_lr_d
+
     if args.c:
         # Run code tests and exit
         logger.info("Running tests ...")
-        logger.setLevel(logging.WARNING)
+        logger.handlers[0].setLevel(logging.WARNING)
         tests.run()
         sys.exit(0)
 

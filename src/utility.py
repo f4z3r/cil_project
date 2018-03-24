@@ -107,7 +107,7 @@ def get_random_image_patch(data_img, verifier_img, size, stride, pad):
     return data_patch, verifier_patch
 
 
-def load_training_set(img_path, pad):
+def load_training_set(img_path, pad, suppress_output=False):
     """Load the training set into memory and pass it on.
 
     Args:
@@ -130,8 +130,9 @@ def load_training_set(img_path, pad):
                          first.shape[2]))
     verifier_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
 
-    prog_bar = ProgressBar(image_count)
-    prog_bar.print()
+    if not suppress_output:
+        prog_bar = ProgressBar(image_count)
+        prog_bar.print()
 
     for idx, file in enumerate(data_files):
         data_set[idx] = pad_image(load_image(file), pad)
@@ -139,7 +140,8 @@ def load_training_set(img_path, pad):
                                      os.path.normpath("assets/trainig/verify"))
         verifier_set[idx] = load_image(verifier_file)
 
-        prog_bar.inc_and_print()
+        if not suppress_output:
+            prog_bar.inc_and_print()
 
     return data_set, verifier_set
 
