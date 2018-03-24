@@ -148,12 +148,17 @@ class Model:
         Args:
             batch_size (int): size of each batch.
         """
+        # Preload the images
+        data_set, verifier_set = utility.load_training_set(self.train_path)
+
         while True:
             batch_data = np.empty((batch_size, self.window_size, self.window_size, 3))
             batch_verifier = np.empty((batch_size, 2))
 
             for idx in range(batch_size):
-                data_patch, verifier_patch = utility.get_random_image_patch(self.train_path,
+                img_num = np.random.choice(data_set.shape[0])
+                data_patch, verifier_patch = utility.get_random_image_patch(data_set[img_num],
+                                                                            verifier_set[img_num],
                                                                             self.patch_size,
                                                                             self.patch_size,
                                                                             self.context_padding)

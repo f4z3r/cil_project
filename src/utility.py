@@ -82,12 +82,13 @@ def generate_patches_with_pad(img, size, stride, pad):
             patch_list.append(patch)
     return np.asarray(patch_list)
 
-def get_random_image_patch(img_path, size, stride, pad):
-    """Creates a random patches of size (size + 2 * pad, size + 2 * pad) pixels from image in
-    img_path and returns it with the corresponding verification patch.
+def get_random_image_patch(data_img, verifier_img, size, stride, pad):
+    """Creates a random patches of size (size + 2 * pad, size + 2 * pad) pixels from img and returns
+    it with the corresponding verification patch from verifier.
 
     Args:
-        img_path (str): path to training data sets.
+        img (numpy.ndarray): image from which to exctract patch.
+        verifier (numpy.ndarray): image from which to exctract verifier patch.
         size (int): the size of interior window of the patches.
         stride (int): the amount of pixels to shift between patches.
         pad (int): padding to be added on each size of the patch.
@@ -97,10 +98,6 @@ def get_random_image_patch(img_path, size, stride, pad):
         numpy.ndarray: the corresponding verifier patch (note this has total size (size x size).
     """
     assert stride <= size, "Stride should not be larger than size."
-    data_file = np.random.choice(glob.glob(os.path.join(img_path, "*.png")))
-    verifier_file = data_file.replace(os.path.normpath("assets/trainig/data"), os.path.normpath("assets/trainig/verify"))
-    data_img = load_image(data_file)
-    verifier_img = load_image(verifier_file)
 
     if len(data_img.shape) == 3:
         img_padded = np.pad(data_img, ((pad, pad), (pad, pad), (0,0)), mode="reflect")
