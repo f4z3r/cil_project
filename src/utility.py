@@ -78,8 +78,9 @@ def generate_patches_with_pad(img, size, stride, pad):
     return np.asarray(patch_list)
 
 def get_random_image_patch(data_img, verifier_img, size, stride, pad):
-    """Creates a random patches of size (size + 2 * pad, size + 2 * pad) pixels from img and returns
-    it with the corresponding verification patch from verifier.
+    """Creates a random patches of size (size + 2 * pad, size + 2 * pad) pixels from `img` and
+    returns it with the corresponding verification patch from verifier. Note that `img` should
+    already be padded according to the padding used here.
 
     Args:
         img (numpy.ndarray): image from which to exctract patch.
@@ -92,27 +93,27 @@ def get_random_image_patch(data_img, verifier_img, size, stride, pad):
         numpy.ndarray: the patch with padding.
         numpy.ndarray: the corresponding verifier patch (note this has total size (size x size).
     """
-    img_padded = pad_image(data_img, pad)
 
-    h = (np.random.choice(data_img.shape[1]) // stride) * stride + pad
-    w = (np.random.choice(data_img.shape[0]) // stride) * stride + pad
+    h = (np.random.choice(data_img.shape[1] - 2 * pad) // stride) * stride + pad
+    w = (np.random.choice(data_img.shape[0] - 2 * pad) // stride) * stride + pad
 
     if len(data_img.shape) == 3:
-        data_patch = img_padded[h - pad:h + size + pad, w - pad:w + size + pad, :]
+        data_patch = data_img[h - pad:h + size + pad, w - pad:w + size + pad, :]
     else:
-        data_patch = img_padded[h - pad:h + size + pad, w - pad:w + size + pad]
+        data_patch = data_img[h - pad:h + size + pad, w - pad:w + size + pad]
 
     verifier_patch = verifier_img[h - pad:h + size - pad, w - pad:w + size - pad]
 
     return data_patch, verifier_patch
 
 
-def load_training_set(img_path):
+def load_training_set(img_path, pad):
     """Load the training set into memory and pass it on.
 
     Args:
         path (str): path to the training set. Note that the folder structure must follow the
                     guidelines given in README.md.
+        pad (int): padding to be added to the images.
     """
     logger.info("Loading image sets into memory ...")
     data_files = glob.glob(os.path.join(img_path, "*.png"))
@@ -123,14 +124,17 @@ def load_training_set(img_path):
                                                                 first.shape[1],
                                                                 first.shape[0]))
 
-    data_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
+    data_set = np.empty((image_count,
+                         first.shape[0] + 2 * pad,
+                         first.shape[1] + 2 * pad,
+                         first.shape[2]))
     verifier_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
 
     prog_bar = ProgressBar(image_count)
     prog_bar.print()
 
     for idx, file in enumerate(data_files):
-        data_set[idx] = load_image(file)
+        data_set[idx] = pad_image(load_image(file), pad)
         verifier_file = file.replace(os.path.normpath("assets/trainig/data"),
                                      os.path.normpath("assets/trainig/verify"))
         verifier_set[idx] = load_image(verifier_file)

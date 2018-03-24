@@ -38,7 +38,8 @@ class Model:
         self.window_size = patch_size + 2 * context_padding
 
         # Preload the images
-        self.data_set, self.verifier_set = utility.load_training_set(self.train_path)
+        self.data_set, self.verifier_set = utility.load_training_set(self.train_path,
+                                                                     self.context_padding)
 
         # The following can be set using a config file in ~/.keras/keras.json
         if keras.backend.image_dim_ordering() == "tf":
