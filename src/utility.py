@@ -120,3 +120,27 @@ def get_random_image_patch(img_path, size, stride, pad):
     verifier_patch = verifier_img[h - pad:h + size - pad, w - pad:w + size - pad]
 
     return data_patch, verifier_patch
+
+
+def load_training_set(img_path):
+    """Load the training set into memory and pass it on.
+
+    Args:
+        path (str): path to the training set. Note that the folder structure must follow the
+                    guidelines given in README.md.
+    """
+    data_files = glob.glob(os.path.join(img_path, "*.png"))
+    image_count = len(data_files)
+    first = load_image(data_files[0])
+    data_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
+    verifier_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
+
+    for idx, file in enumerate(data_files):
+        data_set[idx] = load_image(file)
+        verifier_file = file.replace(os.path.normpath("assets/trainig/data"),
+                                     os.path.normpath("assets/trainig/verify"))
+        verifier_set[idx] = load_image(verifier_file)
+
+    return data_set, verifier_set
+
+
