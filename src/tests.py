@@ -79,15 +79,17 @@ class TestUtilities(unittest.TestCase):
     def test_image_set_loader(self):
         """Test the image set loader utility function"""
         utility.load_training_set(os.path.join(file_path,
-                                               os.path.normpath("../assets/training/data")))
+                                               os.path.normpath("../assets/training/data")),
+                                  28)
 
 class TestModels(unittest.TestCase):
     """Class testing the models."""
 
     def test_model_generation(self):
         """Test the model generations"""
-        cnn_model1 = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"))
-        self.assertNotEqual(cnn_model1, None)
+        with self.assertRaises(ValueError):
+            cnn_model1 = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"),
+                                        load_images=False)
 
 
 

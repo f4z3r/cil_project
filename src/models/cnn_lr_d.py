@@ -19,13 +19,14 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 class Model:
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
-    def __init__(self, train_path, patch_size=16, context_padding=28):
+    def __init__(self, train_path, patch_size=16, context_padding=28, load_images=True):
         """Initialise the model.
 
         Args:
             train_path (str): path to training data.
             patch_size (int): default=16 - the size of the patch to analyse.
             context_padding (int): default=28 - padding on each side of the analysed patch.
+            load_images (bool): ONLY DISABLE FOR CODE CHECKS
         """
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
@@ -36,10 +37,6 @@ class Model:
         self.patch_size = patch_size
         self.context_padding = context_padding
         self.window_size = patch_size + 2 * context_padding
-
-        # Preload the images
-        self.data_set, self.verifier_set = utility.load_training_set(self.train_path,
-                                                                     self.context_padding)
 
         # The following can be set using a config file in ~/.keras/keras.json
         if keras.backend.image_dim_ordering() == "tf":
@@ -99,6 +96,13 @@ class Model:
         self.model.add(keras.layers.Dense(units=2,
                                           kernel_regularizer=keras.regularizers.l2(1e-6),
                                           activation="softmax"))
+
+        if load_images:
+            # Preload the images
+            self.data_set, self.verifier_set = utility.load_training_set(self.train_path,
+                                                                         self.context_padding)
+        else:
+            raise ValueError("load_images must be set to True")
 
         logger.info("Done")
 
