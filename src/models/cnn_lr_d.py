@@ -132,7 +132,7 @@ class Model:
 
         try:
             hist = self.model.fit_generator(self._create_batch(),
-                                     steps_per_epoch=2500,     # 25 x 25 x 400 / 100
+                                     steps_per_epoch=5000,     # 25 x 25 x 800 / 100
                                      verbose=verbosity,
                                      callbacks=[lr_callback, stop_callback])
             print(hist.history)

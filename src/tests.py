@@ -20,7 +20,7 @@ class TestUtilities(unittest.TestCase):
                      "Too many test files in folder. Please ensure that the augmentation" +
                      " was not already run")
     def test_augment_img_set(self):
-        """Tests the image augmentation."""
+        """Tests the image augmentation"""
         utility.augment_img_set(os.path.join(file_path, "../assets/testing/"))
         img_count = len([1 for file in glob.glob(os.path.join(file_path,
                                                               "../assets/testing/test_img*.png"))])
@@ -76,11 +76,16 @@ class TestUtilities(unittest.TestCase):
         patch_list_3d_res = utility.generate_patches_with_pad(img_3d, 1, 1, 1)
         self.assertEqual(np.testing.assert_equal(patch_list_3d, patch_list_3d_res), None)
 
+    def test_image_set_loader(self):
+        """Test the image set loader utility function"""
+        utility.load_training_set(os.path.join(file_path,
+                                               os.path.normpath("../assets/training/data")))
+
 class TestModels(unittest.TestCase):
     """Class testing the models."""
 
     def test_model_generation(self):
-        """Test the model generations."""
+        """Test the model generations"""
         cnn_model1 = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"))
         self.assertNotEqual(cnn_model1, None)
 
