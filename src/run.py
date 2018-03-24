@@ -4,6 +4,9 @@ import os, sys
 import argparse, glob
 import logging
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
 import utility
 import tests
@@ -115,7 +118,7 @@ if args.augment:
 
 if args.train:
     if args.model == "naive":
-        model = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"))
+        model = cnn_lr_d.Model(os.path.join(os.path.dirname(file_path), os.path.normpath("assets/training/data")))
         model.train(not args.quiet)
         model.save("first_test.h5")
 

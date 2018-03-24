@@ -5,7 +5,7 @@ import numpy as np
 
 # Silence import message
 stderr = sys.stderr
-sys.stderr = open('/dev/null', 'w')
+#sys.stderr = open(os.devnull, 'w')
 import keras
 sys.stderr = stderr
 
@@ -131,14 +131,15 @@ class Model:
         logger.info("Starting training ...")
 
         try:
-            self.model.fit_generator(self._create_batch(),
+            hist = self.model.fit_generator(self._create_batch(),
                                      steps_per_epoch=2500,     # 25 x 25 x 400 / 100
                                      verbose=verbosity,
                                      callbacks=[lr_callback, stop_callback])
+            print(hist.history)
         except KeyboardInterrupt:
-            pass
-
-        logger.info("Training completed")
+            logger.warning("\nTraining interrupted")
+        else:
+            logger.info("Training completed")
 
 
     def _create_batch(self, batch_size=100):

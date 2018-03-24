@@ -6,3 +6,17 @@ assets/training/verify/*.png
 assets/validation/data/*.png
 assets/validation/verify/*.png
 logs/*.log
+
+# output
+*.h5
+
+# pycharm
+.idea/*
+
+# Latex
+report/*.aux
+report/*.bbl
+report/*.blg
+report/*.log
+report/*.pdf
+report/*.synctex.gz
