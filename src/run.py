@@ -125,46 +125,6 @@ def _setup_logger(args=None):
     return logger
 
 
-
-###########################################################################################
-# Functions for jupyter notebook
-
-
-# This is not required
-
-# Simply write `%run run.py -t -v` to train network in the jupyter notebook.
-###########################################################################################
-
-def train(model, verbosity=1):
-    """Train model `model`.
-
-    Args:
-        model (str): the model to train. Use `run.py -h` to see available models.
-        verbosity (int): default=1 - verbosity of output
-    """
-    import utility
-    import tests
-    from models import cnn_lr_d
-
-    # Initialise logger
-    logger = _setup_logger()
-
-    verbose = False
-    if verbosity > 0:
-        verbose = True
-        logger.handlers[0].setLevel(logging.INFO)
-    elif verbosity > 1:
-        logger.handlers[0].setLevel(logging.DEBUG)
-    else:
-        logger.handlers[0].setLevel(logging.WARNING)
-
-    if model == "naive":
-        model = cnn_lr_d.Model(os.path.join(os.path.dirname(file_path),
-                                            os.path.normpath("assets/training/data")))
-        model.train(verbose)
-        model.save("google_colab_test.h5")
-
-
 ###########################################################################################
 # RUN.PY actions.
 ###########################################################################################
@@ -176,7 +136,7 @@ if __name__ == "__main__":
 
     import utility
     import tests
-    from models import cnn_lr_d
+    from models import cnn_lr_d, dnn_classifier
 
     if args.command == "check":
         # Run code tests and exit
@@ -205,12 +165,16 @@ if __name__ == "__main__":
 
     if args.train:
         if args.model == "cnn_lr_d":
-            model = cnn_lr_d.Model(os.path.join(os.path.dirname(file_path),
-                                                os.path.normpath("assets/training/data")))
+            model = cnn_lr_d.CnnLrD(os.path.join(os.path.dirname(file_path),
+                                                 os.path.normpath("assets/training/data")))
             model.train(not args.quiet)
             model.save("first_test.h5")
         elif args.model == "dnn_class":
-            logger.warning("Not fully implemented")
+            model = dnn_classifier.DnnClassifier(
+                os.path.join(os.path.dirname(file_path),
+                             os.path.normpath("assets/training/data")))
+            model.train(not args.quiet)
+            model.save("first_test.h5")
 
     if args.run:
         # Test CNN model

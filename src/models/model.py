@@ -60,12 +60,19 @@ class Model:
             yield (batch_data, batch_verifier)
 
 
-    def train(self, verbosity):
+    def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
         """Train the model.
 
         Args:
             verbosity (bool): if the training should be verbose.
+            epochs (int): default: 150 - epochs to train.
+            steps (int): default: 5000 - batches per epoch to train.
+            print_at_end (bool): print history at the end of the training.
         """
+        pass
+
+    def evaluate(self):
+        """Evaluate the efficiency of the model."""
         pass
 
 

@@ -128,7 +128,7 @@ def load_training_set(img_path, pad, suppress_output=False):
                          first.shape[0] + 2 * pad,
                          first.shape[1] + 2 * pad,
                          first.shape[2]))
-    verifier_set = np.empty((image_count, first.shape[0], first.shape[1], first.shape[2]))
+    verifier_set = np.empty((image_count, first.shape[0], first.shape[1]))
 
     if not suppress_output:
         prog_bar = ProgressBar(image_count)
@@ -136,8 +136,8 @@ def load_training_set(img_path, pad, suppress_output=False):
 
     for idx, file in enumerate(data_files):
         data_set[idx] = pad_image(load_image(file), pad)
-        verifier_file = file.replace(os.path.normpath("assets/trainig/data"),
-                                     os.path.normpath("assets/trainig/verify"))
+        verifier_file = file.replace(os.path.normpath("training/data"),
+                                     os.path.normpath("training/verify"))
         verifier_set[idx] = load_image(verifier_file)
 
         if not suppress_output:

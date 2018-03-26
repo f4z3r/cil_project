@@ -78,10 +78,10 @@ class TestUtilities(unittest.TestCase):
 
     def test_image_set_loader(self):
         """Test the image set loader utility function"""
-        utility.load_training_set(os.path.join(file_path,
-                                               os.path.normpath("../assets/training/data")),
-                                  28,
-                                  suppress_output=True)
+        utility.load_training_set(
+            os.path.join(file_path, os.path.normpath("../assets/training/data")),
+            28,
+            suppress_output=True)
 
 class TestModels(unittest.TestCase):
     """Class testing the models."""
@@ -89,12 +89,26 @@ class TestModels(unittest.TestCase):
     def test_model_generation(self):
         """Test the model generations"""
         with self.assertRaises(ValueError):
-            cnn_model1 = cnn_lr_d.CnnLrD(os.path.join(file_path, "../assets/training/data"),
-                                        load_images=False)
+            cnn_model1 = cnn_lr_d.CnnLrD(
+                os.path.join(file_path, os.path.normpath("../assets/training/data")),
+                load_images=False)
         with self.assertRaises(ValueError):
-            dnn_model1 = dnn_classifier.DnnClassifier(os.path.join(file_path,
-                                                                   "../assets/training/data"),
-                                                      load_images=False)
+            dnn_model1 = dnn_classifier.DnnClassifier(
+                os.path.join(file_path,os.path.normpath("../assets/training/data")),
+                load_images=False)
+
+    def test_cnn_lr_d_train(self):
+        """Test the training functions."""
+        cnn_model1 = cnn_lr_d.CnnLrD(
+            os.path.join(file_path,os.path.normpath("../assets/testing/training/data")))
+        cnn_model1.train(True, epochs=1, steps=3, print_at_end=False)
+
+    def test_dnn_class_train(self):
+        """Test the training functions."""
+        dnn_model1 = dnn_classifier.DnnClassifier(
+            os.path.join(file_path, os.path.normpath("../assets/testing/training/data")))
+        dnn_model1.train(True, epochs=1, steps=3, print_at_end=False)
+
 
 
 
