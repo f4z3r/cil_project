@@ -22,10 +22,10 @@ def _setup_argparser():
                                      " this project.")
 
     parser.add_argument("-m", "--model", action="store",
-                        choices=["naive"],
-                        default="naive",
+                        choices=["cnn_lr_d", "dnn_class"],
+                        default="cnn_lr_d",
                         type=str,
-                        help="The CNN model to be used, defaults to naive")
+                        help="The CNN model to be used, defaults to cnn_lr_d")
     parser.add_argument("-g", "--augment",
                         help="augment training image set",
                         action="store_true")
@@ -179,11 +179,13 @@ if __name__ == "__main__":
                            " `assets/training/data` folder")
 
     if args.train:
-        if args.model == "naive":
+        if args.model == "cnn_lr_d":
             model = cnn_lr_d.Model(os.path.join(os.path.dirname(file_path),
                                                 os.path.normpath("assets/training/data")))
             model.train(not args.quiet)
             model.save("first_test.h5")
+        elif args.model == "dnn_class":
+            logger.warning("Not fully implemented")
 
     if args.run:
         # Test CNN model

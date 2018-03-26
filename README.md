@@ -36,14 +36,15 @@ The currently required libraries are the following:
 
 ### Usage
 ```
-usage: run.py [-h] [-m {naive}] [-g] [-t] [-r] [-c] [-v | -vv | -q]
+usage: run.py [-h] [-m {cnn_lr_d,dnn_class}] [-g] [-t] [-r] [-c]
+              [-v | -vv | -q]
 
 Control program to launch all actions related to this project.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -m {naive}, --model {naive}
-                        The CNN model to be used, defaults to naive
+  -m {cnn_lr_d,dnn_class}, --model {cnn_lr_d,dnn_class}
+                        The CNN model to be used, defaults to cnn_lr_d
   -g, --augment         augment training image set
   -t, --train           train the given CNN
   -r, --run             run a trained version of a given CNN
