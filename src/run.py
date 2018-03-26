@@ -33,7 +33,32 @@ def _setup_argparser():
                         action="store_true")
 
     subparsers = parser.add_subparsers(dest="command", help="Test utilities")
-    parser_c = subparsers.add_parser("check", help="Test code")
+    parser_c = subparsers.add_parser("unittest",
+                                     help="Run unittest.main, accepts unittest options.")
+    parser_c.add_argument("tests",
+                          help="a list of any number of test modules, classes and test methods.")
+    parser_c.add_argument("-v", "--verbose",
+                          help="Verbose Output",
+                          action="store_true")
+    parser_c.add_argument("-q", "--quiet",
+                          help="Quiet Output",
+                          action="store_true")
+    parser_c.add_argument("--locals",
+                          help="Show local variables in tracebacks",
+                          action="store_true")
+    parser_c.add_argument("-f", "--failfast",
+                          help="Stop on first fail or error",
+                          action="store_true")
+    parser_c.add_argument("-c", "--catch",
+                          help="Catch Ctrl-C and display results so far",
+                          action="store_true")
+    parser_c.add_argument("-b", "--buffer",
+                          help="Buffer stdout and stderr during tests",
+                          action="store_true")
+    parser_c.add_argument("-p", "--pattern",
+                          help="Pattern to match tests ('test*.py' default)")
+
+
 
     parser.add_argument("-m", "--model", action="store",
                         choices=["cnn_lr_d", "dnn_class"],

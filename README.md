@@ -37,13 +37,13 @@ The currently required libraries are the following:
 ### Usage
 ```
 usage: run.py [-h] [-v | -vv | -q] [-m {cnn_lr_d,dnn_class}] [-g] [-t] [-r]
-              {check} ...
+              {unittest} ...
 
 Control program to launch all actions related to this project.
 
 positional arguments:
-  {check}               Test utilities
-    check               Test code
+  {unittest}            Test utilities
+    unittest            Run unittest.main, accepts unittest options.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -57,7 +57,28 @@ optional arguments:
   -r, --run             run a trained version of a given CNN
 ```
 
-Right now simply run `run.py -v -g` in order to augment the training set on your local machine.
+#### `unittest` usage
+```
+usage: run.py unittest [-h] [-v] [-q] [--locals] [-f] [-c] [-b] [-p PATTERN]
+                       tests
+
+positional arguments:
+  tests                 a list of any number of test modules, classes and test
+                        methods.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         Verbose Output
+  -q, --quiet           Quiet Output
+  --locals              Show local variables in tracebacks
+  -f, --failfast        Stop on first fail or error
+  -c, --catch           Catch Ctrl-C and display results so far
+  -b, --buffer          Buffer stdout and stderr during tests
+  -p PATTERN, --pattern PATTERN
+                        Pattern to match tests ('test*.py' default)
+```
+
+Note that running the CNN on a test image set is not yet supported.
 
 ### Discussions
 Please check the project and the issues for discussions.
