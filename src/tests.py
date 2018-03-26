@@ -98,13 +98,13 @@ class TestModels(unittest.TestCase):
                 load_images=False)
 
     def test_cnn_lr_d_train(self):
-        """Test the training functions."""
+        """Test the training function for CNN + LR + D model"""
         cnn_model1 = cnn_lr_d.CnnLrD(
             os.path.join(file_path,os.path.normpath("../assets/testing/training/data")))
         cnn_model1.train(True, epochs=1, steps=3, print_at_end=False)
 
     def test_dnn_class_train(self):
-        """Test the training functions."""
+        """Test the training function for DNN classifier model"""
         dnn_model1 = dnn_classifier.DnnClassifier(
             os.path.join(file_path, os.path.normpath("../assets/testing/training/data")))
         dnn_model1.train(True, epochs=1, steps=3, print_at_end=False)

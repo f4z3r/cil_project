@@ -2,11 +2,11 @@
 
 import os, sys, logging
 import numpy as np
-# import tensorflow as tf
-import keras
-from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.model_selection import StratifiedKFold, cross_val_score
-from sklearn.preprocessing import LabelEncoder
+import tensorflow as tf
+# import keras
+# from keras.wrappers.scikit_learn import KerasClassifier
+# from sklearn.model_selection import StratifiedKFold, cross_val_score
+# from sklearn.preprocessing import LabelEncoder
 
 import utility
 from models import model
@@ -29,47 +29,47 @@ class DnnClassifier(model.Model):
         super().__init__(train_path, patch_size, context_padding, load_images)
         logger.info("Generating DNN classifier ...")
 
-        # classifier_config = tf.contrib.learn.RunConfig(
-        #     tf_random_seed=0,           # Make reproducible
-        #     model_dir=os.path.join(file_path, os.path.normpath("../../results")),
-        #     keep_checkpoint_max=3,
-        #     save_checkpoints_secs=None,
-        #     save_checkpoints_steps=1000)
-        # feature_columns = [tf.contrib.layers.real_valued_column("feature_col", dimension=75)]
-        # self.model = tf.estimator.DNNClassifier(
-        #     hidden_units=[100, 150, 100, 50],
-        #     feature_columns=feature_columns,
-        #     n_classes=2,
-        #     dropout=0.25,
-        #     activation_fn=tf.nn.leaky_relu,
-        #     config=classifier_config)
+        classifier_config = tf.contrib.learn.RunConfig(
+            tf_random_seed=0,           # Make reproducible
+            model_dir=os.path.join(file_path, os.path.normpath("../../results")),
+            keep_checkpoint_max=3,
+            save_checkpoints_secs=None,
+            save_checkpoints_steps=1000)
+        feature_columns = [tf.contrib.layers.real_valued_column("feature_col", dimension=75)]
+        self.model = tf.estimator.DNNClassifier(
+            hidden_units=[100, 150, 100, 50],
+            feature_columns=feature_columns,
+            n_classes=2,
+            dropout=0.25,
+            activation_fn=tf.nn.leaky_relu,
+            config=classifier_config)
 
-        # The following can be set using a config file in ~/.keras/keras.json
-        if keras.backend.image_dim_ordering() == "tf":
-            # Keras is using Tensorflow as backend
-            input_dim = (self.window_size, self.window_size, 3)
-        else:
-            # Keras is using Theano as backend
-            input_dim = (3, self.window_size, self.window_size)
+        # # The following can be set using a config file in ~/.keras/keras.json
+        # if keras.backend.image_dim_ordering() == "tf":
+        #     # Keras is using Tensorflow as backend
+        #     input_dim = (self.window_size, self.window_size, 3)
+        # else:
+        #     # Keras is using Theano as backend
+        #     input_dim = (3, self.window_size, self.window_size)
 
-        self.model = keras.Sequential()
+        # self.model = keras.Sequential()
 
-        self.model.add(keras.layers.Dense(units=512,
-                                          input_shape=input_dim))
-        self.model.add(keras.layers.LeakyReLU(alpha=0.1))
+        # self.model.add(keras.layers.Dense(units=512,
+        #                                   input_shape=input_dim))
+        # self.model.add(keras.layers.LeakyReLU(alpha=0.1))
 
-        self.model.add(keras.layers.Dense(units=1024))
-        self.model.add(keras.layers.LeakyReLU(alpha=0.1))
+        # self.model.add(keras.layers.Dense(units=1024))
+        # self.model.add(keras.layers.LeakyReLU(alpha=0.1))
 
-        self.model.add(keras.layers.Dense(units=512))
-        self.model.add(keras.layers.LeakyReLU(alpha=0.1))
+        # self.model.add(keras.layers.Dense(units=512))
+        # self.model.add(keras.layers.LeakyReLU(alpha=0.1))
 
-        self.model.add(keras.layers.Dense(units=256))
-        self.model.add(keras.layers.LeakyReLU(alpha=0.1))
+        # self.model.add(keras.layers.Dense(units=256))
+        # self.model.add(keras.layers.LeakyReLU(alpha=0.1))
 
-        self.model.add(keras.layers.Dense(units=1,
-                                          kernel_regularizer=keras.regularizers.l2(1e-6),
-                                          activation="sigmoid"))
+        # self.model.add(keras.layers.Dense(units=1,
+        #                                   kernel_regularizer=keras.regularizers.l2(1e-6),
+        #                                   activation="sigmoid"))
 
 
 
@@ -80,6 +80,7 @@ class DnnClassifier(model.Model):
             raise ValueError("load_images must be set to True")
 
         logger.info("Done")
+
 
     def _build_fn(self):
         """Return the model."""
@@ -104,16 +105,16 @@ class DnnClassifier(model.Model):
             verbose = 0
 
 
-        self.model.compile(loss="binary_crossentropy",
-                           optimizer="adam",
-                           metrics=["accuracy"])
+        # self.model.compile(loss="binary_crossentropy",
+        #                    optimizer="adam",
+        #                    metrics=["accuracy"])
 
-        estimator = KerasClassifier(build_fn=self._build_fn(),
-                                    epochs=100,
-                                    batch_size=100,
-                                    verbose=verbose)
+        # estimator = KerasClassifier(build_fn=self._build_fn(),
+        #                             epochs=epochs,
+        #                             batch_size=100,
+        #                             verbose=verbose)
 
-        kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=0)
+        # kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=0)
 
         logger.info("Starting training ...")
         # encoder = LabelEncoder()
