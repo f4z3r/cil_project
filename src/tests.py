@@ -89,9 +89,12 @@ class TestModels(unittest.TestCase):
     def test_model_generation(self):
         """Test the model generations"""
         with self.assertRaises(ValueError):
-            cnn_model1 = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"),
+            cnn_model1 = cnn_lr_d.CnnLrD(os.path.join(file_path, "../assets/training/data"),
                                         load_images=False)
-            dnn_model1 = dnn_classifier.Model()
+        with self.assertRaises(ValueError):
+            dnn_model1 = dnn_classifier.DnnClassifier(os.path.join(file_path,
+                                                                   "../assets/training/data"),
+                                                      load_images=False)
 
 
 

@@ -227,3 +227,11 @@ class ProgressBar:
         """
         self.increment()
         self.print()
+
+
+def overrides(interface_class):
+    """Mark an override."""
+    def overrider(method):
+        assert(method.__name__ in dir(interface_class))
+        return method
+    return overrider
