@@ -37,13 +37,13 @@ The currently required libraries are the following:
 ### Usage
 ```
 usage: run.py [-h] [-v | -vv | -q] [-m {cnn_lr_d,dnn_class}] [-g] [-t] [-r]
-              {unittest} ...
+              {check} ...
 
 Control program to launch all actions related to this project.
 
 positional arguments:
-  {unittest}            Test utilities
-    unittest            Run unittest.main, accepts unittest options.
+  {check}               Test utilities
+    check               Run unittest.main, accepts unittest options.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -59,8 +59,8 @@ optional arguments:
 
 #### `unittest` usage
 ```
-usage: run.py unittest [-h] [-v] [-q] [--locals] [-f] [-c] [-b] [-p PATTERN]
-                       tests
+usage: run.py check [-h] [-v] [-q] [--locals] [-f] [-c] [-b] [-p PATTERN]
+                    [tests [tests ...]]
 
 positional arguments:
   tests                 a list of any number of test modules, classes and test

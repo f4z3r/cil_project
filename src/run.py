@@ -33,10 +33,11 @@ def _setup_argparser():
                         action="store_true")
 
     subparsers = parser.add_subparsers(dest="command", help="Test utilities")
-    parser_c = subparsers.add_parser("unittest",
+    parser_c = subparsers.add_parser("check",
                                      help="Run unittest.main, accepts unittest options.")
     parser_c.add_argument("tests",
-                          help="a list of any number of test modules, classes and test methods.")
+                          help="a list of any number of test modules, classes and test methods.",
+                          nargs="*")
     parser_c.add_argument("-v", "--verbose",
                           help="Verbose Output",
                           action="store_true")
