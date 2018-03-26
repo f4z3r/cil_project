@@ -8,7 +8,7 @@ import glob, logging
 import numpy as np
 
 import utility
-from models import cnn_lr_d
+from models import cnn_lr_d, dnn_classifier
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -91,6 +91,7 @@ class TestModels(unittest.TestCase):
         with self.assertRaises(ValueError):
             cnn_model1 = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"),
                                         load_images=False)
+            dnn_model1 = dnn_classifier.Model()
 
 
 
