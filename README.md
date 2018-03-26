@@ -36,23 +36,25 @@ The currently required libraries are the following:
 
 ### Usage
 ```
-usage: run.py [-h] [-m {cnn_lr_d,dnn_class}] [-g] [-t] [-r] [-c]
-              [-v | -vv | -q]
+usage: run.py [-h] [-v | -vv | -q] [-m {cnn_lr_d,dnn_class}] [-g] [-t] [-r]
+              {check} ...
 
 Control program to launch all actions related to this project.
 
+positional arguments:
+  {check}               Test utilities
+    check               Test code
+
 optional arguments:
   -h, --help            show this help message and exit
-  -m {cnn_lr_d,dnn_class}, --model {cnn_lr_d,dnn_class}
-                        The CNN model to be used, defaults to cnn_lr_d
-  -g, --augment         augment training image set
-  -t, --train           train the given CNN
-  -r, --run             run a trained version of a given CNN
-  -c                    run code tests, can be run only with unittest
-                        additional optional arguments
   -v, --verbose         provide verbose output
   -vv, --very_verbose   provide even more verbose output
   -q, --quiet           provide next to no output to console
+  -m {cnn_lr_d,dnn_class}, --model {cnn_lr_d,dnn_class}
+                        the CNN model to be used, defaults to cnn_lr_d
+  -g, --augment         augment training image set
+  -t, --train           train the given CNN
+  -r, --run             run a trained version of a given CNN
 ```
 
 Right now simply run `run.py -v -g` in order to augment the training set on your local machine.

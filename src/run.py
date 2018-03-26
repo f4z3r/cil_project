@@ -21,26 +21,6 @@ def _setup_argparser():
     parser = argparse.ArgumentParser(description="Control program to launch all actions related to"
                                      " this project.")
 
-    parser.add_argument("-m", "--model", action="store",
-                        choices=["cnn_lr_d", "dnn_class"],
-                        default="cnn_lr_d",
-                        type=str,
-                        help="The CNN model to be used, defaults to cnn_lr_d")
-    parser.add_argument("-g", "--augment",
-                        help="augment training image set",
-                        action="store_true")
-    parser.add_argument("-t", "--train",
-                        help="train the given CNN",
-                        action="store_true")
-    parser.add_argument("-r", "--run",
-                        help="run a trained version of a given CNN",
-                        action="store_true")
-    parser.add_argument("-c",
-                        help="run code tests, can be run only with unittest additional optional"
-                        " arguments",
-                        action="store_true")
-
-
     verbosity_group = parser.add_mutually_exclusive_group()
     verbosity_group.add_argument("-v", "--verbose",
                         help="provide verbose output",
@@ -52,7 +32,25 @@ def _setup_argparser():
                         help="provide next to no output to console",
                         action="store_true")
 
-    args = parser.parse_args()
+    subparsers = parser.add_subparsers(dest="command", help="Test utilities")
+    parser_c = subparsers.add_parser("check", help="Test code")
+
+    parser.add_argument("-m", "--model", action="store",
+                        choices=["cnn_lr_d", "dnn_class"],
+                        default="cnn_lr_d",
+                        type=str,
+                        help="the CNN model to be used, defaults to cnn_lr_d")
+    parser.add_argument("-g", "--augment",
+                        help="augment training image set",
+                        action="store_true")
+    parser.add_argument("-t", "--train",
+                        help="train the given CNN",
+                        action="store_true")
+    parser.add_argument("-r", "--run",
+                        help="run a trained version of a given CNN",
+                        action="store_true")
+
+    args, unknown = parser.parse_known_args()
 
     return args
 
@@ -154,10 +152,11 @@ if __name__ == "__main__":
     import tests
     from models import cnn_lr_d
 
-    if args.c:
+    if args.command == "check":
         # Run code tests and exit
         logger.info("Running tests ...")
         logger.handlers[0].setLevel(logging.WARNING)
+        sys.argv[1:] = sys.argv[2:]
         tests.run()
         sys.exit(0)
 

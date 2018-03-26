@@ -96,4 +96,5 @@ class TestModels(unittest.TestCase):
 
 
 def run():
+    """Run the tests."""
     unittest.main(module="tests")
