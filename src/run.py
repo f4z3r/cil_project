@@ -62,7 +62,7 @@ def _setup_argparser():
 
 
     parser.add_argument("-m", "--model", action="store",
-                        choices=["cnn_lr_d", "dnn_class"],
+                        choices=["cnn_lr_d", "dnn_class", "cnn_model"],
                         default="cnn_lr_d",
                         type=str,
                         help="the CNN model to be used, defaults to cnn_lr_d")
@@ -139,7 +139,7 @@ if __name__ == "__main__":
 
     import utility
     import tests
-    from models import cnn_lr_d, dnn_classifier
+    from models import cnn_lr_d, dnn_classifier, cnn_model
 
     if args.command == "check":
         # Run code tests and exit
@@ -188,6 +188,11 @@ if __name__ == "__main__":
             model = dnn_classifier.DnnClassifier(
                 os.path.join(os.path.dirname(file_path),
                              os.path.normpath("assets/training/data")))
+            model.train(not args.quiet)
+            model.save("first_test.h5")
+        elif args.model=="cnn_model":
+            model = cnn_model.CNN_keras(os.path.join(os.path.dirname(file_path),
+                                    os.path.normpath("assets/training/data")))
             model.train(not args.quiet)
             model.save("first_test.h5")
 

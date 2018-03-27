@@ -1,119 +1,95 @@
-from __future__ import print_function
+#!/usr/bin/env python3
+
+import os, sys, logging
 import numpy as np
+
+# Silence import message
+stderr = sys.stderr
+#sys.stderr = open(os.devnull, 'w')
+import keras
+sys.stderr = stderr
+
+
+import utility
+from models import model
+
+logger = logging.getLogger("cil_project.models.cnn_lr_d")
+
+file_path = os.path.dirname(os.path.abspath(__file__))
+
+import numpy as np
+import os
+
+os.environ["MKL_THREADING_LAYER"] = "GNU"
+
+import keras
 from keras.models import Sequential
 from keras.layers.core import Dense,Dropout, Flatten
+from keras.layers.convolutional import Conv2D,Conv3D, MaxPooling2D,MaxPooling3D, AveragePooling3D
+from keras.layers import Dense, Dropout, Activation, Flatten, Input, Embedding, LSTM, Bidirectional, Lambda, concatenate, add, Embedding, TimeDistributed
 import matplotlib.image as img
 import cv2
-from utility import *
-class CNN_keras:
+import csv
+from models import model
+import utility
 
-    def __init__(self,network):
-        self.net=network
-	
+class CNN_keras(model.Model):
 
+    def __init__(self, train_path, patch_size=16, context_padding=28, load_images=True):
 
-    def preprocess_data(self):
+        super().__init__(train_path, patch_size, context_padding, load_images)
+        logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
-        self.images_filtered=[]
+        # The following can be set using a config file in ~/.keras/keras.json
+        if keras.backend.image_dim_ordering() == "tf":
+            # Keras is using Tensorflow as backend
+            input_dim = (self.window_size, self.window_size, 3)
+        else:
+             # Keras is using Theano as backend
+            input_dim = (3, self.window_size, self.window_size)
+        
+        if load_images:
+            # Preload the images
+            self.load_images()
+        else:
+            raise ValueError("load_images must be set to True")
 
-        for image in self.images:
-
-            filtered_image=generate_patches_with_pad(image, 16, 16, 0)
-            self.images_filtered.append(filtered_image)
-
-    def load_data(self):
-
-        """ Load data into array"""
-        self.images=[]
-        image= img.imread("../assets/test/test_img.jpg")	
-        print ("Original images are shaped ",image.shape)
-        self.images.append(image)
-        """for i=0;i<=6;i++:
-            image= img.imread("../assets/test/test_img"+i".jpg")
-            self.images.append(image)"""
-
-    def model_setup(self):
-
-        num_classes=2
-        input_data=self.images_filtered[0][0]
-        input_shape=input_data.shape
-
-        self.filters=[]
-        self.filters[0]=[16,16,3]
-        self.filters[1]=[20,20,3]
+        logger.info("Done")
 
 
-        self.model= Sequential()
-        #Stacking first convolutional layer"""
-        #self.model.add(convolution2D(64, self.filters[0], border_mode='same', input_shape=input_shape))
-        #self.model.add(LeakyReLU(alpha=0.1))
-        input_shape = Input(shape=(rows, cols, 1))
-        #filter of different sizes to have higher final accuracy in classification
-        #kernel_size=[]
-        #kernel_size.add([16, 16, 3])
-        #kernel_size.add([16,10,3])
-        #kernel_size.add([16,20,3])
-
-        nb_filters_convl_1=30
-        nb_filters_convl_2=40
-        nb_filters_convl_3=20
-
-        max_pooling_window=[4,4,30]
-        #keras.layers.Conv3D(filters, kernel_size, strides=(1, 1, 1), padding='valid', data_format=None, dilation_rate=(1, 1, 1), activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-        channel_1 = Conv3D(nb_filters_convl_1, input_shape, padding='same', activation='relu', strides=1)(input_shape) 
-        #z1_1=[[(800-kernel_size(0,0)]/stride)+1,([800-kernel_size(0,1)]/stride)+1,([3-kernel_size(0,2)]/stride)+1]
-        channel_1 = MaxPooling3D(max_pooling_window, strides=(1, 1), padding='same')(channel_1)
-
-        #max_pooling_window2=max_pooling_window
-        #max_pooling_window2[1]=max_pooling_window+kernel_size[0][1]-kernel_size[1][1]
-        #channel_2 = Conv3D(nb_filters_convl_1, input_shape, padding='same', activation='relu', strides=1)(input_shape)
-        #channel_2 = MaxPooling3D((1, max_pooling_window2), strides=(1, 1), padding='same')(channel_2)
-
-        #max_pooling_window3=max_pooling_window
-        #max_pooling_window3[1]=max_pooling_window[0][1]+kernel_size[0][1]-kernel_size[2][1]
-        #channel_3 = Conv3D(nb_filters_convl_1, kernel_size[2], padding='same', activation='relu',strides=1)(input_shape)
-        #channel_3 = MaxPooling3D((1, max_pooling_window3), strides=(1, 1), padding='same')(channel_3)
-
-        #the three differently filtered inputs concatenated
-        #merged = keras.layers.concatenate([channel_1, channel_2, channel_3], axis=1)
-        #print("merged shape ",merged.shape)
-
-        #self.model.add(merged)
-        self.model.add(channel_1)
-        self.model.add(Dropout(0.25))
-        self.model.add(LeakyReLU(alpha=0.1))
-
-        #z1_dimensions=channel_1._keras_shape
-        #max_pooling_window=[4,4,40]
-        #self.model.add(Convolution3D(nb_filters_convl_2,[3,3,1],border_mode='same'))
-        #self.model.add(LeakyReLU(alpha=0.1))
-        #self.model.add(MaxPooling3D(pool_size=max_pooling_window, border_mode='same'))
-        #self.model.add(Dropout(0.25))
-
-        #vectorize all the previous multidimensional output to input everythong nto a dense final layer
+        self.model = Sequential()
+        self.model.add(Conv2D(32, kernel_size=(10,10), input_shape=input_dim))
+        #model= BatchNormalization()(model)
+        self.model.add(Activation('relu'))
+        self.model.add(MaxPooling2D(pool_size=(4,4)))
         self.model.add(Flatten())
-
-        out = Dense(input_to_be_determined, activation='relu')
-        out = Dense(num_classes, activation='softmax')(out)
-        self.model.add(input_shap,out)
-        # Compile model
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        #model = Model(input_shape, out)
-        plot_model(self.model, to_file=img_path)
-        return model
-
-        def fit_model(self):
-
-        	self.model.fit(self.images[0], Y, epochs=150, batch_size=10)
+        self.model.add(keras.layers.Dense(units=2,
+                                          kernel_regularizer=keras.regularizers.l2(1e-6),
+                                          activation="softmax"))
+        print(self.model.summary())
 
 
-model=CNN_keras("CNN")
-model.load_data()
+    
+    def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
+
+        optimiser = keras.optimizers.Adam()
+        self.model.compile(loss=keras.losses.categorical_crossentropy,
+                           optimizer=optimiser,
+                           metrics=["accuracy"])
+        #training_set=self.create_batch()
+        #print(training_set)
+        #self.model.fit(training_set, epochs=10)
+        hist = self.model.fit_generator(self.create_batch(),
+                                        steps_per_epoch=steps,
+                                        epochs=epochs
+                                        )
+
+
+#model=CNN_keras("CNN")
 #print(model.images)
-model.preprocess_data()
-print(model.images_filtered[0][0].shape)
-model.model_setup()
-
+#model.preprocess_data()
+#model.model_setup()
+#model.fit_model()
 
 
 """from now on just copy pasted examples"""

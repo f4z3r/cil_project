@@ -4,6 +4,8 @@ import numpy as np
 import keras
 
 import utility
+from models import model
+
 
 class Model:
     """A model template for all models used by this program."""
