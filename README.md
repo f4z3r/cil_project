@@ -1,4 +1,4 @@
-# `cil_project`
+# `CIL_project`
 
 ## Implementation Details
 The currently required libraries are the following:
