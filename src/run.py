@@ -69,6 +69,9 @@ def _setup_argparser():
     parser.add_argument("-g", "--augment",
                         help="augment training image set",
                         action="store_true")
+    parser.add_argument("-d", "--validation_set",
+                        help="create validation set from training set",
+                        action="store_true")
     parser.add_argument("-t", "--train",
                         help="train the given CNN",
                         action="store_true")
@@ -149,19 +152,31 @@ if __name__ == "__main__":
 
     if args.augment:
         # Augment data set
-        if len(glob.glob(os.path.join(file_path, "../assets/training/data/*.png"))) == 100:
+        if len(glob.glob(os.path.join(file_path, "../assets/training/data/*.png"))) <= 100:
             logger.info("Augmenting training data ...")
-            utility.augment_img_set(os.path.join(file_path, "../assets/training/data"))
+            utility.augment_img_set(os.path.join(file_path,
+                                                 os.path.normpath("../assets/training/data")))
         else:
             logger.warning("Skipped. Please ensure only the 100 original images are contained in the"
                            " `assets/training/data` folder")
 
-        if len(glob.glob(os.path.join(file_path, "../assets/training/verify/*.png"))) == 100:
+        if len(glob.glob(os.path.join(file_path, "../assets/training/verify/*.png"))) <= 100:
             logger.info("Augmenting training verification data ...")
-            utility.augment_img_set(os.path.join(file_path, "../assets/training/verify"))
+            utility.augment_img_set(os.path.join(file_path,
+                                                 os.path.normpath("../assets/training/verify")))
         else:
             logger.warning("Skipped. Please ensure only the 100 original images are contained in the"
                            " `assets/training/data` folder")
+
+    if args.validation_set:
+        if len(glob.glob(os.path.join(file_path, "../assets/validation/data/*.png"))) != 0 or \
+                len(glob.glob(os.path.join(file_path, "../assets/validation/verify/*.png"))) != 0:
+            logging.warning("Skipped validation set generation, make sure no validation set"
+                            " is already present.")
+        else:
+            logger.info("Creating validation data ...")
+            utility.get_validation_set(os.path.join(file_path,
+                                                    os.path.normpath("../assets/training/data")))
 
     if args.train:
         if args.model == "cnn_lr_d":

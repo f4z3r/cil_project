@@ -3,7 +3,7 @@
 """Utility module containing helper functions."""
 
 import numpy as np
-import os, sys, glob, logging
+import os, sys, glob, logging, re
 import matplotlib.image as mpimg
 from PIL import Image
 
@@ -45,6 +45,32 @@ def augment_img_set(path):
         for idx in range(4, 7):
             flip_img = flip_img.rotate(90)
             flip_img.save("{}_{}.png".format(filepath_no_ext, idx))
+
+def get_validation_set(path):
+    """Create a validation set from a part of the training set.
+
+    Args:
+        path (str): path to image folder.
+    """
+    pattern = re.compile(r"^satImage_(?P<number>\d{3})(_\d)?$")
+    for file in glob.glob(os.path.join(path, "*.png")):
+        logger.debug("Checking image: {}".format(file))
+        filename_no_ext = "".join(os.path.basename(file).split(".")[:-1])
+        filepath_no_ext = os.path.join(path, filename_no_ext)
+        match = re.fullmatch(pattern, filename_no_ext)
+        num = int(match.group("number"))
+        if num > 80:
+            logger.debug("Moving image: {}".format(file))
+            verifier_file = file.replace(os.path.normpath("training/data"),
+                                         os.path.normpath("training/verify"))
+            validation_file = file.replace(os.path.normpath("training/data"),
+                                           os.path.normpath("validation/data"))
+            validation_veri = verifier_file.replace(os.path.normpath("training/verify"),
+                                                    os.path.normpath("validation/verify"))
+            os.rename(file, validation_file)
+            os.rename(verifier_file, validation_veri)
+
+
 
 def generate_patches_with_pad(img, size, stride, pad):
     """Creates patches of size (size + 2 * pad, size + 2 * pad) pixels from image img and shifting
