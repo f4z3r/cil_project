@@ -8,7 +8,7 @@ import glob, logging
 import numpy as np
 
 import utility
-from models import cnn_lr_d
+from models import cnn_lr_d, dnn_classifier
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -20,7 +20,7 @@ class TestUtilities(unittest.TestCase):
                      "Too many test files in folder. Please ensure that the augmentation" +
                      " was not already run")
     def test_augment_img_set(self):
-        """Tests the image augmentation."""
+        """Tests the image augmentation"""
         utility.augment_img_set(os.path.join(file_path, "../assets/testing/"))
         img_count = len([1 for file in glob.glob(os.path.join(file_path,
                                                               "../assets/testing/test_img*.png"))])
@@ -76,16 +76,43 @@ class TestUtilities(unittest.TestCase):
         patch_list_3d_res = utility.generate_patches_with_pad(img_3d, 1, 1, 1)
         self.assertEqual(np.testing.assert_equal(patch_list_3d, patch_list_3d_res), None)
 
+    def test_image_set_loader(self):
+        """Test the image set loader utility function"""
+        utility.load_training_set(
+            os.path.join(file_path, os.path.normpath("../assets/training/data")),
+            28,
+            suppress_output=True)
+
 class TestModels(unittest.TestCase):
     """Class testing the models."""
 
     def test_model_generation(self):
-        """Test the model generations."""
-        cnn_model1 = cnn_lr_d.Model(os.path.join(file_path, "../assets/training/data"))
-        self.assertNotEqual(cnn_model1, None)
+        """Test the model generations"""
+        with self.assertRaises(ValueError):
+            cnn_model1 = cnn_lr_d.CnnLrD(
+                os.path.join(file_path, os.path.normpath("../assets/training/data")),
+                load_images=False)
+        with self.assertRaises(ValueError):
+            dnn_model1 = dnn_classifier.DnnClassifier(
+                os.path.join(file_path,os.path.normpath("../assets/training/data")),
+                load_images=False)
+
+    def test_cnn_lr_d_train(self):
+        """Test the training function for CNN + LR + D model"""
+        cnn_model1 = cnn_lr_d.CnnLrD(
+            os.path.join(file_path,os.path.normpath("../assets/testing/training/data")))
+        cnn_model1.train(True, epochs=1, steps=3, print_at_end=False)
+
+    def test_dnn_class_train(self):
+        """Test the training function for DNN classifier model"""
+        dnn_model1 = dnn_classifier.DnnClassifier(
+            os.path.join(file_path, os.path.normpath("../assets/testing/training/data")))
+        dnn_model1.train(True, epochs=1, steps=3, print_at_end=False)
+
 
 
 
 
 def run():
+    """Run the tests."""
     unittest.main(module="tests")

@@ -1,10 +1,10 @@
 .DS_Store
 __pycache__/
 *.pyc
-assets/training/data/*.png
-assets/training/verify/*.png
-assets/validation/data/*.png
-assets/validation/verify/*.png
+# assets/training/data/*.png
+# assets/training/verify/*.png
+# assets/validation/data/*.png
+# assets/validation/verify/*.png
 logs/*.log
 
 # output
