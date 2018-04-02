@@ -5,6 +5,9 @@ import argparse, glob
 import logging
 
 import warnings
+
+from src.models import robin_classifier
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
@@ -62,7 +65,7 @@ def _setup_argparser():
 
 
     parser.add_argument("-m", "--model", action="store",
-                        choices=["cnn_lr_d", "dnn_class", "cnn_model"],
+                        choices=["cnn_lr_d", "dnn_class", "cnn_model", "robin_classifier"],
                         default="cnn_lr_d",
                         type=str,
                         help="the CNN model to be used, defaults to cnn_lr_d")
@@ -195,6 +198,10 @@ if __name__ == "__main__":
                                     os.path.normpath("assets/training/data")))
             model.train(not args.quiet)
             model.save("first_test.h5")
+
+        elif args.model == "robin_classifier":
+            model = robin_classifier.RobinClassifier(os.path.normpath("./assets/training"), os.path.normpath("./assets/validation"))
+            model.train(not args.quiet)
 
     if args.run:
         # Test CNN model
