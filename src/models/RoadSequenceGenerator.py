@@ -8,7 +8,7 @@ from keras.utils import Sequence
 
 
 class RoadSequenceGenerator(Sequence):
-    def __init__(self, image_path, image_folder, mask_folder, batch_size, seed=1, dim=72, threshold_mask=0.15):
+    def __init__(self, image_path, image_folder, mask_folder, batch_size, seed=1, dim=16, threshold_mask=0.25):
         self.image_path = image_path
         self.image_folder = image_folder
         self.mask_folder = mask_folder

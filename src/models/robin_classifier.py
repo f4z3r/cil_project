@@ -16,7 +16,7 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 class RobinClassifier(model.Model):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
-    def __init__(self, train_path, validation_path, dimension=72):
+    def __init__(self, train_path, validation_path, dimension=16):
         # Define the model
         self.model = models.Sequential()
 
