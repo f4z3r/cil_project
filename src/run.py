@@ -180,8 +180,8 @@ if __name__ == "__main__":
 
     if args.train:
         if args.model == "cnn_lr_d":
-            model = cnn_lr_d.CnnLrD(os.path.join(os.path.dirname(file_path),
-                                                 os.path.normpath("assets/training/data")))
+            model = cnn_lr_d.CnnLrD(os.path.join(os.path.dirname(file_path), os.path.normpath("assets/training/data/")),
+                                    os.path.join(os.path.dirname(file_path), os.path.normpath("assets/validation/data/")))
             model.train(not args.quiet)
             model.save("first_test.h5")
         elif args.model == "dnn_class":

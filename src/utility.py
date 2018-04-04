@@ -162,8 +162,8 @@ def load_training_set(img_path, pad, suppress_output=False):
 
     for idx, file in enumerate(data_files):
         data_set[idx] = pad_image(load_image(file), pad)
-        verifier_file = file.replace(os.path.normpath("training/data"),
-                                     os.path.normpath("training/verify"))
+        verifier_file = file.replace(os.path.normpath("data"),
+                                     os.path.normpath("verify"))
         verifier_set[idx] = load_image(verifier_file)
 
         if not suppress_output:
