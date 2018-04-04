@@ -22,18 +22,18 @@ def _setup_argparser():
         argparse.Namespace: The command line arguments.
     """
     parser = argparse.ArgumentParser(description="Control program to launch all actions related to"
-                                     " this project.")
+                                                 " this project.")
 
     verbosity_group = parser.add_mutually_exclusive_group()
     verbosity_group.add_argument("-v", "--verbose",
-                        help="provide verbose output",
-                        action="store_true")
+                                 help="provide verbose output",
+                                 action="store_true")
     verbosity_group.add_argument("-vv", "--very_verbose",
-                        help="provide even more verbose output",
-                        action="store_true")
+                                 help="provide even more verbose output",
+                                 action="store_true")
     verbosity_group.add_argument("-q", "--quiet",
-                        help="provide next to no output to console",
-                        action="store_true")
+                                 help="provide next to no output to console",
+                                 action="store_true")
 
     subparsers = parser.add_subparsers(dest="command", help="Test utilities")
     parser_c = subparsers.add_parser("check",
@@ -61,8 +61,6 @@ def _setup_argparser():
                           action="store_true")
     parser_c.add_argument("-p", "--pattern",
                           help="Pattern to match tests ('test*.py' default)")
-
-
 
     parser.add_argument("-m", "--model", action="store",
                         choices=["cnn_lr_d", "dnn_class", "cnn_model", "robin_classifier"],
@@ -152,7 +150,6 @@ if __name__ == "__main__":
         tests.run()
         sys.exit(0)
 
-
     if args.augment:
         # Augment data set
         if len(glob.glob(os.path.join(file_path, "../assets/training/data/*.png"))) <= 100:
@@ -193,14 +190,17 @@ if __name__ == "__main__":
                              os.path.normpath("assets/training/data")))
             model.train(not args.quiet)
             model.save("first_test.h5")
-        elif args.model=="cnn_model":
+        elif args.model == "cnn_model":
             model = cnn_model.CNN_keras(os.path.join(os.path.dirname(file_path),
-                                    os.path.normpath("assets/training/data")))
+                                                     os.path.normpath("assets/training/data")))
             model.train(not args.quiet)
             model.save("first_test.h5")
 
         elif args.model == "robin_classifier":
-            model = robin_classifier.RobinClassifier(os.path.normpath("./assets/training"), os.path.normpath("./assets/validation"))
+            model = robin_classifier.RobinClassifier(os.path.join(os.path.dirname(file_path),
+                                                                  os.path.normpath("assets/training")),
+                                                     os.path.join(os.path.dirname(file_path),
+                                                                  os.path.normpath("assets/validation")))
             model.train(not args.quiet)
 
     if args.run:

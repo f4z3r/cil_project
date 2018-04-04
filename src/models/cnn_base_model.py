@@ -11,16 +11,20 @@ from models.abstract_model import AbstractModel
 class CnnBaseModel(AbstractModel):
     """A model template for all models used by this program."""
 
+    def __init__(self, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
+        # Seed the RNG to ensure the results are reproducible.
+        np.random.seed(0)
+
+        self.train_path = train_path
+        self.validation_path = validation_path
+        self.patch_size = patch_size
+        self.context_padding = context_padding
+        self.window_size = patch_size + 2 * context_padding
+
     def load_images(self):
-        """Load all images into memory."""
         self.data_set, self.verifier_set = utility.load_training_set(self.train_path, self.context_padding)
 
-    def create_batch(self, batch_size=100):
-        """Create a batch to feed to the neural network for training.
-
-        Args:
-            batch_size (int): size of each batch.
-        """
+    def create_train_batch(self, batch_size=100):
         while True:
             batch_data = np.empty((batch_size, self.window_size, self.window_size, 3))
             batch_verifier = np.empty((batch_size, 2))

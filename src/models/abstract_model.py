@@ -6,7 +6,7 @@ import numpy as np
 class AbstractModel:
     """A model template for all models used by this program."""
 
-    def __init__(self, train_path, patch_size=16, context_padding=28, load_images=True):
+    def __init__(self, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
         """Initialise the model.
 
         Args:
@@ -15,20 +15,22 @@ class AbstractModel:
             context_padding (int): default=28 - padding on each side of the analysed patch.
             load_images (bool): ONLY DISABLE FOR CODE CHECKS
         """
-        # Seed the RNG to ensure the results are reproducible.
-        np.random.seed(0)
-
-        self.train_path = train_path
-        self.patch_size = patch_size
-        self.context_padding = context_padding
-        self.window_size = patch_size + 2 * context_padding
+        pass
 
     def load_images(self):
         """Load all images into memory."""
         pass
 
-    def create_batch(self, batch_size=100):
+    def create_train_batch(self, batch_size=100):
         """Create a batch to feed to the neural network for training.
+
+        Args:
+            batch_size (int): size of each batch.
+        """
+        pass
+
+    def create_validation_batch(self, batch_size=100):
+        """Create a batch to feed to the neural network for validation.
 
         Args:
             batch_size (int): size of each batch.
