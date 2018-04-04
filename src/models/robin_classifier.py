@@ -6,14 +6,14 @@ from keras import models, layers, regularizers, optimizers, losses, callbacks
 from src.models.RoadSequenceGenerator import RoadSequenceGenerator
 
 import utility
-from models import model
+from models import cnn_base_model
 
 logger = logging.getLogger("cil_project.models.RobinClassifier")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
 
-class RobinClassifier(model.Model):
+class RobinClassifier(cnn_base_model.CnnBaseModel):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
     def __init__(self, train_path, validation_path, dimension=16):
@@ -71,7 +71,7 @@ class RobinClassifier(model.Model):
         self.generator_train = RoadSequenceGenerator(train_path, 'data', 'verify', 2, dim=dimension)
         self.generator_validation = RoadSequenceGenerator(validation_path, 'data', 'verify', 2, dim=dimension)
 
-    @utility.overrides(model.Model)
+    @utility.overrides(cnn_base_model.CnnBaseModel)
     def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
 
         logger.info("Preparing training, compiling model ...")
@@ -103,7 +103,7 @@ class RobinClassifier(model.Model):
                                         validation_data=self.generator_validation)
         print(hist.history)
 
-    @utility.overrides(model.Model)
+    @utility.overrides(cnn_base_model.CnnBaseModel)
     def save(self, filename):
         """Save the weights of the trained model.
 

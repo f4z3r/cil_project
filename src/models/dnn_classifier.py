@@ -9,13 +9,13 @@ import tensorflow as tf
 # from sklearn.preprocessing import LabelEncoder
 
 import utility
-from models import model
+from models import cnn_base_model
 
 logger = logging.getLogger("cil_project.models.dnn_classifier")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
-class DnnClassifier(model.Model):
+class DnnClassifier(cnn_base_model.CnnBaseModel):
     """Deep neural network classifier model. This is composed of several fully connected layers."""
     def __init__(self, train_path, patch_size=16, context_padding=28, load_images=True):
         """Initialise the model.
@@ -87,7 +87,7 @@ class DnnClassifier(model.Model):
         return self.model
 
 
-    @utility.overrides(model.Model)
+    @utility.overrides(cnn_base_model.CnnBaseModel)
     def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
         """Train the model.
 
@@ -125,11 +125,11 @@ class DnnClassifier(model.Model):
 
         # print("Results: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
 
-    @utility.overrides(model.Model)
+    @utility.overrides(cnn_base_model.CnnBaseModel)
     def evaluate(self):
         """Evaluate the efficiency of the model."""
         pass
 
-    @utility.overrides(model.Model)
+    @utility.overrides(cnn_base_model.CnnBaseModel)
     def save(self, filename):
         pass

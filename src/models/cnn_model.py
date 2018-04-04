@@ -11,7 +11,7 @@ sys.stderr = stderr
 
 
 import utility
-from models import model
+from models import cnn_base_model
 
 logger = logging.getLogger("cil_project.models.cnn_lr_d")
 
@@ -30,10 +30,10 @@ from keras.layers import Dense, Dropout, Activation, Flatten, Input, Embedding, 
 import matplotlib.image as img
 import cv2
 import csv
-from models import model
+from models import cnn_base_model
 import utility
 
-class CNN_keras(model.Model):
+class CNN_keras(cnn_base_model.CnnBaseModel):
 
     def __init__(self, train_path, patch_size=16, context_padding=28, load_images=True):
 
