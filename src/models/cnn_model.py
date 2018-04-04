@@ -1,43 +1,34 @@
 #!/usr/bin/env python3
 
-import os, sys, logging
-import numpy as np
+import logging
+import os
+import sys
 
 # Silence import message
 stderr = sys.stderr
 #sys.stderr = open(os.devnull, 'w')
-import keras
 sys.stderr = stderr
-
-
-import utility
-from models import cnn_base_model
 
 logger = logging.getLogger("cil_project.models.cnn_lr_d")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
-import numpy as np
 import os
 
 os.environ["MKL_THREADING_LAYER"] = "GNU"
 
 import keras
 from keras.models import Sequential
-from keras.layers.core import Dense,Dropout, Flatten
-from keras.layers.convolutional import Conv2D,Conv3D, MaxPooling2D,MaxPooling3D, AveragePooling3D
-from keras.layers import Dense, Dropout, Activation, Flatten, Input, Embedding, LSTM, Bidirectional, Lambda, concatenate, add, Embedding, TimeDistributed
-import matplotlib.image as img
-import cv2
-import csv
+from keras.layers.convolutional import Conv2D, MaxPooling2D
+from keras.layers import Activation, Flatten
 from models import cnn_base_model
-import utility
+
 
 class CNN_keras(cnn_base_model.CnnBaseModel):
 
-    def __init__(self, train_path, patch_size=16, context_padding=28, load_images=True):
+    def __init__(self, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
 
-        super().__init__(train_path, patch_size, context_padding, load_images)
+        super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
         # The following can be set using a config file in ~/.keras/keras.json

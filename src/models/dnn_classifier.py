@@ -1,15 +1,17 @@
 #!usr/bin/env python3
 
-import os, sys, logging
-import numpy as np
+import logging
+import os
+
 import tensorflow as tf
+
+import utility
+from models import cnn_base_model
+
 # import keras
 # from keras.wrappers.scikit_learn import KerasClassifier
 # from sklearn.model_selection import StratifiedKFold, cross_val_score
 # from sklearn.preprocessing import LabelEncoder
-
-import utility
-from models import cnn_base_model
 
 logger = logging.getLogger("cil_project.models.dnn_classifier")
 
@@ -17,7 +19,7 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 
 class DnnClassifier(cnn_base_model.CnnBaseModel):
     """Deep neural network classifier model. This is composed of several fully connected layers."""
-    def __init__(self, train_path, patch_size=16, context_padding=28, load_images=True):
+    def __init__(self, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
         """Initialise the model.
 
         Args:
@@ -26,7 +28,7 @@ class DnnClassifier(cnn_base_model.CnnBaseModel):
             context_padding (int): default=28 - padding on each side of the analysed patch.
             load_images (bool): ONLY DISABLE FOR CODE CHECKS
         """
-        super().__init__(train_path, patch_size, context_padding, load_images)
+        super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
         logger.info("Generating DNN classifier ...")
 
         classifier_config = tf.contrib.learn.RunConfig(

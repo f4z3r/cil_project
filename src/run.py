@@ -185,14 +185,13 @@ if __name__ == "__main__":
             model.train(not args.quiet)
             model.save("first_test.h5")
         elif args.model == "dnn_class":
-            model = dnn_classifier.DnnClassifier(
-                os.path.join(os.path.dirname(file_path),
-                             os.path.normpath("assets/training/data")))
+            model = dnn_classifier.DnnClassifier(os.path.join(os.path.dirname(file_path), os.path.normpath("assets/training/data")),
+                                                 os.path.join(os.path.dirname(file_path), os.path.normpath("assets/validation/data/")))
             model.train(not args.quiet)
             model.save("first_test.h5")
         elif args.model == "cnn_model":
-            model = cnn_model.CNN_keras(os.path.join(os.path.dirname(file_path),
-                                                     os.path.normpath("assets/training/data")))
+            model = cnn_model.CNN_keras(os.path.join(os.path.dirname(file_path), os.path.normpath("assets/training/data")),
+                                        os.path.join(os.path.dirname(file_path), os.path.normpath("assets/validation/data/")))
             model.train(not args.quiet)
             model.save("first_test.h5")
 
