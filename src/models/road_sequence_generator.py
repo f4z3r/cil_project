@@ -1,83 +1,69 @@
-import random
+import glob
 
 import keras
 import numpy as np
-
-from keras.preprocessing.image import ImageDataGenerator
+import scipy
 from keras.utils import Sequence
-
+from os.path import join, normpath
 
 '''
-Augments image data set and masks using Keras ImageDataGenerator.
 Runs on own thread because of keras.utils.Sequence
 '''
+
+
 class RoadSequenceGenerator(Sequence):
-    def __init__(self, image_path, image_folder, mask_folder, batch_size, seed=1, dim=72, patch=16,
-                 threshold_mask=0.15, allow_rotation=True):
-        self.image_path = image_path
-        self.image_folder = image_folder
-        self.mask_folder = mask_folder
+    def __init__(self, image_path, image_folder, mask_folder, batch_size, dim=72, patch=16, threshold_mask=0.25):
         self.batch_size = batch_size
-
-        rotation = 0
-        if allow_rotation:
-            rotation = 180
-
-        self.datagen = ImageDataGenerator(
-            rotation_range=rotation,
-            horizontal_flip=True,
-            fill_mode='nearest',
-            rescale=1. / 255,
-        )
-
-        self.seed = seed
         self.dim = dim
         self.patch = patch
         self.threshold_mask = threshold_mask
 
-        # hack to get same seed for image and mask generator
-        random.seed(seed)
-        datagen_seed = random.randint(0, 1000000)
+        padding = dim // 2
+        patch_padding = self.patch // 2
 
-        self.image_generator = self.datagen.flow_from_directory(
-            self.image_path,
-            target_size=(400, 400),
-            batch_size=self.batch_size,
-            class_mode=None,
-            classes=[self.image_folder],
-            seed=datagen_seed,
-        )
+        image_directory = glob.glob(join(join(normpath(image_path), image_folder), '*.png'))
+        mask_directory = glob.glob(join(join(normpath(image_path), mask_folder), '*.png'))
 
-        self.mask_generator = self.datagen.flow_from_directory(
-            self.image_path,
-            target_size=(400, 400),
-            batch_size=self.batch_size,
-            class_mode=None,
-            classes=[self.mask_folder],
-            seed=datagen_seed,
-        )
+        first = scipy.ndimage.imread(image_directory[0])
+        image_count = len(image_directory)
+
+        self.image_set = np.empty((image_count, first.shape[0] + 2 * padding, first.shape[1] + 2 * padding, 3))
+        self.mask_set = np.empty((image_count, first.shape[0] + 2 * patch_padding, first.shape[1] + 2 * patch_padding))
+
+        for idx, (image_file, mask_file) in enumerate(zip(image_directory, mask_directory)):
+            self.image_set[idx] = np.pad(scipy.ndimage.imread(image_file),
+                                         ((padding, padding), (padding, padding), (0, 0)), mode="reflect")
+            mask = np.pad(scipy.ndimage.imread(mask_file),
+                          ((patch_padding, patch_padding), (patch_padding, patch_padding)),
+                          mode="reflect")
+            self.mask_set[idx] = mask / 255.
 
     def __len__(self):
-        return len(self.image_generator)
+        return self.image_set.shape[0] * 4
 
     def __getitem__(self, idx):
-        images = self.image_generator.next()
-        masks = self.mask_generator.next()
+        images = np.empty((self.batch_size, self.dim, self.dim, 3))
+        masks = np.empty((self.batch_size, 2))
 
-        # find center
-        n_pictures, height, width, _ = images.shape
-        half_dim = self.dim // 2
-        half_patch = self.patch // 2
-        x = random.randint(half_dim, (height - half_dim))
-        y = random.randint(half_dim, (width - half_dim))
+        padding = self.dim // 2
+        patch_padding = self.patch // 2
 
-        # crop the images using the dim size (e.g. 72 pixel)
-        images_cropped = images[:, (x - half_dim): (x + half_dim), (y - half_dim): (y + half_dim), :]
-        # crop the mask using the patch size (e.g. 16 pixel)
-        masks_patch = masks[:, (x - half_patch): (x + half_patch), (y - half_patch): (y + half_patch), :]
+        for idx in range(self.batch_size):
+            image_idx = np.random.randint(0, self.image_set.shape[0])
+            image = self.image_set[image_idx]
+            mask = self.mask_set[image_idx]
 
-        # calculate mean. If mean is over threshold mark as true
-        mask_means = np.mean(masks_patch, axis=(1, 2, 3))
-        y = mask_means > self.threshold_mask
+            # random center
+            c = np.random.randint(0, image.shape[0] - self.dim, 2)
+            c_image = c + [padding, padding]
+            c_mask = c + [patch_padding, patch_padding]
+            image_patch = image[(c_image[0] - padding):(c_image[0] + padding),
+                          (c_image[1] - padding):(c_image[1] + padding), :]
+            mask_patch = mask[(c_mask[0] - patch_padding):(c_mask[0] + patch_padding),
+                         (c_mask[1] - patch_padding):(c_mask[1] + patch_padding)]
 
-        return images_cropped, keras.utils.to_categorical(y, num_classes=2)
+            label = np.mean(mask_patch) > self.threshold_mask
+            label_categorized = keras.utils.to_categorical(label, num_classes=2)
+            images[idx] = image_patch
+            masks[idx] = label_categorized
+        return images, masks
