@@ -6,7 +6,7 @@ import logging
 
 import warnings
 
-from src.models import robin_classifier
+#from models import robin_classifier
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
