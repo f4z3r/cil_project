@@ -11,16 +11,16 @@ sys.stderr = stderr
 
 
 import utility
-from models import model
+from models import cnn_base_model
 
 logger = logging.getLogger("cil_project.models.cnn_lr_d")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
-class CnnLrD(model.Model):
+class CnnLrD(cnn_base_model.CnnBaseModel):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
-    def __init__(self, train_path, patch_size=16, context_padding=28, load_images=True):
+    def __init__(self, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
         """Initialise the model.
 
         Args:
@@ -29,7 +29,7 @@ class CnnLrD(model.Model):
             context_padding (int): default=28 - padding on each side of the analysed patch.
             load_images (bool): ONLY DISABLE FOR CODE CHECKS
         """
-        super().__init__(train_path, patch_size, context_padding, load_images)
+        super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
 
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
@@ -100,7 +100,7 @@ class CnnLrD(model.Model):
 
         logger.info("Done")
 
-    @utility.overrides(model.Model)
+    @utility.overrides(cnn_base_model.CnnBaseModel)
     def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
         """Train the model.
 
@@ -134,14 +134,27 @@ class CnnLrD(model.Model):
                                                       verbose=0,
                                                       mode="auto")
 
+        log_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/logs/"))
+        model_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/models/"))
+        tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0, batch_size=32,
+                                                     write_graph=True,
+                                                     write_grads=False, write_images=False, embeddings_freq=0,
+                                                     embeddings_layer_names=None, embeddings_metadata=None)
+
+        checkpoint_callback = keras.callbacks.ModelCheckpoint(model_dir + '\model_cnn_lr_d.{epoch:02d}-{val_loss:.2f}.hdf5',
+                                                        monitor='val_loss', verbose=0, save_best_only=False,
+                                                        save_weights_only=False, mode='auto', period=1)
+
         logger.info("Starting training ...")
 
         try:
-            hist = self.model.fit_generator(self.create_batch(),
-                                            steps_per_epoch=steps,
+            hist = self.model.fit_generator(self.create_train_batch(),
+                                            steps_per_epoch=5000,
                                             verbose=verbosity,
                                             epochs=epochs,
-                                            callbacks=[lr_callback, stop_callback])
+                                            callbacks=[lr_callback, stop_callback],
+                                            validation_data=self.create_validation_batch(),
+                                            validation_steps=100)
             if print_at_end:
                 print(hist.history)
         except KeyboardInterrupt:
@@ -149,7 +162,7 @@ class CnnLrD(model.Model):
         else:
             logger.info("Training completed")
 
-    @utility.overrides(model.Model)
+    @utility.overrides(cnn_base_model.CnnBaseModel)
     def save(self, filename):
         """Save the weights of the trained model.
 
