@@ -46,7 +46,6 @@ class CnnBaseModel(AbstractModel):
                 batch_data = np.rollaxis(batch_data, 3, 1)
             if four_dim:
                 batch_data = batch_data.reshape(batch_size, self.window_size, self.window_size, 3,1)
-                print(batch_data.shape)
 
 
             yield (batch_data, batch_verifier)
@@ -72,6 +71,6 @@ class CnnBaseModel(AbstractModel):
                 batch_data = np.rollaxis(batch_data, 3, 1)
             if four_dim:
                 batch_data = batch_data.reshape(batch_size, self.window_size, self.window_size, 3,1)
-                print(batch_data.shape)
+
 
             yield (batch_data, batch_verifier)
