@@ -85,11 +85,7 @@ class CNN_keras(model.Model):
                                         )
 
 
-#model=CNN_keras("CNN")
-#print(model.images)
-#model.preprocess_data()
-#model.model_setup()
-#model.fit_model()
+
 
 
 """from now on just copy pasted examples"""
