@@ -140,7 +140,7 @@ if __name__ == "__main__":
 
     import utility
     import tests
-    from models import cnn_lr_d, dnn_classifier, cnn_model
+    from models import cnn_lr_d, dnn_classifier, cnn_model, robin_classifier
 
     if args.command == "check":
         # Run code tests and exit

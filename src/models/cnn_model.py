@@ -22,7 +22,7 @@ from keras.models import Sequential
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers.convolutional import Conv3D, MaxPooling3D
 from keras.layers import Activation, Flatten
-from models import cnn_base_model
+from models import cnn_base_model, augmentation_model
 from keras.layers.core import Dense, Dropout, Activation, Flatten, Reshape
 """Resources used :
    http://cs231n.github.io/convolutional-networks/
@@ -34,7 +34,7 @@ from keras.layers.core import Dense, Dropout, Activation, Flatten, Reshape
    learns its filters.
    """
 
-class CNN_keras(cnn_base_model.CnnBaseModel):
+class CNN_keras(augmentation_model.AugmentationModel):
 
     def __init__(self, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
 

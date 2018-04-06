@@ -2,7 +2,7 @@
 
 import os, logging
 
-from keras import Input, Model, optimizers, losses, callbacks
+from keras import Input, Model, optimizers, losses, callbacks, Sequential
 from keras.layers import Convolution2D, LeakyReLU, MaxPooling2D, Dropout, Dense, regularizers, Flatten
 
 import utility
@@ -22,60 +22,59 @@ class RobinClassifier(augmentation_model.AugmentationModel):
 
         dimension = 72
 
-        inputs = Input(shape=(dimension, dimension, 3))
-        x = Convolution2D(filters=64,
-                          kernel_size=(5, 5),
-                          padding="same")(inputs)
-
-        x = LeakyReLU(alpha=0.1)(x)
-        x = MaxPooling2D(pool_size=(2, 2),
-                         padding="same")(x)
-        x = Dropout(rate=0.25)(x)
+        model = Sequential()
+        model.add(Convolution2D(filters=64,
+                                kernel_size=(5, 5),
+                                padding="same",
+                                input_shape=(dimension, dimension, 3)))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2),
+                               padding="same"))
+        model.add(Dropout(rate=0.25))
 
         # Define the second wave of layers
-        x = Convolution2D(filters=128,
-                          kernel_size=(3, 3),
-                          padding="same")(x)
-        x = LeakyReLU(alpha=0.1)(x)
-        x = MaxPooling2D(pool_size=(2, 2),
-                         padding="same")(x)
-        x = Dropout(rate=0.25)(x)
+        model.add(Convolution2D(filters=128,
+                                kernel_size=(3, 3),
+                                padding="same"))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2),
+                               padding="same"))
+        model.add(Dropout(rate=0.25))
 
         # Define the third wave of layers
-        x = Convolution2D(filters=256,
-                          kernel_size=(3, 3),
-                          padding="same")(x)
-        x = LeakyReLU(alpha=0.1)(x)
-        x = MaxPooling2D(pool_size=(2, 2),
-                         padding="same")(x)
-        x = Dropout(rate=0.25)(x)
+        model.add(Convolution2D(filters=256,
+                                kernel_size=(3, 3),
+                                padding="same"))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2),
+                               padding="same"))
+        model.add(Dropout(rate=0.25))
 
         # Define the fourth wave of layers
-        x = Convolution2D(filters=256,
-                          kernel_size=(3, 3),
-                          padding="same")(x)
-        x = LeakyReLU(alpha=0.1)(x)
-        x = MaxPooling2D(pool_size=(2, 2),
-                         padding="same")(x)
-        x = Dropout(rate=0.25)(x)
+        model.add(Convolution2D(filters=256,
+                                kernel_size=(3, 3),
+                                padding="same"))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2),
+                               padding="same"))
+        model.add(Dropout(rate=0.25))
 
         # Define the fifth wave of layers
-        x = Flatten()(x)
-        x = Dense(units=128,
-                  kernel_regularizer=regularizers.l2(1e-6))(x)
-        x = LeakyReLU(alpha=0.1)(x)
-        x = Dropout(rate=0.5)(x)
+        model.add(Flatten())
+        model.add(Dense(units=128,
+                        kernel_regularizer=regularizers.l2(1e-6)))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(Dropout(rate=0.5))
 
-        predictions = Dense(units=2,
-                            kernel_regularizer=regularizers.l2(1e-6),
-                            activation="softmax")(x)
-
-        self.model = Model(inputs=inputs, outputs=predictions)
+        model.add(Dense(units=2,
+                        kernel_regularizer=regularizers.l2(1e-6),
+                        activation="softmax"))
 
         optimiser = optimizers.Adam()
-        self.model.compile(loss=losses.categorical_crossentropy,
+        model.compile(loss=losses.categorical_crossentropy,
                       optimizer=optimiser,
                       metrics=["accuracy"])
+        self.model = model
 
     @utility.overrides(augmentation_model.AugmentationModel)
     def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
