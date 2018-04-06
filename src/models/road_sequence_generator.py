@@ -2,68 +2,68 @@ import glob
 
 import keras
 import numpy as np
-import scipy
 from keras.utils import Sequence
-from os.path import join, normpath
+from os import path
+from scipy.misc import imread
 
 '''
 Runs on own thread because of keras.utils.Sequence
 '''
-
-
 class RoadSequenceGenerator(Sequence):
-    def __init__(self, image_path, image_folder, mask_folder, batch_size, dim=72, patch=16, threshold_mask=0.25):
+    def __init__(self, image_path, image_folder, mask_folder, batch_size, dim=72, patch=16, pad=28,
+                 threshold_mask=0.25):
+        print('initializing')
         self.batch_size = batch_size
         self.dim = dim
         self.patch = patch
         self.threshold_mask = threshold_mask
 
-        padding = dim // 2
-        patch_padding = self.patch // 2
+        self.pad = pad
 
-        image_directory = glob.glob(join(join(normpath(image_path), image_folder), '*.png'))
-        mask_directory = glob.glob(join(join(normpath(image_path), mask_folder), '*.png'))
+        image_directory = glob.glob(path.join(path.join(path.normpath(image_path), image_folder), '*.png'))
+        mask_directory = glob.glob(path.join(path.join(path.normpath(image_path), mask_folder), '*.png'))
 
-        first = scipy.ndimage.imread(image_directory[0])
         image_count = len(image_directory)
+        first = imread(image_directory[0])
 
-        self.image_set = np.empty((image_count, first.shape[0] + 2 * padding, first.shape[1] + 2 * padding, 3))
-        self.mask_set = np.empty((image_count, first.shape[0] + 2 * patch_padding, first.shape[1] + 2 * patch_padding))
+        self.image_set = np.empty((image_count,
+                                   first.shape[0] + 2 * pad,
+                                   first.shape[1] + 2 * pad,
+                                   first.shape[2]))
+        self.mask_set = np.empty((image_count, first.shape[0], first.shape[1]))
 
-        for idx, (image_file, mask_file) in enumerate(zip(image_directory, mask_directory)):
-            self.image_set[idx] = np.pad(scipy.ndimage.imread(image_file),
-                                         ((padding, padding), (padding, padding), (0, 0)), mode="reflect")
-            mask = np.pad(scipy.ndimage.imread(mask_file),
-                          ((patch_padding, patch_padding), (patch_padding, patch_padding)),
-                          mode="reflect")
-            self.mask_set[idx] = mask / 255.
+        for idx, (file, mask) in enumerate(zip(image_directory, mask_directory)):
+            self.image_set[idx] = np.pad(imread(file), ((pad, pad), (pad, pad), (0, 0)), mode="reflect") / 255.
+            self.mask_set[idx] = imread(mask) / 255.
 
     def __len__(self):
-        return self.image_set.shape[0] * 4
+        return self.image_set.shape[0]
 
     def __getitem__(self, idx):
-        images = np.empty((self.batch_size, self.dim, self.dim, 3))
-        masks = np.empty((self.batch_size, 2))
-
-        padding = self.dim // 2
-        patch_padding = self.patch // 2
+        batch_image = np.empty((self.batch_size, self.dim, self.dim, 3))
+        batch_label = np.empty((self.batch_size, 2))
 
         for idx in range(self.batch_size):
-            image_idx = np.random.randint(0, self.image_set.shape[0])
-            image = self.image_set[image_idx]
-            mask = self.mask_set[image_idx]
+            img_num = np.random.choice(self.image_set.shape[0])
 
-            # random center
-            c = np.random.randint(0, image.shape[0] - self.dim, 2)
-            c_image = c + [padding, padding]
-            c_mask = c + [patch_padding, patch_padding]
-            image_patch = image[(c_image[0] - padding):(c_image[0] + padding),
-                          (c_image[1] - padding):(c_image[1] + padding), :]
-            mask_patch = mask[(c_mask[0] - patch_padding):(c_mask[0] + patch_padding),
-                         (c_mask[1] - patch_padding):(c_mask[1] + patch_padding)]
+            h = (np.random.choice(
+                self.image_set[img_num].shape[1] - 2 * self.pad) // self.patch) * self.patch + self.pad
+            w = (np.random.choice(
+                self.image_set[img_num].shape[0] - 2 * self.pad) // self.patch) * self.patch + self.pad
 
-            label = np.mean(mask_patch) > self.threshold_mask
-            label_categorized = keras.utils.to_categorical(label, num_classes=2)
-            images[idx] = image_patch
-            masks[idx] = label_categorized
-        return images, masks
+            if len(self.image_set[img_num].shape) == 3:
+                data_patch = self.image_set[img_num][h - self.pad:h + self.patch + self.pad,
+                             w - self.pad:w + self.patch + self.pad, :]
+            else:
+                data_patch = self.image_set[img_num][h - self.pad:h + self.patch + self.pad,
+                             w - self.pad:w + self.patch + self.pad]
+
+            mask_patch = self.mask_set[img_num][h - self.pad:h + self.patch - self.pad,
+                         w - self.pad:w + self.patch - self.pad]
+
+            label = (np.mean(mask_patch) > 0.25) * 1
+            label = keras.utils.to_categorical(label, num_classes=2)
+            batch_image[idx] = data_patch
+            batch_label[idx] = label
+
+        return batch_image, batch_label
