@@ -34,11 +34,12 @@ from keras.layers.core import Dense, Dropout, Activation, Flatten, Reshape
    learns its filters.
    """
 
-class CNN_keras(augmentation_model.AugmentationModel):
+class CNN_keras(cnn_base_model.CnnBaseModel):
 
     def __init__(self, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
 
         super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
+
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
         conv3D=True
