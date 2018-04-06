@@ -5,6 +5,8 @@ import os
 import sys
 import numpy as np
 # Silence import message
+from keras import callbacks
+
 stderr = sys.stderr
 #sys.stderr = open(os.devnull, 'w')
 sys.stderr = stderr
@@ -138,9 +140,24 @@ class CNN_keras(cnn_base_model.CnnBaseModel):
         #training_set=self.create_batch()
         #print(training_set)
         #self.model.fit(training_set, epochs=10)
-        hist = self.model.fit_generator(self.create_train_batch(four_dim=True),
+
+        log_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/logs/"))
+        model_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/models/"))
+        tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0, batch_size=32,
+                                                     write_graph=True,
+                                                     write_grads=False, write_images=False, embeddings_freq=0,
+                                                     embeddings_layer_names=None, embeddings_metadata=None)
+
+        checkpoint_callback = callbacks.ModelCheckpoint(model_dir + '\model_cnn_model.{epoch:02d}-{val_loss:.2f}.hdf5',
+                                                        monitor='val_loss', verbose=0, save_best_only=False,
+                                                        save_weights_only=False, mode='auto', period=1)
+
+        self.model.fit_generator(self.create_train_batch(four_dim=True),
+                                        validation_data=self.create_validation_batch(four_dim=True),
+                                        validation_steps=1,
                                         steps_per_epoch=steps,
-                                        epochs=epochs
+                                        epochs=epochs,
+                                        callbacks=[checkpoint_callback, tensorboard_callback]
                                         )
 
 
