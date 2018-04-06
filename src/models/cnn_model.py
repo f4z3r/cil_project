@@ -3,7 +3,7 @@
 import logging
 import os
 import sys
-
+import numpy as np
 # Silence import message
 stderr = sys.stderr
 #sys.stderr = open(os.devnull, 'w')
@@ -20,9 +20,19 @@ os.environ["MKL_THREADING_LAYER"] = "GNU"
 import keras
 from keras.models import Sequential
 from keras.layers.convolutional import Conv2D, MaxPooling2D
+from keras.layers.convolutional import Conv3D, MaxPooling3D
 from keras.layers import Activation, Flatten
 from models import cnn_base_model
+from keras.layers.core import Dense, Dropout, Activation, Flatten, Reshape
+"""Resources used :
+   http://cs231n.github.io/convolutional-networks/
 
+   This implementation plays around with the hidden dimesion of the filters applied to the image.
+   The 3-rd dimension, originally colors, comes to be substituted after the very first 3-d convolution, which convolutes over
+   the all colors at the same time, by the hidden dimensions of filters.
+   Then other stacked triplets of layers expands the hidden dimension and restrict it. Since non lnearity is applied, each of the three stacked blocks
+   learns its filters.
+   """
 
 class CNN_keras(cnn_base_model.CnnBaseModel):
 
@@ -31,10 +41,15 @@ class CNN_keras(cnn_base_model.CnnBaseModel):
         super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
+        conv3D=True
+
         # The following can be set using a config file in ~/.keras/keras.json
         if keras.backend.image_dim_ordering() == "tf":
             # Keras is using Tensorflow as backend
-            input_dim = (self.window_size, self.window_size, 3)
+            if Conv3D:
+                input_dim = (self.window_size, self.window_size, 3, 1)
+            else:
+                input_dim = (self.window_size, self.window_size, 3)
         else:
              # Keras is using Theano as backend
             input_dim = (3, self.window_size, self.window_size)
@@ -45,15 +60,67 @@ class CNN_keras(cnn_base_model.CnnBaseModel):
         else:
             raise ValueError("load_images must be set to True")
 
-        logger.info("Done")
+                
+        """Applying conv3D focusing on the new 3-rd dimension (filters) of the previous conv3D which hopefully learns through time 
+           to attribute distinctive values to roads and not roads sub-filtered images. A way to think of it is that the first conv3D layer
+           learns to count roads sub image and not sub image looking at filters dimension |||||||||| -> layers depth (filters) -> what is road , what is not? """
 
-
+        """Think if to add a stride in layers & model= BatchNormalization()(model) at some point in blocks of layers"""
         self.model = Sequential()
-        self.model.add(Conv2D(32, kernel_size=(10,10), input_shape=input_dim))
-        #model= BatchNormalization()(model)
+
+
+        """ max-pooling and monotonely increasing non-linearities commute, so the result is the same, but applying max pooing before, subsample stuff and reduce computation
+            https://stackoverflow.com/questions/35543428/activation-function-after-pooling-layer-or-convolutional-layer"""
+
+        """1-st block of layers"""
+
+        """From 72x72x3 -> 18x18x32"""
+        self.model.add(Conv3D(32, kernel_size=(4,4,3), strides=(4,4,3),input_shape=input_dim))
+        self.model.add(Reshape((18, 18, 32, 1)))
+        """From 18x18x32 -> 9x9x16"""
+        self.model.add(MaxPooling3D(pool_size=(2,2,2), strides=(2,2,2)))
+        self.model.add(Reshape((9, 9, 16, 1)))
         self.model.add(Activation('relu'))
-        self.model.add(MaxPooling2D(pool_size=(4,4)))
+        print("Gone through first block")
+
+        """2-rd block of layers"""
+        """From 9x9x16 -> 9x9x64   (3-rd, filters, dimension expanded)"""
+        self.model.add(Conv3D(64, kernel_size=(1,1,16),strides=(1,1,16), input_shape=input_dim))
+        self.model.add(Reshape((9, 9, 64, 1)))
+
+        """From 9x9x64 -> 9x9x32 (focusing on hidden filters dimension -> learning hidden representation)"""
+        self.model.add(MaxPooling3D(pool_size=(1,1,2),strides=(1,1,2)))
+        self.model.add(Reshape((9, 9, 32, 1)))
+
+        self.model.add(Activation('relu'))
+
+        """Again expanding the 3-rd dimension -> hidden dimension (of filter results which this way with backprop are forced to learn)""" 
+        """3-rd block of layers"""
+        """From 9x9x32 -> 9x9x100 -> maybe the higher the depth , the more accuracy on results we get (the more filters learn and share their opinion on the sub image)"""
+        self.model.add(Conv3D(100, kernel_size=(1,1,32), strides=(1,1,32), input_shape=input_dim))
+        self.model.add(Reshape((9, 9, 100, 1)))
+
+        """From 9x9x100 -> 9x9x50 (here we could do even 1x1x50 -> better to expand dimension in dense layer -> expanding just hidden dimensions) """
+        self.model.add(MaxPooling3D(pool_size=(1,1,2), strides=(1,1,2)))
+        self.model.add(Reshape((9, 9, 50, 1)))
+        
+        self.model.add(Activation('relu'))
+
+        """Please note that each filter on each block of layers learn from previous filters of previous block of layers"""
+
+        """Dense layer -> out for prediction & groundtruth -> learning afterwards with backprop"""
+        """Thinks if to decomment the dense layer before the output one with only 2 units,
+           cause all the information can be kernelized expanding with a dense layer (from 
+           9x9x32 = 2592 -> for instance W=(2592,10000) going to higher dimensions 
+           (sort of SVM, which is luckily done implicitely by the Neural network + non linearity)
+           and then last out layer (10000,2) all reduced to 2 dimensions for output """
+
         self.model.add(Flatten())
+        self.model.add(keras.layers.Dense(units=10000,
+                                          kernel_regularizer=keras.regularizers.l2(1e-6),
+                                          activation="relu"))
+        #self.model.add(Activation('relu'))
+
         self.model.add(keras.layers.Dense(units=2,
                                           kernel_regularizer=keras.regularizers.l2(1e-6),
                                           activation="softmax"))
@@ -70,17 +137,13 @@ class CNN_keras(cnn_base_model.CnnBaseModel):
         #training_set=self.create_batch()
         #print(training_set)
         #self.model.fit(training_set, epochs=10)
-        hist = self.model.fit_generator(self.create_batch(),
+        hist = self.model.fit_generator(self.create_train_batch(four_dim=True),
                                         steps_per_epoch=steps,
                                         epochs=epochs
                                         )
 
 
-#model=CNN_keras("CNN")
-#print(model.images)
-#model.preprocess_data()
-#model.model_setup()
-#model.fit_model()
+
 
 
 """from now on just copy pasted examples"""

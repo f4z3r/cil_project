@@ -25,7 +25,7 @@ class CnnBaseModel(AbstractModel):
         self.data_set, self.verifier_set = utility.load_training_set(self.train_path, self.context_padding)
         self.data_set_validation, self.verifier_set_validation = utility.load_training_set(self.validation_path, self.context_padding)
 
-    def create_train_batch(self, batch_size=100):
+    def create_train_batch(self, batch_size=100, four_dim=False):
         while True:
             batch_data = np.empty((batch_size, self.window_size, self.window_size, 3))
             batch_verifier = np.empty((batch_size, 2))
@@ -44,10 +44,13 @@ class CnnBaseModel(AbstractModel):
 
             if keras.backend.image_dim_ordering() == "th":
                 batch_data = np.rollaxis(batch_data, 3, 1)
+            if four_dim:
+                batch_data = batch_data.reshape(batch_size, self.window_size, self.window_size, 3,1)
+
 
             yield (batch_data, batch_verifier)
 
-    def create_validation_batch(self, batch_size=100):
+    def create_validation_batch(self, batch_size=100, four_dim=False):
         while True:
             batch_data = np.empty((batch_size, self.window_size, self.window_size, 3))
             batch_verifier = np.empty((batch_size, 2))
@@ -66,5 +69,8 @@ class CnnBaseModel(AbstractModel):
 
             if keras.backend.image_dim_ordering() == "th":
                 batch_data = np.rollaxis(batch_data, 3, 1)
+            if four_dim:
+                batch_data = batch_data.reshape(batch_size, self.window_size, self.window_size, 3,1)
+
 
             yield (batch_data, batch_verifier)
