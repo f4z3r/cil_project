@@ -124,13 +124,13 @@ class CnnLrD(BaseModel):
 
         try:
             self.model.fit_generator(self.train_generator.generate_patch(),
-                                            steps_per_epoch=steps,
-                                            verbose=verbosity,
-                                            epochs=epochs,
-                                            callbacks=[lr_callback, stop_callback, tensorboard_callback,
-                                                       checkpoint_callback],
-                                            validation_data=self.validation_generator.generate_patch(),
-                                            validation_steps=100)
+                                     steps_per_epoch=steps,
+                                     verbose=verbosity,
+                                     epochs=epochs,
+                                     callbacks=[lr_callback, stop_callback, tensorboard_callback,
+                                                checkpoint_callback],
+                                     validation_data=self.validation_generator.generate_patch(),
+                                     validation_steps=100)
         except KeyboardInterrupt:
             logger.warning("\nTraining interrupted")
         else:

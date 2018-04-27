@@ -9,6 +9,7 @@ from models import cnn_lr_d
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
+
 class TestModels(unittest.TestCase):
     """Class testing the models."""
 
@@ -22,8 +23,9 @@ class TestModels(unittest.TestCase):
     def test_cnn_lr_d_train(self):
         """Test the training function for CNN + LR + D model"""
         cnn_model1 = cnn_lr_d.CnnLrD(
-            os.path.join(file_path,os.path.normpath("../assets/testing/training/data")))
+            os.path.join(file_path, os.path.normpath("../assets/testing/training/data")))
         cnn_model1.train(True, epochs=1, steps=3, print_at_end=False)
+
 
 def run():
     """Run the tests."""

@@ -134,8 +134,6 @@ if __name__ == "__main__":
     args = _setup_argparser()
     logger = _setup_logger(args)
 
-
-
     if args.command == "check":
         # Run code tests and exit
         logger.info("Running tests ...")
@@ -146,16 +144,20 @@ if __name__ == "__main__":
 
     if args.train:
         if args.model == "cnn_lr_d":
-            train_generator = PatchImageGenerator(os.path.normpath("../assets/training/data"), os.path.normpath("../assets/training/verify"))
-            validation_generator = PatchImageGenerator(os.path.normpath("../assets/validation/data"), os.path.normpath("../assets/validation/verify"))
+            train_generator = PatchImageGenerator(os.path.normpath("../assets/training/data"),
+                                                  os.path.normpath("../assets/training/verify"))
+            validation_generator = PatchImageGenerator(os.path.normpath("../assets/validation/data"),
+                                                       os.path.normpath("../assets/validation/verify"))
 
             model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
             model.train(not args.quiet)
             model.save("first_test.h5")
 
         elif args.model == "cnn_model":
-            train_generator = PatchImageGenerator(os.path.normpath("../assets/training/data"), os.path.normpath("../assets/training/verify"))
-            validation_generator = PatchImageGenerator(os.path.normpath("../assets/validation/data"), os.path.normpath("../assets/validation/verify"))
+            train_generator = PatchImageGenerator(os.path.normpath("../assets/training/data"),
+                                                  os.path.normpath("../assets/training/verify"))
+            validation_generator = PatchImageGenerator(os.path.normpath("../assets/validation/data"),
+                                                       os.path.normpath("../assets/validation/verify"))
             model = cnn_model.CNN_keras(train_generator, validation_generator)
             model.train(not args.quiet)
             model.save("first_test.h5")

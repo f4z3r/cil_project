@@ -104,7 +104,6 @@ class CNN_keras(BaseModel):
         print(self.model.summary())
 
     def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
-
         optimiser = keras.optimizers.Adam()
         self.model.compile(loss=keras.losses.categorical_crossentropy,
                            optimizer=optimiser,
