@@ -20,7 +20,7 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 class CnnLrD(cnn_base_model.CnnBaseModel):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
-    def __init__(self, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
+    def __init__(self, train_generator, validation_generator, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
         """Initialise the model.
 
         Args:
@@ -29,6 +29,9 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
             context_padding (int): default=28 - padding on each side of the analysed patch.
             load_images (bool): ONLY DISABLE FOR CODE CHECKS
         """
+        self.train_generator = train_generator
+        self.validation_generator = validation_generator
+
         super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
 
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
@@ -148,12 +151,12 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
         logger.info("Starting training ...")
 
         try:
-            hist = self.model.fit_generator(self.create_train_batch(),
+            hist = self.model.fit_generator(self.train_generator.generate_patch(),
                                             steps_per_epoch=5000,
                                             verbose=verbosity,
                                             epochs=epochs,
                                             callbacks=[lr_callback, stop_callback],
-                                            validation_data=self.create_validation_batch(),
+                                            validation_data=self.validation_generator.generate_patch(),
                                             validation_steps=100)
             if print_at_end:
                 print(hist.history)
