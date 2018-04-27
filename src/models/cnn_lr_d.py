@@ -32,17 +32,9 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
         self.train_generator = train_generator
         self.validation_generator = validation_generator
 
-        super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
+        # super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
 
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
-
-        # The following can be set using a config file in ~/.keras/keras.json
-        if keras.backend.image_dim_ordering() == "tf":
-            # Keras is using Tensorflow as backend
-            input_dim = (self.window_size, self.window_size, 3)
-        else:
-            # Keras is using Theano as backend
-            input_dim = (3, self.window_size, self.window_size)
 
         # Define the model
         self.model = keras.models.Sequential()
@@ -51,7 +43,7 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
         self.model.add(keras.layers.Convolution2D(filters=64,
                                                   kernel_size=(5, 5),
                                                   padding="same",
-                                                  input_shape=input_dim))
+                                                  input_shape=train_generator.input_dim()))
         self.model.add(keras.layers.LeakyReLU(alpha=0.1))
         self.model.add(keras.layers.MaxPooling2D(pool_size=(2,2),
                                                  padding="same"))
@@ -94,12 +86,6 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
         self.model.add(keras.layers.Dense(units=2,
                                           kernel_regularizer=keras.regularizers.l2(1e-6),
                                           activation="softmax"))
-
-        if load_images:
-            # Preload the images
-            self.load_images()
-        else:
-            raise ValueError("load_images must be set to True")
 
         logger.info("Done")
 

@@ -67,3 +67,6 @@ class PatchImageGenerator:
             # batch_data = np.rollaxis(batch_data, 3, 1)
 
             yield (batch_data, batch_verifier)
+
+    def input_dim(self):
+        return self.window_size, self.window_size, 3
