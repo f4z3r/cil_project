@@ -5,8 +5,6 @@ import argparse, glob
 import logging
 
 import warnings
-
-#from models import robin_classifier
 from generators.PatchImageGenerator import PatchImageGenerator
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -64,7 +62,7 @@ def _setup_argparser():
                           help="Pattern to match tests ('test*.py' default)")
 
     parser.add_argument("-m", "--model", action="store",
-                        choices=["cnn_lr_d", "dnn_class", "cnn_model", "robin_classifier"],
+                        choices=["cnn_lr_d", "cnn_model"],
                         default="cnn_lr_d",
                         type=str,
                         help="the CNN model to be used, defaults to cnn_lr_d")
@@ -141,7 +139,7 @@ if __name__ == "__main__":
 
     import utility
     import tests
-    from models import cnn_lr_d, dnn_classifier, cnn_model, robin_classifier
+    from models import cnn_lr_d, cnn_model
 
     if args.command == "check":
         # Run code tests and exit
@@ -187,23 +185,12 @@ if __name__ == "__main__":
             model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
             model.train(not args.quiet)
             model.save("first_test.h5")
-        elif args.model == "dnn_class":
-            model = dnn_classifier.DnnClassifier(os.path.join(os.path.dirname(file_path), os.path.normpath("assets/training/data")),
-                                                 os.path.join(os.path.dirname(file_path), os.path.normpath("assets/validation/data/")))
-            model.train(not args.quiet)
-            model.save("first_test.h5")
+
         elif args.model == "cnn_model":
             model = cnn_model.CNN_keras(os.path.join(os.path.dirname(file_path), os.path.normpath("assets/training/data")),
                                         os.path.join(os.path.dirname(file_path), os.path.normpath("assets/validation/data/")))
             model.train(not args.quiet)
             model.save("first_test.h5")
-
-        elif args.model == "robin_classifier":
-            model = robin_classifier.RobinClassifier(os.path.join(os.path.dirname(file_path),
-                                                                  os.path.normpath("assets/training")),
-                                                     os.path.join(os.path.dirname(file_path),
-                                                                  os.path.normpath("assets/validation")))
-            model.train(not args.quiet)
 
     if args.run:
         # Test CNN model

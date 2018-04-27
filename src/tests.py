@@ -8,7 +8,7 @@ import glob, logging
 import numpy as np
 
 import utility
-from models import cnn_lr_d, dnn_classifier
+from models import cnn_lr_d
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 

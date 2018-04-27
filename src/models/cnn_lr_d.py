@@ -23,8 +23,6 @@ class CnnLrD(AbstractModel):
         self.train_generator = train_generator
         self.validation_generator = validation_generator
 
-        # super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
-
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
         # Define the model
