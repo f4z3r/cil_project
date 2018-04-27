@@ -1,33 +1,24 @@
 #!/usr/bin/env python3
 
-import os, sys, logging
-import numpy as np
+import logging
+import os
 
-# Silence import message
-stderr = sys.stderr
-#sys.stderr = open(os.devnull, 'w')
 import keras
-sys.stderr = stderr
-
 
 import utility
 from models import cnn_base_model
+from models.abstract_model import AbstractModel
 
 logger = logging.getLogger("cil_project.models.cnn_lr_d")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
-class CnnLrD(cnn_base_model.CnnBaseModel):
+
+class CnnLrD(AbstractModel):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
-    def __init__(self, train_generator, validation_generator, train_path, validation_path, patch_size=16, context_padding=28, load_images=True):
+    def __init__(self, train_generator, validation_generator):
         """Initialise the model.
-
-        Args:
-            train_path (str): path to training data.
-            patch_size (int): default=16 - the size of the patch to analyse.
-            context_padding (int): default=28 - padding on each side of the analysed patch.
-            load_images (bool): ONLY DISABLE FOR CODE CHECKS
         """
         self.train_generator = train_generator
         self.validation_generator = validation_generator
@@ -45,7 +36,7 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
                                                   padding="same",
                                                   input_shape=train_generator.input_dim()))
         self.model.add(keras.layers.LeakyReLU(alpha=0.1))
-        self.model.add(keras.layers.MaxPooling2D(pool_size=(2,2),
+        self.model.add(keras.layers.MaxPooling2D(pool_size=(2, 2),
                                                  padding="same"))
         self.model.add(keras.layers.Dropout(rate=0.25))
 
@@ -54,7 +45,7 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
                                                   kernel_size=(3, 3),
                                                   padding="same"))
         self.model.add(keras.layers.LeakyReLU(alpha=0.1))
-        self.model.add(keras.layers.MaxPooling2D(pool_size=(2,2),
+        self.model.add(keras.layers.MaxPooling2D(pool_size=(2, 2),
                                                  padding="same"))
         self.model.add(keras.layers.Dropout(rate=0.25))
 
@@ -63,7 +54,7 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
                                                   kernel_size=(3, 3),
                                                   padding="same"))
         self.model.add(keras.layers.LeakyReLU(alpha=0.1))
-        self.model.add(keras.layers.MaxPooling2D(pool_size=(2,2),
+        self.model.add(keras.layers.MaxPooling2D(pool_size=(2, 2),
                                                  padding="same"))
         self.model.add(keras.layers.Dropout(rate=0.25))
 
@@ -72,7 +63,7 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
                                                   kernel_size=(3, 3),
                                                   padding="same"))
         self.model.add(keras.layers.LeakyReLU(alpha=0.1))
-        self.model.add(keras.layers.MaxPooling2D(pool_size=(2,2),
+        self.model.add(keras.layers.MaxPooling2D(pool_size=(2, 2),
                                                  padding="same"))
         self.model.add(keras.layers.Dropout(rate=0.25))
 
@@ -126,22 +117,24 @@ class CnnLrD(cnn_base_model.CnnBaseModel):
         log_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/logs/"))
         model_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/models/"))
         tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0, batch_size=32,
-                                                     write_graph=True,
-                                                     write_grads=False, write_images=False, embeddings_freq=0,
-                                                     embeddings_layer_names=None, embeddings_metadata=None)
+                                                           write_graph=True,
+                                                           write_grads=False, write_images=False, embeddings_freq=0,
+                                                           embeddings_layer_names=None, embeddings_metadata=None)
 
-        checkpoint_callback = keras.callbacks.ModelCheckpoint(model_dir + '\model_cnn_lr_d.{epoch:02d}-{val_loss:.2f}.hdf5',
-                                                        monitor='val_loss', verbose=0, save_best_only=False,
-                                                        save_weights_only=False, mode='auto', period=1)
+        checkpoint_callback = keras.callbacks.ModelCheckpoint(
+            model_dir + '\model_cnn_lr_d.{epoch:02d}-{val_acc:.2f}.hdf5',
+            monitor='val_loss', verbose=0, save_best_only=False,
+            save_weights_only=False, mode='auto', period=1)
 
         logger.info("Starting training ...")
 
         try:
             hist = self.model.fit_generator(self.train_generator.generate_patch(),
-                                            steps_per_epoch=5000,
+                                            steps_per_epoch=steps,
                                             verbose=verbosity,
                                             epochs=epochs,
-                                            callbacks=[lr_callback, stop_callback],
+                                            callbacks=[lr_callback, stop_callback, tensorboard_callback,
+                                                       checkpoint_callback],
                                             validation_data=self.validation_generator.generate_patch(),
                                             validation_steps=100)
             if print_at_end:
