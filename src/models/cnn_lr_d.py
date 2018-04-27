@@ -5,8 +5,6 @@ import os
 
 import keras
 
-import utility
-from models import cnn_base_model
 from models.abstract_model import AbstractModel
 
 logger = logging.getLogger("cil_project.models.cnn_lr_d")
@@ -20,8 +18,7 @@ class CnnLrD(AbstractModel):
     def __init__(self, train_generator, validation_generator):
         """Initialise the model.
         """
-        self.train_generator = train_generator
-        self.validation_generator = validation_generator
+        super().__init__(train_generator, validation_generator)
 
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
@@ -78,7 +75,6 @@ class CnnLrD(AbstractModel):
 
         logger.info("Done")
 
-    @utility.overrides(cnn_base_model.CnnBaseModel)
     def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
         """Train the model.
 
@@ -140,7 +136,6 @@ class CnnLrD(AbstractModel):
         else:
             logger.info("Training completed")
 
-    @utility.overrides(cnn_base_model.CnnBaseModel)
     def save(self, filename):
         """Save the weights of the trained model.
 

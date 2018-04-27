@@ -2,10 +2,10 @@
 
 import logging
 import os
-import sys
 
-# Silence import message
 from keras import callbacks
+
+from models.abstract_model import AbstractModel
 
 logger = logging.getLogger("cil_project.models.cnn_model")
 
@@ -18,7 +18,6 @@ os.environ["MKL_THREADING_LAYER"] = "GNU"
 import keras
 from keras.models import Sequential
 from keras.layers.convolutional import Conv3D, MaxPooling3D
-from models import cnn_base_model
 from keras.layers.core import Activation, Flatten, Reshape
 
 """Resources used :
@@ -32,35 +31,13 @@ from keras.layers.core import Activation, Flatten, Reshape
    """
 
 
-class CNN_keras(cnn_base_model.CnnBaseModel):
-
-    def __init__(self, train_generator, validation_generator, train_path, validation_path, patch_size=16,
-                 context_padding=28, load_images=True):
-        self.train_generator = train_generator
-        self.validation_generator = validation_generator
-
-        super().__init__(train_path, validation_path, patch_size, context_padding, load_images)
+class CNN_keras(AbstractModel):
+    def __init__(self, train_generator, validation_generator):
+        super().__init__(train_generator, validation_generator)
 
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
-        conv3D = True
-
-        # The following can be set using a config file in ~/.keras/keras.json
-        if keras.backend.image_dim_ordering() == "tf":
-            # Keras is using Tensorflow as backend
-            if Conv3D:
-                input_dim = (self.window_size, self.window_size, 3, 1)
-            else:
-                input_dim = (self.window_size, self.window_size, 3)
-        else:
-            # Keras is using Theano as backend
-            input_dim = (3, self.window_size, self.window_size)
-
-        if load_images:
-            # Preload the images
-            self.load_images()
-        else:
-            raise ValueError("load_images must be set to True")
+        input_dim = self.train_generator.input_dim(four_dim=True)
 
         """Applying conv3D focusing on the new 3-rd dimension (filters) of the previous conv3D which hopefully learns through time 
            to attribute distinctive values to roads and not roads sub-filtered images. A way to think of it is that the first conv3D layer

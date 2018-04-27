@@ -70,5 +70,7 @@ class PatchImageGenerator:
 
             yield (batch_data, batch_verifier)
 
-    def input_dim(self):
+    def input_dim(self, four_dim=True):
+        if four_dim:
+            return self.window_size, self.window_size, 3, 1
         return self.window_size, self.window_size, 3
