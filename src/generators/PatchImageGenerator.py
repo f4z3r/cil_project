@@ -45,7 +45,7 @@ class PatchImageGenerator:
 
         return data_patch, verifier_patch
 
-    def generate_patch(self, batch_size=100, allow_augmentation=True):
+    def generate_patch(self, batch_size=100, four_dim=False):
         window_size = self.window_size
         patch_size = self.patch_size
         context_padding = self.context_padding
@@ -64,7 +64,9 @@ class PatchImageGenerator:
                 label = keras.utils.to_categorical(label, num_classes=2)
                 batch_data[idx] = data_patch
                 batch_verifier[idx] = label
-            # batch_data = np.rollaxis(batch_data, 3, 1)
+
+            if four_dim:
+                batch_data = batch_data.reshape(batch_size, self.window_size, self.window_size, 3, 1)
 
             yield (batch_data, batch_verifier)
 

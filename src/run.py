@@ -187,7 +187,9 @@ if __name__ == "__main__":
             model.save("first_test.h5")
 
         elif args.model == "cnn_model":
-            model = cnn_model.CNN_keras(os.path.join(os.path.dirname(file_path), os.path.normpath("assets/training/data")),
+            train_generator = PatchImageGenerator(os.path.normpath("../assets/training/data"), os.path.normpath("../assets/training/verify"))
+            validation_generator = PatchImageGenerator(os.path.normpath("../assets/validation/data"), os.path.normpath("../assets/validation/verify"))
+            model = cnn_model.CNN_keras(train_generator, validation_generator, os.path.join(os.path.dirname(file_path), os.path.normpath("assets/training/data")),
                                         os.path.join(os.path.dirname(file_path), os.path.normpath("assets/validation/data/")))
             model.train(not args.quiet)
             model.save("first_test.h5")

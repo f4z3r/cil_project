@@ -127,7 +127,7 @@ class CnnLrD(AbstractModel):
         logger.info("Starting training ...")
 
         try:
-            hist = self.model.fit_generator(self.train_generator.generate_patch(),
+            self.model.fit_generator(self.train_generator.generate_patch(),
                                             steps_per_epoch=steps,
                                             verbose=verbosity,
                                             epochs=epochs,
@@ -135,8 +135,6 @@ class CnnLrD(AbstractModel):
                                                        checkpoint_callback],
                                             validation_data=self.validation_generator.generate_patch(),
                                             validation_steps=100)
-            if print_at_end:
-                print(hist.history)
         except KeyboardInterrupt:
             logger.warning("\nTraining interrupted")
         else:
