@@ -5,7 +5,7 @@ import os
 
 from keras import callbacks
 
-from models.abstract_model import AbstractModel
+from models.base_model import BaseModel
 
 logger = logging.getLogger("cil_project.models.cnn_model")
 
@@ -31,7 +31,7 @@ from keras.layers.core import Activation, Flatten, Reshape
    """
 
 
-class CNN_keras(AbstractModel):
+class CNN_keras(BaseModel):
     def __init__(self, train_generator, validation_generator):
         super().__init__(train_generator, validation_generator)
 

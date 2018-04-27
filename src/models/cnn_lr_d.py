@@ -5,14 +5,14 @@ import os
 
 import keras
 
-from models.abstract_model import AbstractModel
+from models.base_model import BaseModel
 
 logger = logging.getLogger("cil_project.models.cnn_lr_d")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
 
-class CnnLrD(AbstractModel):
+class CnnLrD(BaseModel):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
     def __init__(self, train_generator, validation_generator):

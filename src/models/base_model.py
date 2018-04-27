@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-class AbstractModel:
+class BaseModel:
     """A model template for all models used by this program."""
 
     def __init__(self, train_generator, validation_generator):
