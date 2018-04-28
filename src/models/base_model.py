@@ -6,6 +6,8 @@ class BaseModel:
 
     def __init__(self, train_generator, validation_generator):
         """Initialise the model.
+           Remark: the validation generator feeded is empty if the model is predicting,
+           it is not empty otherwise
         """
         self.train_generator = train_generator
         self.validation_generator = validation_generator

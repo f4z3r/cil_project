@@ -7,9 +7,11 @@ import sys
 import warnings
 
 import tests
+from keras.models import load_model
 from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
 from generators.PatchTestImageGenerator import PatchTestImageGenerator
 from models import cnn_lr_d, cnn_model
+from models import predictions
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
@@ -75,6 +77,9 @@ def _setup_argparser():
                         action="store_true")
     parser.add_argument("-pr", "--predict",
                         help="predict on a test set given the CNN",
+                        action="store_true")
+    parser.add_argument("-ptm", "--path_to_trained_model",
+                        help="path to load a specific trained model",
                         action="store_true")
     parser.add_argument("-r", "--run",
                         help="run a trained version of a given CNN",
@@ -167,22 +172,40 @@ if __name__ == "__main__":
             model.save("first_test.h5")
 
     if args.predict:
-        #TODO complete this part
-        #if args.
+        #TODO complete this part -> Wait Jakob to create directories with saved files
+        
+        """trained_models_dir = os.path.normpath("../trained_models/args.model/")
+        if not os.path.exists(trained_models_dir):
+            os.makedirs(trained_models_dir)"""
+
+        if args.path_to_trained_model:
+            path_to_trained_model = args.path_to_trained_model
+        else:
+            path_to_trained_model = os.path.normpath("../trained_models/"+args.model+"/")
+            all_runs = [os.path.join(path_to_trained_model, o) for o in os.listdir(path_to_trained_model)
+                        if os.path.isdir(os.path.join(path_to_trained_model, o))]
+            latest_run = max(all_runs, key=os.path.getmtime)  # get the latest run
+            checkpoint_path = path_to_trained_model+latest_run+"/"
+            path_model_to_restore = checkpoint_path +"*.h5" #TODO + name of the saved model to fetch
+            print("Loading the last checkpoint of the model ",args.model," from: ",checkpoint_path)
+
+
         if args.model == "cnn_lr_d":
+            
             test_generator = PatchTestImageGenerator(os.path.normpath("../assets/testing/data"),
                                                   os.path.normpath("../assets/testing/predictions"))
-
-
+            
+            restored_model = load_model(path_model_to_restore)
+            model = predictions.Prediction_model(test_generator = test_generator, restored_model = restored_model)
+            model.prediction_given_model()
+        
         elif args.model == "cnn_model":
             test_generator = PatchTestImageGenerator(os.path.normpath("../assets/testing/data"),
-                                                  os.path.normpath("../assets/testing/verify"))
-            validation_generator = PatchTestImageGenerator(os.path.normpath("../assets/validation/data"),
-                                                       os.path.normpath("../assets/validation/verify"))
-            model = cnn_model.CNN_keras(train_generator, validation_generator)
-            model.train(not args.quiet)
-            model.save("first_test.h5")
-
+                                                  os.path.normpath("../assets/testing/predictions"))
+            restored_model = load_model(path_model_to_restore)
+            model = predictions.Prediction_model(test_generator = test_generator, restored_model = restored_model)
+            model.prediction_given_model()
+            
     if args.run:
         # Test CNN model
         logger.warning("Requires training or predicting")

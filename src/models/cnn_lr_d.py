@@ -15,7 +15,7 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 class CnnLrD(BaseModel):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
-    def __init__(self, train_generator, validation_generator):
+    def __init__(self, train_generator, validation_generator = []):
         """Initialise the model.
         """
         super().__init__(train_generator, validation_generator)

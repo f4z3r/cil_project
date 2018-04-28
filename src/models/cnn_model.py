@@ -32,12 +32,15 @@ from keras.layers.core import Activation, Flatten, Reshape
 
 
 class CNN_keras(BaseModel):
-    def __init__(self, train_generator, validation_generator):
+    def __init__(self, train_generator, validation_generator = []):
+
         super().__init__(train_generator, validation_generator)
 
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
         input_dim = self.train_generator.input_dim(four_dim=True)
+        print("input DMENSIONS")
+        print(self.train_generator.input_dim())
 
         """Applying conv3D focusing on the new 3-rd dimension (filters) of the previous conv3D which hopefully learns through time 
            to attribute distinctive values to roads and not roads sub-filtered images. A way to think of it is that the first conv3D layer
@@ -130,6 +133,8 @@ class CNN_keras(BaseModel):
                                  validation_data=self.validation_generator.generate_patch(four_dim=True),
                                  validation_steps=100
                                  )
+
+
 
 
 """from now on just copy pasted examples"""
