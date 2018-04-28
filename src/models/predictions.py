@@ -59,7 +59,7 @@ class Prediction_model():
             id_image = images_ids[id_idx]
             idx_row = 0
             idx_column = 0
-            for prediction in prediction_batch
+            for prediction in prediction_batch:
                 full_row = [str(id_image)+"_"+str(idx_row)+"_"+str(idx_column), str(prediction)]
                 writer.writerow(full_row)
                 
