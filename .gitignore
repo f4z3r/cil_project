@@ -22,3 +22,4 @@ report/*.pdf
 report/*.synctex.gz
 
 data/
+assets/*

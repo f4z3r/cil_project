@@ -7,7 +7,8 @@ import sys
 import warnings
 
 import tests
-from generators.PatchImageGenerator import PatchImageGenerator
+from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
+from generators.PatchTestImageGenerator import PatchTestImageGenerator
 from models import cnn_lr_d, cnn_model
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -71,6 +72,9 @@ def _setup_argparser():
                         help="the CNN model to be used, defaults to cnn_lr_d")
     parser.add_argument("-t", "--train",
                         help="train the given CNN",
+                        action="store_true")
+    parser.add_argument("-pr", "--predict",
+                        help="predict on a test set given the CNN",
                         action="store_true")
     parser.add_argument("-r", "--run",
                         help="run a trained version of a given CNN",
@@ -144,9 +148,9 @@ if __name__ == "__main__":
 
     if args.train:
         if args.model == "cnn_lr_d":
-            train_generator = PatchImageGenerator(os.path.normpath("../assets/training/data"),
+            train_generator = PatchTrainImageGenerator(os.path.normpath("../assets/training/data"),
                                                   os.path.normpath("../assets/training/verify"))
-            validation_generator = PatchImageGenerator(os.path.normpath("../assets/validation/data"),
+            validation_generator = PatchTrainImageGenerator(os.path.normpath("../assets/validation/data"),
                                                        os.path.normpath("../assets/validation/verify"))
 
             model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
@@ -154,9 +158,26 @@ if __name__ == "__main__":
             model.save("first_test.h5")
 
         elif args.model == "cnn_model":
-            train_generator = PatchImageGenerator(os.path.normpath("../assets/training/data"),
+            train_generator = PatchTrainImageGenerator(os.path.normpath("../assets/training/data"),
                                                   os.path.normpath("../assets/training/verify"))
-            validation_generator = PatchImageGenerator(os.path.normpath("../assets/validation/data"),
+            validation_generator = PatchTrainImageGenerator(os.path.normpath("../assets/validation/data"),
+                                                       os.path.normpath("../assets/validation/verify"))
+            model = cnn_model.CNN_keras(train_generator, validation_generator)
+            model.train(not args.quiet)
+            model.save("first_test.h5")
+
+    if args.predict:
+        #TODO complete this part
+        #if args.
+        if args.model == "cnn_lr_d":
+            test_generator = PatchTestImageGenerator(os.path.normpath("../assets/testing/data"),
+                                                  os.path.normpath("../assets/testing/predictions"))
+
+
+        elif args.model == "cnn_model":
+            test_generator = PatchTestImageGenerator(os.path.normpath("../assets/testing/data"),
+                                                  os.path.normpath("../assets/testing/verify"))
+            validation_generator = PatchTestImageGenerator(os.path.normpath("../assets/validation/data"),
                                                        os.path.normpath("../assets/validation/verify"))
             model = cnn_model.CNN_keras(train_generator, validation_generator)
             model.train(not args.quiet)
@@ -164,4 +185,4 @@ if __name__ == "__main__":
 
     if args.run:
         # Test CNN model
-        logger.warning("Requires training")
+        logger.warning("Requires training or predicting")
