@@ -9,6 +9,7 @@ import sys, traceback
 class PatchTestImageGenerator:
     def __init__(self, path_to_images, save_predictions_path, pad=28, patch_size=16, context_padding=28):
         data_files = glob.glob(os.path.join(path_to_images, "*.png"))
+        extract_image_ids(data_files=data_files)
         image_count = len(data_files)
         first = mpimg.imread(data_files[0])
         """Define the 72x72x3 single patch -> 16x16 patch with context"""
@@ -28,13 +29,13 @@ class PatchTestImageGenerator:
 
         print('PatchImageGenerator initialized with {} pictures'.format(image_count))
 
-    def extract_image_ids(self):
+    def extract_image_ids(self, data_files):
 
-        path_to_images = self.path_to_images
-        data_files = glob.glob(os.path.join(path_to_images, "*.png"))
+        #path_to_images = self.path_to_images
+        #data_files = glob.glob(os.path.join(path_to_images, "*.png"))
         images_ids = []
         for image_file in data_files:
-            start_index = image_file.index("_")
+            start_index = image_file.index("_")+1
             end_index = image_file.index(".")
             images_ids.append(image_file[start_index:end_index])
 
