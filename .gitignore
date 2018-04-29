@@ -23,3 +23,5 @@ report/*.synctex.gz
 
 data/
 assets/*
+
+/trained_models/

@@ -6,6 +6,7 @@ import os
 import keras
 
 from models.base_model import BaseModel
+from utils.commons import *
 
 logger = logging.getLogger("cil_project.models.cnn_lr_d")
 
@@ -108,15 +109,14 @@ class CnnLrD(BaseModel):
                                                       verbose=0,
                                                       mode="auto")
 
-        log_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/logs/"))
-        model_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/models/"))
-        tensorboard_callback = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0, batch_size=32,
+
+        tensorboard_callback = keras.callbacks.TensorBoard(log_dir=properties["LOG_DIR"], histogram_freq=0, batch_size=32,
                                                            write_graph=True,
                                                            write_grads=False, write_images=False, embeddings_freq=0,
                                                            embeddings_layer_names=None, embeddings_metadata=None)
 
         checkpoint_callback = keras.callbacks.ModelCheckpoint(
-            model_dir + '\model_cnn_lr_d.{epoch:02d}-{val_acc:.2f}.hdf5',
+            os.path.join(properties["OUTPUT_DIR"], 'model_cnn_lr_d.{epoch:02d}-{val_acc:.2f}.hdf5'),
             monitor='val_loss', verbose=0, save_best_only=False,
             save_weights_only=False, mode='auto', period=1)
 
@@ -136,11 +136,11 @@ class CnnLrD(BaseModel):
         else:
             logger.info("Training completed")
 
-    def save(self, filename):
+    def save(self, path):
         """Save the weights of the trained model.
 
         Args:
-            filename (str): filename for the weights.
+            path (path): path for the weights file.
         """
-        self.model.save_weights(os.path.join(file_path, "../../results/weights", filename))
-        logger.info("Weights saved to results/weights/{}".format(filename))
+        self.model.save_weights(path)
+        logger.info("Weights saved to {}".format(path))

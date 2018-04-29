@@ -22,17 +22,17 @@ class BaseModel:
             print_at_end (bool): print history at the end of the training.
         """
         raise NotImplementedError
-    
+
     def predict(self):
         """Predict with the model.
 
         """
         raise NotImplementedError
 
-    def save(self, filename):
+    def save(self, path):
         """Save the weights of the trained model.
 
         Args:
-            filename (str): filename for the weights.
+            path (path): path for the weights file.
         """
         raise NotImplementedError
