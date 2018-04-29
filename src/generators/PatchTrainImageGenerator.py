@@ -1,10 +1,12 @@
 import glob
-import os
+import os, logging
 
 import keras
 import matplotlib.image as mpimg
 import numpy as np
 import sys, traceback
+
+logger = logging.getLogger("cil_project.src.generators.PatchTrainImageGenerator")
 
 
 class PatchTrainImageGenerator:
@@ -31,7 +33,7 @@ class PatchTrainImageGenerator:
         self.patch_size = patch_size
         self.context_padding = context_padding
 
-        print('PatchImageGenerator initialized with {} pictures'.format(image_count))
+        logger.info('PatchImageGenerator initialized with {} pictures'.format(image_count))
 
     def get_random_image_patch(self, data_img, verifier_img, size, stride, pad):
         h = (np.random.choice(data_img.shape[1] - 2 * pad) // stride) * stride + pad

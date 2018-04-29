@@ -1,10 +1,12 @@
 import glob
-import os
+import os, logging
 
 import keras
 import matplotlib.image as mpimg
 import numpy as np
 import sys, traceback
+
+logger = logging.getLogger("cil_project.src.generators.PatchTestImageGenerator")
 
 class PatchTestImageGenerator:
     def __init__(self, path_to_images, save_predictions_path, pad=28, patch_size=16, context_padding=28):
@@ -27,7 +29,7 @@ class PatchTestImageGenerator:
         self.patch_size = patch_size
         self.context_padding = context_padding
 
-        print('PatchImageGenerator initialized with {} pictures'.format(image_count))
+        logger.info('PatchImageGenerator initialized with {} pictures'.format(image_count))
 
     def extract_image_ids(self, data_files):
 
@@ -57,24 +59,24 @@ class PatchTestImageGenerator:
 
         width_image, height_image = data_img.shape
         """check_result = self.check_dimensions_patch_with_img(width_image, height_image)
-        
+
         if not check_result:
             print("The width of the image ",width_image," and the height of the image", height_image,
                    " are incompatible with patch size ", patch_size)
             traceback.print_exc(file=sys.stdout)
             sys.exit(0)"""
-        
+
         patches_over_width = width_image/patch_size
         patches_over_height = height_image/patch_size
         total_patches = patches_over_height*patches_over_width
-        
+
         """Test patches:
             from the left to the right w.r.t the image width,
             from the bottom to top w.r.t the image height
         """
         img_patches = []
         for patch_h_idx in range(patches_over_height):
-            
+
             height_patch = patch_h_idx * patch_size
             total_height_patch_context = height_patch + context_padding*2
 
@@ -83,15 +85,15 @@ class PatchTestImageGenerator:
                 width_patch = patch_w_idx * patch_size
 
                 total_width_patch_context = width_patch + context_padding*2
-                
+
 
                 start_w = patch_w_idx*total_width_patch_context
                 end_w = patch_w_idx*total_width_patch_context+total_width_patch_context
                 start_h = patch_h_idx*total_width_patch_context
                 end_h = patch_h_idx*total_height_patch_context+total_height_patch_context
-                
+
                 img_patches.append(img[start_w:end_w,start_h:end_h,:])
-        
+
         return total_patches, np.asarray(img_patches)
 
 
