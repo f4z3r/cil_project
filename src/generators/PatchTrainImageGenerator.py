@@ -70,7 +70,7 @@ class PatchTrainImageGenerator:
                 batch_data = batch_data.reshape(batch_size, self.window_size, self.window_size, 3, 1)
 
             yield (batch_data, batch_verifier)
- 
+
 
     def input_dim(self, four_dim=False):
         if four_dim:

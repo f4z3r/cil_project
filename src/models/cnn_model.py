@@ -42,7 +42,7 @@ class CNN_keras(BaseModel):
         print("input DMENSIONS")
         print(self.train_generator.input_dim())
 
-        """Applying conv3D focusing on the new 3-rd dimension (filters) of the previous conv3D which hopefully learns through time 
+        """Applying conv3D focusing on the new 3-rd dimension (filters) of the previous conv3D which hopefully learns through time
            to attribute distinctive values to roads and not roads sub-filtered images. A way to think of it is that the first conv3D layer
            learns to count roads sub image and not sub image looking at filters dimension |||||||||| -> layers depth (filters) -> what is road , what is not? """
 
@@ -90,8 +90,8 @@ class CNN_keras(BaseModel):
 
         """Dense layer -> out for prediction & groundtruth -> learning afterwards with backprop"""
         """Thinks if to decomment the dense layer before the output one with only 2 units,
-           cause all the information can be kernelized expanding with a dense layer (from 
-           9x9x32 = 2592 -> for instance W=(2592,10000) going to higher dimensions 
+           cause all the information can be kernelized expanding with a dense layer (from
+           9x9x32 = 2592 -> for instance W=(2592,10000) going to higher dimensions
            (sort of SVM, which is luckily done implicitely by the Neural network + non linearity)
            and then last out layer (10000,2) all reduced to 2 dimensions for output """
 
@@ -115,16 +115,15 @@ class CNN_keras(BaseModel):
         # print(training_set)
         # self.model.fit(training_set, epochs=10)
 
-        log_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/logs/"))
-        model_dir = os.path.join(os.path.dirname(file_path), os.path.normpath("..//data/models/"))
-        tensorboard_callback = callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0, batch_size=32,
+        tensorboard_callback = callbacks.TensorBoard(log_dir=properties["LOG_DIR"], histogram_freq=0, batch_size=32,
                                                      write_graph=True,
                                                      write_grads=False, write_images=False, embeddings_freq=0,
                                                      embeddings_layer_names=None, embeddings_metadata=None)
 
-        checkpoint_callback = callbacks.ModelCheckpoint(model_dir + '\model_cnn_model.{epoch:02d}-{val_loss:.2f}.hdf5',
-                                                        monitor='val_loss', verbose=0, save_best_only=False,
-                                                        save_weights_only=False, mode='auto', period=1)
+        checkpoint_callback = callbacks.ModelCheckpoint(
+            os.path.join(properties["OUTPUT_DIR"], 'model_cnn_model.{epoch:02d}-{val_acc:.2f}.hdf5'),
+            monitor='val_loss', verbose=0, save_best_only=False,
+            save_weights_only=False, mode='auto', period=1)
 
         self.model.fit_generator(self.train_generator.generate_patch(four_dim=True),
                                  steps_per_epoch=steps,
@@ -139,7 +138,7 @@ class CNN_keras(BaseModel):
 
 """from now on just copy pasted examples"""
 
-"""#variable initialization 
+"""#variable initialization
 nb_filters =100
 kernel_size= {}
 kernel_size[0]= [3,3]

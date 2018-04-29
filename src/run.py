@@ -5,13 +5,9 @@ import logging
 import os
 import sys
 import warnings
+import datetime
 
-import tests
-from keras.models import load_model
-from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
-from generators.PatchTestImageGenerator import PatchTestImageGenerator
-from models import cnn_lr_d, cnn_model
-from models import predictions
+from utils.commons import *
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
@@ -104,14 +100,14 @@ def _setup_logger(args=None):
     file_path = os.path.dirname(os.path.abspath(__file__))
 
     try:
-        os.mkdir(os.path.join(file_path, "../logs"))
+        os.mkdir(properties["LOG_DIR"])
     except OSError:
         pass
 
     logger = logging.getLogger("cil_project")
     logger.setLevel(logging.DEBUG)
     console = logging.StreamHandler()
-    logfile = logging.FileHandler(os.path.join(file_path, "../logs/run.log"), 'a')
+    logfile = logging.FileHandler(os.path.join(properties["LOG_DIR"], "run.log"), 'a')
     console_formatter = logging.Formatter("%(message)s")
     logfile_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
@@ -143,7 +139,34 @@ if __name__ == "__main__":
     file_path = os.path.dirname(os.path.abspath(__file__))
 
     args = _setup_argparser()
+
+    if args.train:
+        properties["OUTPUT_DIR"] = os.path.normpath(
+            os.path.join(properties["SRC_DIR"],
+                         "../trained_models/",
+                         args.model,
+                         datetime.datetime.now().strftime(r"%Y-%m-%d[%Hh%M]")))
+        try:
+            os.makedirs(properties["OUTPUT_DIR"])
+        except OSError:
+            pass
+
+    else:
+        properties["OUTPUT_DIR"] = os.path.normpath("..")
+
+    properties["LOG_DIR"] = os.path.join(properties["OUTPUT_DIR"], "logs")
+
+
+
     logger = _setup_logger(args)
+
+    from keras.models import load_model
+
+    from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
+    from generators.PatchTestImageGenerator import PatchTestImageGenerator
+    from models import cnn_lr_d, cnn_model
+    from models import predictions
+    import tests
 
     if args.command == "check":
         # Run code tests and exit
@@ -155,27 +178,27 @@ if __name__ == "__main__":
 
     if args.train:
         if args.model == "cnn_lr_d":
-            train_generator = PatchTrainImageGenerator(os.path.normpath("../assets/training/data"),
-                                                  os.path.normpath("../assets/training/verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.normpath("../assets/validation/data"),
-                                                       os.path.normpath("../assets/validation/verify"))
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                            os.path.join(properties["VAL_DIR"], "verify"))
 
             model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
             model.train(not args.quiet)
-            model.save("first_test.h5")
+            model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
         elif args.model == "cnn_model":
-            train_generator = PatchTrainImageGenerator(os.path.normpath("../assets/training/data"),
-                                                  os.path.normpath("../assets/training/verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.normpath("../assets/validation/data"),
-                                                       os.path.normpath("../assets/validation/verify"))
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                            os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_model.CNN_keras(train_generator, validation_generator)
             model.train(not args.quiet)
-            model.save("first_test.h5")
+            model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
     if args.predict:
         #TODO complete this part -> Wait Jakob to create directories with saved files
-        
+
         """trained_models_dir = os.path.normpath("../trained_models/args.model/")
         if not os.path.exists(trained_models_dir):
             os.makedirs(trained_models_dir)"""
@@ -193,21 +216,21 @@ if __name__ == "__main__":
 
 
         if args.model == "cnn_lr_d":
-            
-            test_generator = PatchTestImageGenerator(os.path.normpath("../assets/testing/data"),
-                                                  os.path.normpath("../assets/testing/predictions"))
-            
+
+            test_generator = PatchTestImageGenerator(os.path.join(properties["TEST_DIR"], "data"),
+                                                     os.path.join(properties["OUTPUT_DIR"], "predictions"))
+
             restored_model = load_model(path_model_to_restore)
             model = predictions.Prediction_model(test_generator = test_generator, restored_model = restored_model)
             model.prediction_given_model()
-        
+
         elif args.model == "cnn_model":
-            test_generator = PatchTestImageGenerator(os.path.normpath("../assets/testing/data"),
-                                                  os.path.normpath("../assets/testing/predictions"))
+            test_generator = PatchTestImageGenerator(os.path.join(properties["TEST_DIR"], "data"),
+                                                     os.path.join(properties["OUTPUT_DIR"], "predictions"))
             restored_model = load_model(path_model_to_restore)
             model = predictions.Prediction_model(test_generator = test_generator, restored_model = restored_model)
             model.prediction_given_model()
-            
+
     if args.run:
         # Test CNN model
         logger.warning("Requires training or predicting")
