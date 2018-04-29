@@ -1,10 +1,6 @@
 .DS_Store
 __pycache__/
 *.pyc
-# assets/training/data/*.png
-# assets/training/verify/*.png
-# assets/validation/data/*.png
-# assets/validation/verify/*.png
 logs/*.log
 
 # output
@@ -20,8 +16,5 @@ report/*.blg
 report/*.log
 report/*.pdf
 report/*.synctex.gz
-
-data/
-assets/*
 
 /trained_models/
