@@ -21,4 +21,4 @@ report/*.log
 report/*.pdf
 report/*.synctex.gz
 
-data/
+/data/
