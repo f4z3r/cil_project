@@ -75,12 +75,14 @@ def _setup_argparser():
     parser.add_argument("-t", "--train",
                         help="train the given CNN",
                         action="store_true")
-    parser.add_argument("-pr", "--predict",
+    parser.add_argument("-p", "--predict",
                         help="predict on a test set given the CNN",
                         action="store_true")
     parser.add_argument("-ptm", "--path_to_trained_model",
                         help="path to load a specific trained model",
-                        action="store_true")
+                        action="store",
+                        default=None,
+                        type=str)
     parser.add_argument("-r", "--run",
                         help="run a trained version of a given CNN",
                         action="store_true")
