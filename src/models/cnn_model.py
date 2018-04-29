@@ -7,7 +7,7 @@ from keras import callbacks
 
 from models.base_model import BaseModel
 
-logger = logging.getLogger("cil_project.models.cnn_model")
+logger = logging.getLogger("cil_project.src.models.cnn_model")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 

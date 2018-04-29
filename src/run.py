@@ -160,6 +160,8 @@ if __name__ == "__main__":
 
     args = _setup_argparser()
 
+    from keras.models import load_model
+
     if args.train:
         properties["OUTPUT_DIR"] = os.path.normpath(
             os.path.join(properties["SRC_DIR"],
@@ -176,7 +178,8 @@ if __name__ == "__main__":
 
     properties["LOG_DIR"] = os.path.join(properties["OUTPUT_DIR"], "logs")
 
-    from keras.models import load_model
+    _ = _setup_logger(args)
+    logger = logging.getLogger("cil_project.src.run")
 
     from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
     from generators.PatchTestImageGenerator import PatchTestImageGenerator
@@ -193,27 +196,35 @@ if __name__ == "__main__":
         sys.exit(0)
 
     if args.train:
+        train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                   os.path.join(properties["TRAIN_DIR"], "verify"))
+        validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                   os.path.join(properties["VAL_DIR"], "verify"))
         if args.model == "cnn_lr_d":
-            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                            os.path.join(properties["VAL_DIR"], "verify"))
-
             model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
             model.train(not args.quiet)
             model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
         elif args.model == "cnn_model":
-            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                            os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_model.CNN_keras(train_generator, validation_generator)
             model.train(not args.quiet)
             model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+
     elif args.train_presume:
         properties["OUTPUT_DIR"] = get_lastest_model()
-        print(properties["OUTPUT_DIR"])
+
+        train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                   os.path.join(properties["TRAIN_DIR"], "verify"))
+        validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                   os.path.join(properties["VAL_DIR"], "verify"))
+        model = None
+        if args.model == "cnn_lr_d":
+            model = cnn_lr_d.CnnLrD(train_generator,
+                                    validation_generator,
+                                    path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+
+        model.train(not args.quiet)
+        model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
     if args.predict:
 
