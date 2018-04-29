@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from keras.models import load_model
 
 class BaseModel:
     """A model template for all models used by this program."""
@@ -30,9 +31,20 @@ class BaseModel:
         raise NotImplementedError
 
     def save(self, path):
-        """Save the weights of the trained model.
+        """Save the model of the trained model.
 
         Args:
-            path (path): path for the weights file.
+            path (path): path for the model file.
         """
         raise NotImplementedError
+
+    def load(self, path):
+        """Load a (partly) trained model.
+
+        Args:
+            path (path): path for the model file.
+
+        Returns:
+            The model.
+        """
+        self.model = load_model(path)

@@ -36,8 +36,8 @@ The currently required libraries are the following:
 
 ### Usage
 ```
-usage: run.py [-h] [-v | -vv | -q] [-m {cnn_lr_d,dnn_class}] [-g] [-d] [-t]
-              [-r]
+usage: run.py [-h] [-v | -vv | -q] [-m {cnn_lr_d,cnn_model}] [-t] [-tp] [-p]
+              [-d DATA] [-r]
               {check} ...
 
 Control program to launch all actions related to this project.
@@ -51,11 +51,12 @@ optional arguments:
   -v, --verbose         provide verbose output
   -vv, --very_verbose   provide even more verbose output
   -q, --quiet           provide next to no output to console
-  -m {cnn_lr_d,dnn_class}, --model {cnn_lr_d,dnn_class}
+  -m {cnn_lr_d,cnn_model}, --model {cnn_lr_d,cnn_model}
                         the CNN model to be used, defaults to cnn_lr_d
-  -g, --augment         augment training image set
-  -d, --validation_set  create validation set from training set
   -t, --train           train the given CNN
+  -tp, --train_presume  continue training the given CNN
+  -p, --predict         predict on a test set given the CNN
+  -d DATA, --data DATA  path to the data to use (prediction)
   -r, --run             run a trained version of a given CNN
 ```
 

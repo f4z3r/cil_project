@@ -4,11 +4,12 @@ import logging
 import os
 
 import keras
+from keras.models import load_model
 
 from models.base_model import BaseModel
 from utils.commons import *
 
-logger = logging.getLogger("cil_project.models.cnn_lr_d")
+logger = logging.getLogger("cil_project.src.models.cnn_lr_d")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -16,10 +17,19 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 class CnnLrD(BaseModel):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
-    def __init__(self, train_generator, validation_generator = []):
+    def __init__(self, train_generator, validation_generator = [], path=None):
         """Initialise the model.
+
+        If `path` is given, the model is loaded from memory instead of compiled.
         """
         super().__init__(train_generator, validation_generator)
+
+        if path:
+            logger.info("Loading existing model from {}".format(path))
+            self.load(path)
+            logger.info("Finished loading model")
+            return
+
 
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
@@ -74,27 +84,31 @@ class CnnLrD(BaseModel):
                                           kernel_regularizer=keras.regularizers.l2(1e-6),
                                           activation="softmax"))
 
+        logger.info("Compiling model ...")
+
+        optimiser = keras.optimizers.Adam()
+        self.model.compile(loss=keras.losses.categorical_crossentropy,
+                           optimizer=optimiser,
+                           metrics=["accuracy"])
+
         logger.info("Done")
 
-    def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
+
+
+    def train(self, verbosity, epochs=150, steps=5000):
         """Train the model.
 
         Args:
             verbosity (bool): if the training should be verbose.
             epochs (int): default: 150 - epochs to train.
             steps (int): default: 5000 - batches per epoch to train.
-            print_at_end (bool): print history at the end of the training.
         """
-        logger.info("Preparing training, compiling model ...")
+
+        logger.info("Starting training ...")
         if verbosity:
             verbosity = 1
         else:
             verbosity = 0
-
-        optimiser = keras.optimizers.Adam()
-        self.model.compile(loss=keras.losses.categorical_crossentropy,
-                           optimizer=optimiser,
-                           metrics=["accuracy"])
 
         lr_callback = keras.callbacks.ReduceLROnPlateau(monitor="acc",
                                                         factor=0.5,
@@ -120,8 +134,6 @@ class CnnLrD(BaseModel):
             monitor='val_loss', verbose=0, save_best_only=False,
             save_weights_only=False, mode='auto', period=1)
 
-        logger.info("Starting training ...")
-
         try:
             self.model.fit_generator(self.train_generator.generate_patch(),
                                      steps_per_epoch=steps,
@@ -137,10 +149,10 @@ class CnnLrD(BaseModel):
             logger.info("Training completed")
 
     def save(self, path):
-        """Save the weights of the trained model.
+        """Save the model of the trained model.
 
         Args:
-            path (path): path for the weights file.
+            path (path): path for the model file.
         """
-        self.model.save_weights(path)
-        logger.info("Weights saved to {}".format(path))
+        self.model.save(path)
+        logger.info("Model saved to {}".format(path))
