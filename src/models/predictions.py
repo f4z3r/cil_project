@@ -22,29 +22,34 @@ import time
 
 
 class Prediction_model():
-    def __init__(self, test_generator, restored_model):
+    def __init__(self, test_generator_class, restored_model):
 
-        self.test_generator = test_generator
+        self.test_generator_class = test_generator_class
         self.prediction_model = restored_model
+        print("MODEL RESTORED IS ", restored_model)
 
-    def prediction_given_model():
 
-        test_generator = self.test_generator
-        model = self.restored_model
-        patch_size = test_generator.patch_size
-        width_image, height_image, channels = test_generator.data_set[0].shape
+    def prediction_given_model(self):
 
+        test_generator = self.test_generator_class.generate_test_patches()
+        model = self.prediction_model
+        print("MODEL IS ", model)
+        patch_size = self.test_generator_class.patch_size
+        dimensions = list(self.test_generator_class.data_set[0].shape)
+        width_image = dimensions[0] 
+        height_image = dimensions[1]
 
         predictions = []
         for img_patches in test_generator:
-            img_predictions = predict_on_batch(restored_model, img_patches)
+            print("MODEL IS ", model)
+            img_predictions = model.predict_on_batch(img_patches)
             predictions.append(img_predictions)
             print("First 10 predictions are ",img_predictions[0:10])
 
-        save_predictions_to_csv(images_ids = test_generator.images_ids, img_predictions=img_predictions,
+        save_predictions_to_csv(images_ids = test_generator_class.images_ids, img_predictions=img_predictions,
                                  w_image = width_image, h_image = height_image, patch_size=patch_size)
 
-    def save_predictions_to_csv(images_ids, img_predictions, w_image, h_image, patch_size):
+    def save_predictions_to_csv(self,images_ids, img_predictions, w_image, h_image, patch_size):
 
         ts = int(time.time())
         print("Writing to submission file: submission_"+ts+".csv")

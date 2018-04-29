@@ -182,6 +182,7 @@ if __name__ == "__main__":
     from generators.PatchTestImageGenerator import PatchTestImageGenerator
     from models import cnn_lr_d, cnn_model
     from models import predictions
+    import keras
     import tests
 
     if args.command == "check":
@@ -212,7 +213,7 @@ if __name__ == "__main__":
             model.train(not args.quiet)
             model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
     elif args.train_presume:
-        properties["OUTPUT_DIR"] = get_lastest_model()
+        properticnn_lr_des["OUTPUT_DIR"] = get_lastest_model()
         print(properties["OUTPUT_DIR"])
 
     if args.predict:
@@ -224,12 +225,21 @@ if __name__ == "__main__":
 
         if args.model == "cnn_lr_d":
 
-            test_generator = PatchTestImageGenerator(os.path.join(data_path),
+            test_generator_class = PatchTestImageGenerator(os.path.join(data_path),
                                                      os.path.join(properties["OUTPUT_DIR"], "predictions"))
-
-            restored_model = load_model(path_model_to_restore)
-            model = predictions.Prediction_model(test_generator = test_generator, restored_model = restored_model)
-            model.prediction_given_model()
+            
+            model_class = cnn_lr_d.CnnLrD(test_generator_class)
+            print("Model class ",model_class)
+            model = model_class.model
+            #optimiser = keras.optimizers.Adam()
+            #model.compile(loss=keras.losses.categorical_crossentropy,
+            #               optimizer=optimiser,
+            #               metrics=["accuracy"])
+            print("MODEL RESTORED IS ",model)
+            restored_model = model.load_weights(path_model_to_restore)
+            print("Model has been restored successfully")
+            predictions = predictions.Prediction_model(test_generator_class = test_generator_class, restored_model = restored_model)
+            predictions.prediction_given_model()
 
         elif args.model == "cnn_model":
             test_generator = PatchTestImageGenerator(os.path.join(data_path),

@@ -9,7 +9,7 @@ import sys, traceback
 class PatchTestImageGenerator:
     def __init__(self, path_to_images, save_predictions_path, pad=28, patch_size=16, context_padding=28):
         data_files = glob.glob(os.path.join(path_to_images, "*.png"))
-        extract_image_ids(data_files=data_files)
+        self.extract_image_ids(data_files=data_files)
         image_count = len(data_files)
         first = mpimg.imread(data_files[0])
         """Define the 72x72x3 single patch -> 16x16 patch with context"""
@@ -55,7 +55,11 @@ class PatchTestImageGenerator:
         patch_size = self.patch_size
         context_padding = self.context_padding
 
-        width_image, height_image = data_img.shape
+        dimensions = list(data_img.shape)
+        width_image = dimensions[0] 
+        height_image = dimensions[1]
+
+        #width_image, height_image = data_img.shape
         """check_result = self.check_dimensions_patch_with_img(width_image, height_image)
         
         if not check_result:
@@ -63,10 +67,14 @@ class PatchTestImageGenerator:
                    " are incompatible with patch size ", patch_size)
             traceback.print_exc(file=sys.stdout)
             sys.exit(0)"""
-        
-        patches_over_width = width_image/patch_size
-        patches_over_height = height_image/patch_size
+        print("Width image ",width_image)
+        print("Height image ",height_image)
+        patches_over_width = int((width_image-2*context_padding)/patch_size)
+        print("Patches over width ",patches_over_width)
+        patches_over_height = int((height_image-2*context_padding)/patch_size)
+        print("Patches over height ",patches_over_height)
         total_patches = patches_over_height*patches_over_width
+        print("Patch size ",patch_size)
         
         """Test patches:
             from the left to the right w.r.t the image width,
@@ -75,23 +83,29 @@ class PatchTestImageGenerator:
         img_patches = []
         for patch_h_idx in range(patches_over_height):
             
-            height_patch = patch_h_idx * patch_size
-            total_height_patch_context = height_patch + context_padding*2
+            #height_patch = patch_h_idx * patch_size
+            total_height_patch_context = patch_size + context_padding*2
 
             for patch_w_idx in range(patches_over_width):
 
-                width_patch = patch_w_idx * patch_size
+                #width_patch = patch_w_idx * patch_size
 
-                total_width_patch_context = width_patch + context_padding*2
-                
+                total_width_patch_context = patch_size + context_padding*2
+                #print("TOTAL ", total_width_patch_context)
 
-                start_w = patch_w_idx*total_width_patch_context
-                end_w = patch_w_idx*total_width_patch_context+total_width_patch_context
-                start_h = patch_h_idx*total_width_patch_context
-                end_h = patch_h_idx*total_height_patch_context+total_height_patch_context
-                
-                img_patches.append(img[start_w:end_w,start_h:end_h,:])
-        
+                start_w = patch_w_idx * patch_size + context_padding
+                end_w = patch_w_idx * patch_size + patch_size + context_padding
+                start_h = patch_h_idx * patch_size + context_padding
+                end_h = patch_h_idx * patch_size + patch_size + context_padding
+                #print("Edges patch width & height:")
+                #print(start_w)
+                print(end_w)
+                #print(start_h)
+                print(end_h)
+                #print("Data img shape ", data_img.shape)
+                #print("Image cut ",data_img[start_w:end_w,start_h:end_h,:])
+                img_patches.append(data_img[start_w:end_w,start_h:end_h,:])
+        print("Done with image patches")
         return total_patches, np.asarray(img_patches)
 
 
