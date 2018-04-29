@@ -74,10 +74,10 @@ def _setup_argparser():
     parser.add_argument("-p", "--predict",
                         help="predict on a test set given the CNN",
                         action="store_true")
-    parser.add_argument("-ptm", "--path_to_trained_model",
-                        help="path to load a specific trained model",
+    parser.add_argument("-d", "--data",
+                        help="path to the data to use (prediction)",
                         action="store",
-                        default=None,
+                        default=os.path.join(properties["TEST_DIR"],"data"),
                         type=str)
     parser.add_argument("-r", "--run",
                         help="run a trained version of a given CNN",
@@ -203,21 +203,20 @@ if __name__ == "__main__":
         if not os.path.exists(trained_models_dir):
             os.makedirs(trained_models_dir)"""
 
-        if args.path_to_trained_model:
-            path_to_trained_model = args.path_to_trained_model
-        else:
-            path_to_trained_model = os.path.normpath("../trained_models/"+args.model+"/")
-            all_runs = [os.path.join(path_to_trained_model, o) for o in os.listdir(path_to_trained_model)
-                        if os.path.isdir(os.path.join(path_to_trained_model, o))]
-            latest_run = max(all_runs, key=os.path.getmtime)  # get the latest run
-            checkpoint_path = path_to_trained_model+latest_run+"/"
-            path_model_to_restore = checkpoint_path +"*.h5" #TODO + name of the saved model to fetch
-            print("Loading the last checkpoint of the model ",args.model," from: ",checkpoint_path)
+        data_path = args.data
+
+        path_to_trained_model = os.path.normpath("../trained_models/"+args.model+"/")
+        all_runs = [os.path.join(path_to_trained_model, o) for o in os.listdir(path_to_trained_model)
+                    if os.path.isdir(os.path.join(path_to_trained_model, o))]
+        latest_run = max(all_runs, key=os.path.getmtime)  # get the latest run
+        checkpoint_path = os.path.join(path_to_trained_model,latest_run)
+        path_model_to_restore = checkpoint_path +"weights.h5" #TODO + name of the saved model to fetch
+        print("Loading the last checkpoint of the model ",args.model," from: ",checkpoint_path)
 
 
         if args.model == "cnn_lr_d":
 
-            test_generator = PatchTestImageGenerator(os.path.join(properties["TEST_DIR"], "data"),
+            test_generator = PatchTestImageGenerator(os.path.join(data_path),
                                                      os.path.join(properties["OUTPUT_DIR"], "predictions"))
 
             restored_model = load_model(path_model_to_restore)
@@ -225,7 +224,7 @@ if __name__ == "__main__":
             model.prediction_given_model()
 
         elif args.model == "cnn_model":
-            test_generator = PatchTestImageGenerator(os.path.join(properties["TEST_DIR"], "data"),
+            test_generator = PatchTestImageGenerator(os.path.join(data_path),
                                                      os.path.join(properties["OUTPUT_DIR"], "predictions"))
             restored_model = load_model(path_model_to_restore)
             model = predictions.Prediction_model(test_generator = test_generator, restored_model = restored_model)
