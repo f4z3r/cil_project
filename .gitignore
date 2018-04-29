@@ -18,4 +18,3 @@ report/*.pdf
 report/*.synctex.gz
 
 /trained_models/
-/data/
