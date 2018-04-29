@@ -216,22 +216,11 @@ if __name__ == "__main__":
         print(properties["OUTPUT_DIR"])
 
     if args.predict:
-        #TODO complete this part -> Wait Jakob to create directories with saved files
-
-        """trained_models_dir = os.path.normpath("../trained_models/args.model/")
-        if not os.path.exists(trained_models_dir):
-            os.makedirs(trained_models_dir)"""
 
         data_path = args.data
-
-        path_to_trained_model = os.path.normpath("../trained_models/"+args.model+"/")
-        all_runs = [os.path.join(path_to_trained_model, o) for o in os.listdir(path_to_trained_model)
-                    if os.path.isdir(os.path.join(path_to_trained_model, o))]
-        latest_run = max(all_runs, key=os.path.getmtime)  # get the latest run
-        checkpoint_path = os.path.join(path_to_trained_model,latest_run)
-        path_model_to_restore = checkpoint_path +"weights.h5" #TODO + name of the saved model to fetch
-        print("Loading the last checkpoint of the model ",args.model," from: ",checkpoint_path)
-
+        path_model_to_restore = os.path.join(get_lastest_model(),"weights.h5")
+        
+        print("Loading the last checkpoint of the model ",args.model," from: ",path_model_to_restore)
 
         if args.model == "cnn_lr_d":
 
