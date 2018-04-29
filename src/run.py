@@ -71,6 +71,9 @@ def _setup_argparser():
     parser.add_argument("-t", "--train",
                         help="train the given CNN",
                         action="store_true")
+    parser.add_argument("-tp", "--train_presume",
+                        help="continue training the given CNN",
+                        action="store_true")
     parser.add_argument("-pr", "--predict",
                         help="predict on a test set given the CNN",
                         action="store_true")
@@ -129,6 +132,23 @@ def _setup_logger(args=None):
 
     return logger
 
+def get_lastest_model():
+    """Returns the latest directory of the model specified in the arguments.
+
+    Returns:
+        (path) a path to the directory.
+    """
+    if not os.path.exists(os.path.join(properties["SRC_DIR"], "../trained_models", args.model)):
+        logger.error("No trainted model {} exists.".format(args.model))
+        sys.exit(1)
+
+    res = os.path.join(properties["SRC_DIR"], "../trained_models", args.model)
+    all_runs = [os.path.join(res, o) for o in os.listdir(res) if os.path.isdir(os.path.join(res, o))]
+    res = max(all_runs, key=os.path.getmtime)
+
+    return res
+
+
 
 ###########################################################################################
 # RUN.PY actions.
@@ -153,10 +173,6 @@ if __name__ == "__main__":
         properties["OUTPUT_DIR"] = os.path.normpath("..")
 
     properties["LOG_DIR"] = os.path.join(properties["OUTPUT_DIR"], "logs")
-
-
-
-    logger = _setup_logger(args)
 
     from keras.models import load_model
 
@@ -193,6 +209,9 @@ if __name__ == "__main__":
             model = cnn_model.CNN_keras(train_generator, validation_generator)
             model.train(not args.quiet)
             model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+    elif args.train_presume:
+        properties["OUTPUT_DIR"] = get_lastest_model()
+        print(properties["OUTPUT_DIR"])
 
     if args.predict:
         #TODO complete this part -> Wait Jakob to create directories with saved files
