@@ -141,7 +141,7 @@ def get_lastest_model():
         (path) a path to the directory.
     """
     if not os.path.exists(os.path.join(properties["SRC_DIR"], "../trained_models", args.model)):
-        logger.error("No trainted model {} exists.".format(args.model))
+        print("No trained model {} exists.".format(args.model))
         sys.exit(1)
 
     res = os.path.join(properties["SRC_DIR"], "../trained_models", args.model)
