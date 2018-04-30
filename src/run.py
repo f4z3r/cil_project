@@ -6,6 +6,7 @@ import os
 import sys
 import warnings
 import datetime
+import time
 
 from utils.commons import *
 
@@ -134,7 +135,7 @@ def _setup_logger(args=None):
 
     return logger
 
-def get_lastest_model():
+def get_latest_model():
     """Returns the latest directory of the model specified in the arguments.
 
     Returns:
@@ -149,8 +150,16 @@ def get_lastest_model():
     res = max(all_runs, key=os.path.getmtime)
 
     return res
+def get_submission_filename():
+    """
+    Returns:
+        (path to directory) + filename of the submission file.
+    """
+    ts = int(time.time())
+    submission_filename = "submission_"+str(args.model)+"_"+str(ts)+".csv" 
+    submission_path_filename = os.path.join(get_latest_model(), submission_filename)
 
-
+    return submission_path_filename
 
 ###########################################################################################
 # RUN.PY actions.
@@ -184,7 +193,7 @@ if __name__ == "__main__":
     from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
     from generators.PatchTestImageGenerator import PatchTestImageGenerator
     from models import cnn_lr_d, cnn_model
-    from models import predictions
+    from models import predict_on_tests
     import keras
     import tests
 
@@ -213,7 +222,7 @@ if __name__ == "__main__":
 
     elif args.train_presume:
 
-        properties["OUTPUT_DIR"] = get_lastest_model()
+        properties["OUTPUT_DIR"] = get_latest_model()
 
         train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
                                                    os.path.join(properties["TRAIN_DIR"], "verify"))
@@ -230,35 +239,49 @@ if __name__ == "__main__":
 
     if args.predict:
 
+        """
+           Path to data to predict on,
+           Path to the model to restore for predictions
+        """
         data_path = args.data
-        path_model_to_restore = os.path.join(get_lastest_model(),"weights.h5")
+        path_model_to_restore = os.path.join(get_latest_model(),"weights.h5")
         
+        """Submission file"""
+        submission_path_filename = get_submission_filename()
+
+
         print("Loading the last checkpoint of the model ",args.model," from: ",path_model_to_restore)
 
         if args.model == "cnn_lr_d":
 
-            test_generator_class = PatchTestImageGenerator(os.path.join(data_path),
-                                                     os.path.join(properties["OUTPUT_DIR"], "predictions"))
+            test_generator_class = PatchTestImageGenerator(path_to_images = os.path.join(data_path),
+                                                     save_predictions_path = os.path.join(properties["OUTPUT_DIR"], "predictions"))
             
-            model_class = cnn_lr_d.CnnLrD(test_generator_class)
-            print("Model class ",model_class)
+            model_class = cnn_lr_d.CnnLrD(test_generator_class,path=path_model_to_restore)
             model = model_class.model
-            #optimiser = keras.optimizers.Adam()
-            #model.compile(loss=keras.losses.categorical_crossentropy,
-            #               optimizer=optimiser,
-            #               metrics=["accuracy"])
-            print("MODEL RESTORED IS ",model)
-            restored_model = model.load_weights(path_model_to_restore)
+
             print("Model has been restored successfully")
-            predictions = predictions.Prediction_model(test_generator_class = test_generator_class, restored_model = restored_model)
-            predictions.prediction_given_model()
+            prediction_model = predict_on_tests.Prediction_model(test_generator_class = test_generator_class, restored_model = model)
+            predictions = prediction_model.prediction_given_model()
+
+            print("Writing predictions to: ",submission_path_filename)
+            prediction_model.save_predictions_to_csv(predictions = predictions, submission_file = submission_path_filename)
 
         elif args.model == "cnn_model":
-            test_generator = PatchTestImageGenerator(os.path.join(data_path),
-                                                     os.path.join(properties["OUTPUT_DIR"], "predictions"))
-            restored_model = load_model(path_model_to_restore)
-            model = predictions.Prediction_model(test_generator = test_generator, restored_model = restored_model)
-            model.prediction_given_model()
+            #TODO error in the training -> to be fixed later on by the person who is responsible for the training part
+            test_generator_class = PatchTestImageGenerator(path_to_images = os.path.join(data_path),
+                                                     save_predictions_path = os.path.join(properties["OUTPUT_DIR"], "predictions"),
+                                                     four_dim = True)
+            
+            model_class = cnn_lr_d.CnnLrD(test_generator_class,path=path_model_to_restore)
+            model = model_class.model
+
+            print("Model has been restored successfully")
+            prediction_model = predict_on_tests.Prediction_model(test_generator_class = test_generator_class, restored_model = model)
+            predictions = prediction_model.prediction_given_model()
+
+            print("Writing predictions to: ",submission_path_filename)
+            prediction_model.save_predictions_to_csv(predictions = predictions, submission_file = submission_path_filename)
 
     if args.run:
         # Test CNN model

@@ -18,7 +18,6 @@ import keras
 from keras.models import Sequential
 from keras.layers.convolutional import Conv3D, MaxPooling3D
 from keras.layers.core import Activation, Flatten, Reshape
-import time
 
 
 class Prediction_model():
@@ -26,46 +25,45 @@ class Prediction_model():
 
         self.test_generator_class = test_generator_class
         self.prediction_model = restored_model
-        print("MODEL RESTORED IS ", restored_model)
 
 
     def prediction_given_model(self):
 
         test_generator = self.test_generator_class.generate_test_patches()
         model = self.prediction_model
-        print("MODEL IS ", model)
-        patch_size = self.test_generator_class.patch_size
-        dimensions = list(self.test_generator_class.data_set[0].shape)
-        width_image = dimensions[0] 
-        height_image = dimensions[1]
 
         predictions = []
         for img_patches in test_generator:
-            print("MODEL IS ", model)
             img_predictions = model.predict_on_batch(img_patches)
             predictions.append(img_predictions)
-            print("First 10 predictions are ",img_predictions[0:10])
+            #print("First 10 predictions are ",img_predictions[0:10])
+            print("Done with prediction on the image")
 
-        save_predictions_to_csv(images_ids = test_generator_class.images_ids, img_predictions=img_predictions,
-                                 w_image = width_image, h_image = height_image, patch_size=patch_size)
+        return predictions
 
-    def save_predictions_to_csv(self,images_ids, img_predictions, w_image, h_image, patch_size):
 
-        ts = int(time.time())
-        print("Writing to submission file: submission_"+ts+".csv")
+    def save_predictions_to_csv(self, predictions, submission_file):
+        """Requires :
+            predictions: 2-d array -> patches for each image
+        """
+        dimensions = list(self.test_generator_class.data_set[0].shape)
+        w_image = dimensions[0] - self.test_generator_class.context_padding*2 
+        h_image = dimensions[1] - self.test_generator_class.context_padding*2
+        patch_size = self.test_generator_class.patch_size    
+        images_ids = self.test_generator_class.images_ids
+        
 
-        writer = csv.writer(open("../submission_"+ts+".csv", 'w'), delimiter=",")
+        writer = csv.writer(open(submission_file, 'w'), delimiter=",")
         writer.writerow(["Id", "Prediction"])
-        #TODO see if it works, might be necessary to change the delimiter to
-        # "," and to place that symbol as intearleaving between id and prediciton
 
         id_idx = 0
-        for prediction_batch in img_predictions:
+        for prediction_batch in predictions:
             id_image = images_ids[id_idx]
             idx_row = 0
             idx_column = 0
-            for prediction in prediction_batch:
-                full_row = [str(id_image)+"_"+str(idx_row)+"_"+str(idx_column), str(prediction)]
+            for prediction_probabilities in prediction_batch:
+                prediction = list(prediction_probabilities).index(max(list(prediction_probabilities)))
+                full_row = [str(id_image)+"_"+str(idx_column)+"_"+str(idx_row), str(prediction)]
                 writer.writerow(full_row)
 
                 if idx_row + patch_size < w_image:
