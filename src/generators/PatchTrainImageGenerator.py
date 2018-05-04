@@ -5,7 +5,6 @@ import os
 import keras
 import matplotlib.image as mpimg
 import numpy as np
-import scipy
 
 logger = logging.getLogger("cil_project.src.generators.PatchTrainImageGenerator")
 
@@ -45,7 +44,7 @@ class PatchTrainImageGenerator:
 
         return data_patch, verifier_patch
 
-    def generate_patch(self, batch_size=100, four_dim=False, augmentation=False):
+    def generate_patch(self, batch_size=100, four_dim=False, augmentation=True):
         window_size = self.window_size
         patch_size = self.patch_size
         while True:
@@ -63,10 +62,9 @@ class PatchTrainImageGenerator:
                         image = image[:, ::-1]
                         ground_truth = ground_truth[:, ::-1]
 
-                    rotation = np.random.random_sample() * 360
-                    image = scipy.ndimage.interpolation.rotate(image, rotation, mode="reflect", reshape=False)
-                    ground_truth = scipy.ndimage.interpolation.rotate(ground_truth, rotation, mode="reflect",
-                                                                      reshape=False)
+                    rotation = np.random.randint(0, 4)
+                    image = np.rot90(image, rotation)
+                    ground_truth = np.rot90(ground_truth, rotation)
 
                 data_patch, veri_patch = self.get_random_image_patch(image, ground_truth, window_size, patch_size)
 
