@@ -28,8 +28,6 @@ class PatchTrainImageGenerator:
             verifier_set[idx] = mpimg.imread(mask_file)
 
         verifier_set = verifier_set / verifier_set.max()  # normalize data
-        print(verifier_set.min(), verifier_set.max())
-
         self.data_set = data_set
         self.verifier_set = verifier_set
 
@@ -47,7 +45,7 @@ class PatchTrainImageGenerator:
 
         return data_patch, verifier_patch
 
-    def generate_patch(self, batch_size=100, four_dim=False, augmentation=True):
+    def generate_patch(self, batch_size=100, four_dim=False, augmentation=False):
         window_size = self.window_size
         patch_size = self.patch_size
         while True:
