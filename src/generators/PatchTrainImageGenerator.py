@@ -10,28 +10,33 @@ logger = logging.getLogger("cil_project.src.generators.PatchTrainImageGenerator"
 
 
 class PatchTrainImageGenerator:
-    def __init__(self, path_to_images, path_to_groundtruth, pad=28, patch_size=16):
+    def __init__(self, path_to_images, path_to_groundtruth, window_size=72, patch_size=16, threshold=0.25):
+        padding = (self.window_size - self.patch_size) // 2
+
         data_files = glob.glob(os.path.join(path_to_images, "*.png"))
         mask_files = glob.glob(os.path.join(path_to_groundtruth, "*.png"))
         image_count = len(data_files)
         first = mpimg.imread(data_files[0])
 
         data_set = np.empty((image_count,
-                             first.shape[0] + 2 * pad,
-                             first.shape[1] + 2 * pad,
+                             first.shape[0] + 2 * padding,
+                             first.shape[1] + 2 * padding,
                              first.shape[2]))
-        verifier_set = np.empty((image_count, first.shape[0], first.shape[1]))
+        verifier_set = np.empty((image_count, first.shape[0] + 2 * padding, first.shape[1] + 2 * padding))
 
         for idx, (file, mask_file) in enumerate(zip(data_files, mask_files)):
-            data_set[idx] = np.pad(mpimg.imread(file), ((pad, pad), (pad, pad), (0, 0)), mode="reflect")
-            verifier_set[idx] = mpimg.imread(mask_file)
+            data_set[idx] = np.pad(mpimg.imread(file), ((padding, padding), (padding, padding), (0, 0)), mode="reflect")
+            verifier_set[idx] = np.pad(mpimg.imread(mask_file), ((padding, padding), (padding, padding)),
+                                       mode="reflect")
 
         verifier_set = verifier_set / verifier_set.max()  # normalize data
+
         self.data_set = data_set
         self.verifier_set = verifier_set
-
-        self.window_size = patch_size + 2 * pad
         self.patch_size = patch_size
+        self.window_size = window_size
+        self.padding = padding
+        self.threshold = threshold
 
         logger.info('PatchImageGenerator initialized with {} pictures'.format(image_count))
 
@@ -56,22 +61,34 @@ class PatchTrainImageGenerator:
                 image = self.data_set[img_num]
                 ground_truth = self.verifier_set[img_num]
 
+                # Sample a random window from the image
+                center = np.random.randint(window_size // 2, image.shape[0] - window_size // 2, 2)
+                sub_image = image[center[0] - window_size // 2:center[0] + window_size // 2,
+                            center[1] - window_size // 2:center[1] + window_size // 2]
+                gt_sub_image = ground_truth[center[0] - patch_size // 2:center[0] + patch_size // 2,
+                               center[1] - patch_size // 2:center[1] + patch_size // 2]
+
+                label = (np.array([np.mean(gt_sub_image)]) > self.threshold) * 1
+
+
                 if augmentation:
-                    if np.random.choice([False, True]):
-                        # randomly flip
-                        image = image[:, ::-1]
-                        ground_truth = ground_truth[:, ::-1]
+                    # Image augmentation
+                    # Random flip
+                    if np.random.choice(2) == 0:
+                        # Flip vertically
+                        sub_image = np.flipud(sub_image)
+                    if np.random.choice(2) == 0:
+                        # Flip horizontally
+                        sub_image = np.fliplr(sub_image)
 
-                    rotation = np.random.randint(0, 4)
-                    image = np.rot90(image, rotation)
-                    ground_truth = np.rot90(ground_truth, rotation)
+                    # Random rotation in steps of 90°
+                    num_rot = np.random.choice(4)
+                    sub_image = np.rot90(sub_image, num_rot)
+                    image = sub_image
 
-                data_patch, veri_patch = self.get_random_image_patch(image, ground_truth, window_size, patch_size)
-
-                label = (np.mean(veri_patch) > 0.25) * 1
                 label = keras.utils.to_categorical(label, num_classes=2)
-                batch_data[idx] = data_patch
-                batch_verifier[idx] = label
+                batch_data[idx] = image
+                batch_verifier = label
 
             if four_dim:
                 batch_data = batch_data.reshape(batch_size, self.window_size, self.window_size, 3, 1)
