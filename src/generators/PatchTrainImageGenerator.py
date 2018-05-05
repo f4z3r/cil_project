@@ -84,10 +84,9 @@ class PatchTrainImageGenerator:
                     # Random rotation in steps of 90°
                     num_rot = np.random.choice(4)
                     sub_image = np.rot90(sub_image, num_rot)
-                    image = sub_image
 
                 label = keras.utils.to_categorical(label, num_classes=2)
-                batch_data[idx] = image
+                batch_data[idx] = sub_image
                 batch_verifier[idx] = label
 
             if four_dim:
