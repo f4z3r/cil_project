@@ -10,7 +10,7 @@ properties = {
     "TRAIN_DIR": os.path.join(os.path.dirname(sys.modules['__main__'].__file__),
                               os.path.normpath("../assets/training")),
     "VAL_DIR": os.path.join(os.path.dirname(sys.modules['__main__'].__file__),
-                            os.path.normpath("../assets/training")),
+                            os.path.normpath("../assets/validation")),
     "TEST_DIR": os.path.join(os.path.dirname(sys.modules['__main__'].__file__),
                              os.path.normpath("../assets/tests")),
     "TESTING_DIR": os.path.join(os.path.dirname(sys.modules['__main__'].__file__),

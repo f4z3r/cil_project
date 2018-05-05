@@ -11,7 +11,7 @@ logger = logging.getLogger("cil_project.src.generators.PatchTrainImageGenerator"
 
 class PatchTrainImageGenerator:
     def __init__(self, path_to_images, path_to_groundtruth, window_size=72, patch_size=16, threshold=0.25):
-        padding = (self.window_size - self.patch_size) // 2
+        padding = (window_size - patch_size) // 2
 
         data_files = glob.glob(os.path.join(path_to_images, "*.png"))
         mask_files = glob.glob(os.path.join(path_to_groundtruth, "*.png"))
@@ -88,7 +88,7 @@ class PatchTrainImageGenerator:
 
                 label = keras.utils.to_categorical(label, num_classes=2)
                 batch_data[idx] = image
-                batch_verifier = label
+                batch_verifier[idx] = label
 
             if four_dim:
                 batch_data = batch_data.reshape(batch_size, self.window_size, self.window_size, 3, 1)
