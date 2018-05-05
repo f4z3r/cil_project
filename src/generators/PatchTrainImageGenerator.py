@@ -14,7 +14,12 @@ class PatchTrainImageGenerator:
         padding = (window_size - patch_size) // 2
 
         data_files = glob.glob(os.path.join(path_to_images, "*.png"))
+        #print("TRAINING")
+        #print(data_files[0:10])
         mask_files = glob.glob(os.path.join(path_to_groundtruth, "*.png"))
+        #print("VERIFIED")
+        #print(mask_files[0:10])
+        self.check_ids_order(data_files, mask_files)
         image_count = len(data_files)
         first = mpimg.imread(data_files[0])
 
@@ -28,7 +33,12 @@ class PatchTrainImageGenerator:
             data_set[idx] = np.pad(mpimg.imread(file), ((padding, padding), (padding, padding), (0, 0)), mode="reflect")
             verifier_set[idx] = np.pad(mpimg.imread(mask_file), ((padding, padding), (padding, padding)),
                                        mode="reflect")
+            #print("shapes")
+            #print(data_set[idx].shape)
+            #print(verifier_set[idx].shape)
 
+        #print(verifier_set.max())
+        #print(verifier_set.shape)
         verifier_set = verifier_set / verifier_set.max()  # normalize data
 
         self.data_set = data_set
@@ -39,6 +49,25 @@ class PatchTrainImageGenerator:
         self.threshold = threshold
 
         logger.info('PatchImageGenerator initialized with {} pictures'.format(image_count))
+
+    def check_ids_order(self,data_files, mask_files):
+        total_files = len(data_files)
+        for file_idx in range(total_files):
+            image_file = data_files[file_idx]
+            image_file = image_file[image_file.index("_")+1:-1]
+            image_id = image_file[0:image_file.index(".")]
+            #print(image_id)
+            image_file_ver = mask_files[file_idx]
+            image_file_ver = image_file_ver[image_file_ver.index("_")+1: -1]
+            image_id_ver = image_file_ver[0:image_file_ver.index(".")]
+            #print(image_id_ver)
+            if(image_id != image_id_ver):
+                print("Found wrong match between image and verifier")
+
+
+
+        print("Matches completed END")
+        return 0
 
     def get_random_image_patch(self, data_img, verifier_img, size, stride):
         h = (np.random.choice(verifier_img.shape[1]) // stride) * stride
@@ -67,8 +96,19 @@ class PatchTrainImageGenerator:
                             center[1] - window_size // 2:center[1] + window_size // 2]
                 gt_sub_image = ground_truth[center[0] - patch_size // 2:center[0] + patch_size // 2,
                                center[1] - patch_size // 2:center[1] + patch_size // 2]
+                """print("Position image patch selected:")
+                print(center[0] - window_size // 2)
+                print(center[0] + window_size // 2)
+                print(center[1] - window_size // 2)
+                print(center[1] + window_size // 2)
+                print("Position verifier patch selected:")
+                print(center[0] - patch_size // 2)
+                print(center[0] + patch_size // 2)
+                print(center[1] - patch_size // 2)
+                print(center[1] + patch_size // 2)"""
 
                 label = (np.array([np.mean(gt_sub_image)]) > self.threshold) * 1
+                #print("label is ",label)
 
 
                 if augmentation:
