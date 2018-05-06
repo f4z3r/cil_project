@@ -8,6 +8,8 @@ import warnings
 import datetime
 import time
 
+from generators.FullTestImageGenerator import FullTestImageGenerator
+from generators.FullTrainImageGenerator import FullTrainImageGenerator
 from utils.commons import *
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -65,7 +67,7 @@ def _setup_argparser():
                           help="Pattern to match tests ('test*.py' default)")
 
     parser.add_argument("-m", "--model", action="store",
-                        choices=["cnn_lr_d", "cnn_model"],
+                        choices=["cnn_lr_d", "cnn_model", "full_cnn"],
                         default="cnn_lr_d",
                         type=str,
                         help="the CNN model to be used, defaults to cnn_lr_d")
@@ -81,7 +83,7 @@ def _setup_argparser():
     parser.add_argument("-d", "--data",
                         help="path to the data to use (prediction)",
                         action="store",
-                        default=os.path.join(properties["TEST_DIR"],"data"),
+                        default=os.path.join(properties["TEST_DIR"], "data"),
                         type=str)
     parser.add_argument("-r", "--run",
                         help="run a trained version of a given CNN",
@@ -135,6 +137,7 @@ def _setup_logger(args=None):
 
     return logger
 
+
 def get_latest_model():
     """Returns the latest directory of the model specified in the arguments.
 
@@ -150,16 +153,19 @@ def get_latest_model():
     res = max(all_runs, key=os.path.getmtime)
 
     return res
+
+
 def get_submission_filename():
     """
     Returns:
         (path to directory) + filename of the submission file.
     """
     ts = int(time.time())
-    submission_filename = "submission_"+str(args.model)+"_"+str(ts)+".csv" 
+    submission_filename = "submission_" + str(args.model) + "_" + str(ts) + ".csv"
     submission_path_filename = os.path.join(get_latest_model(), submission_filename)
 
     return submission_path_filename
+
 
 ###########################################################################################
 # RUN.PY actions.
@@ -192,7 +198,7 @@ if __name__ == "__main__":
 
     from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
     from generators.PatchTestImageGenerator import PatchTestImageGenerator
-    from models import cnn_lr_d, cnn_model
+    from models import cnn_lr_d, cnn_model, full_cnn
     from models import predict_on_tests
     import keras
     import tests
@@ -206,36 +212,56 @@ if __name__ == "__main__":
         sys.exit(0)
 
     if args.train:
-        train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                   os.path.join(properties["TRAIN_DIR"], "verify"))
-        validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                   os.path.join(properties["VAL_DIR"], "verify"))
+
         if args.model == "cnn_lr_d":
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                            os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
             model.train(not args.quiet)
             model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
         elif args.model == "cnn_model":
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                            os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_model.CNN_keras(train_generator, validation_generator)
             model.train(not args.quiet)
             model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+
+        elif args.model == "full_cnn":
+            train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                      os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                           os.path.join(properties["VAL_DIR"], "verify"))
+            model = full_cnn.FullCNN(train_generator, validation_generator)
+            model.train()
 
     elif args.train_presume:
 
         properties["OUTPUT_DIR"] = get_latest_model()
 
-        train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                   os.path.join(properties["TRAIN_DIR"], "verify"))
-        validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                   os.path.join(properties["VAL_DIR"], "verify"))
         model = None
         if args.model == "cnn_lr_d":
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                            os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_lr_d.CnnLrD(train_generator,
                                     validation_generator,
                                     path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
-
-        model.train(not args.quiet)
-        model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model.train(not args.quiet)
+            model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+        elif args.model == "full_cnn":
+            train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                      os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                           os.path.join(properties["VAL_DIR"], "verify"))
+            model = full_cnn.FullCNN(train_generator, validation_generator)
+            model.load(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model.train()
 
     if args.predict:
 
@@ -244,44 +270,53 @@ if __name__ == "__main__":
            Path to the model to restore for predictions
         """
         data_path = args.data
-        path_model_to_restore = os.path.join(get_latest_model(),"weights.h5")
-        
+        path_model_to_restore = os.path.join(get_latest_model(), "weights.h5")
+
         """Submission file"""
         submission_path_filename = get_submission_filename()
 
-
-        print("Loading the last checkpoint of the model ",args.model," from: ",path_model_to_restore)
+        print("Loading the last checkpoint of the model ", args.model, " from: ", path_model_to_restore)
 
         if args.model == "cnn_lr_d":
 
-            test_generator_class = PatchTestImageGenerator(path_to_images = os.path.join(data_path),
-                                                     save_predictions_path = os.path.join(properties["OUTPUT_DIR"], "predictions"))
-            
-            model_class = cnn_lr_d.CnnLrD(test_generator_class,path=path_model_to_restore)
+            test_generator_class = PatchTestImageGenerator(path_to_images=os.path.join(data_path),
+                                                           save_predictions_path=os.path.join(properties["OUTPUT_DIR"],
+                                                                                              "predictions"))
+
+            model_class = cnn_lr_d.CnnLrD(test_generator_class, path=path_model_to_restore)
             model = model_class.model
 
             print("Model has been restored successfully")
-            prediction_model = predict_on_tests.Prediction_model(test_generator_class = test_generator_class, restored_model = model)
+            prediction_model = predict_on_tests.Prediction_model(test_generator_class=test_generator_class,
+                                                                 restored_model=model)
             predictions = prediction_model.prediction_given_model()
 
-            print("Writing predictions to: ",submission_path_filename)
-            prediction_model.save_predictions_to_csv(predictions = predictions, submission_file = submission_path_filename)
+            print("Writing predictions to: ", submission_path_filename)
+            prediction_model.save_predictions_to_csv(predictions=predictions, submission_file=submission_path_filename)
 
         elif args.model == "cnn_model":
-            #TODO error in the training -> to be fixed later on by the person who is responsible for the training part
-            test_generator_class = PatchTestImageGenerator(path_to_images = os.path.join(data_path),
-                                                     save_predictions_path = os.path.join(properties["OUTPUT_DIR"], "predictions"),
-                                                     four_dim = True)
-            
-            model_class = cnn_lr_d.CnnLrD(test_generator_class,path=path_model_to_restore)
+            # TODO error in the training -> to be fixed later on by the person who is responsible for the training part
+            test_generator_class = PatchTestImageGenerator(path_to_images=os.path.join(data_path),
+                                                           save_predictions_path=os.path.join(properties["OUTPUT_DIR"],
+                                                                                              "predictions"),
+                                                           four_dim=True)
+
+            model_class = cnn_lr_d.CnnLrD(test_generator_class, path=path_model_to_restore)
             model = model_class.model
 
             print("Model has been restored successfully")
-            prediction_model = predict_on_tests.Prediction_model(test_generator_class = test_generator_class, restored_model = model)
+            prediction_model = predict_on_tests.Prediction_model(test_generator_class=test_generator_class,
+                                                                 restored_model=model)
             predictions = prediction_model.prediction_given_model()
 
-            print("Writing predictions to: ",submission_path_filename)
-            prediction_model.save_predictions_to_csv(predictions = predictions, submission_file = submission_path_filename)
+            print("Writing predictions to: ", submission_path_filename)
+            prediction_model.save_predictions_to_csv(predictions=predictions, submission_file=submission_path_filename)
+
+        elif args.model == "full_cnn":
+            test_generator_class = FullTestImageGenerator(os.path.join(data_path))
+            model = full_cnn.FullCNN(None, None)
+            model.load(os.path.join(get_latest_model(), "weights.h5"))
+            model.predict(test_generator_class)
 
     if args.run:
         # Test CNN model

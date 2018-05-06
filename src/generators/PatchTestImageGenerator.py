@@ -1,10 +1,9 @@
 import glob
 import os
 
-import keras
 import matplotlib.image as mpimg
 import numpy as np
-import sys, traceback
+
 
 class PatchTestImageGenerator:
     def __init__(self, path_to_images, save_predictions_path, pad = 28, patch_size = 16, context_padding = 28, four_dim = False):
