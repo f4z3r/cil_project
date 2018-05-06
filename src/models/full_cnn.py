@@ -42,11 +42,11 @@ class FullCNN(BaseModel):
         self.model.compile(loss=self.bce_dice_loss, optimizer=Adam(lr=1e-4), metrics=[self.dice_coef])
         # print(self.model.summary())
 
-    def train(self, verbosity=None, epochs=150, steps=5000, print_at_end=True):
+    def train(self, verbosity=None, epochs=150, steps=50, print_at_end=True):
         self.model.fit_generator(
             self.train_generator.generate_patch(batch_size=2),
             steps_per_epoch=self.train_generator.size // 2,
-            epochs=epochs,
+            epochs=steps,
             callbacks=self.callbacks_list,
             verbose=1,
             validation_data=self.validation_generator.generate_patch(batch_size=2),
