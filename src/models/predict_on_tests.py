@@ -47,6 +47,12 @@ class Prediction_model():
         id_idx = 0
         for prediction_batch in predictions:
             id_image = images_ids[id_idx]
+            id_length = len(id_image)
+            #Padding with zeros the ids
+            if id_length<3:
+                zero_padding = 3-id_length
+                id_image = "0"*zero_padding+str(id_image)
+
             idx_row = 0
             idx_column = 0
             for prediction_probabilities in prediction_batch:
