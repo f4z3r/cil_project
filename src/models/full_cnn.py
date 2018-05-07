@@ -18,8 +18,14 @@ CHANNELS = 3
 
 
 class FullCNN(BaseModel):
-    def __init__(self, train_generator, validation_generator):
+    def __init__(self, train_generator, validation_generator, path=None):
         super().__init__(train_generator, validation_generator)
+
+        if path:
+            logger.info("Loading existing model from {}".format(path))
+            self.load(path)
+            logger.info("Finished loading model")
+            return
 
         checkpoint_loc = os.path.join(properties["OUTPUT_DIR"], 'weights.h5')
 
@@ -38,7 +44,6 @@ class FullCNN(BaseModel):
 
         self.model = self.get_unet_400()
         self.model.compile(loss=self.bce_dice_loss, optimizer=Adam(lr=1e-4), metrics=[self.dice_coef])
-        # print(self.model.summary())
 
     def train(self, verbosity=None, epochs=150, steps=1000, print_at_end=True):
         self.model.fit_generator(
