@@ -130,8 +130,8 @@ class CnnLrD(BaseModel):
                                                            embeddings_layer_names=None, embeddings_metadata=None)
 
         checkpoint_callback = keras.callbacks.ModelCheckpoint(
-            os.path.join(properties["OUTPUT_DIR"], 'model_cnn_lr_d.{epoch:02d}-{val_acc:.2f}.hdf5'),
-            monitor='val_loss', verbose=0, save_best_only=False,
+            os.path.join(properties["OUTPUT_DIR"], 'weights.h5'),
+            monitor='val_loss', verbose=0, save_best_only=True,
             save_weights_only=False, mode='auto', period=1)
 
         self.model.fit_generator(self.train_generator.generate_patch(),

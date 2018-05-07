@@ -221,11 +221,6 @@ if __name__ == "__main__":
             validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
                                                             os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
-            try:
-                model.train(not args.quiet)
-            except KeyboardInterrupt:
-                logger.warning("\nTraining interrupted")
-            model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
         elif args.model == "cnn_model":
             train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
@@ -233,11 +228,7 @@ if __name__ == "__main__":
             validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
                                                             os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_model.CNN_keras(train_generator, validation_generator)
-            try:
-                model.train(not args.quiet)
-            except KeyboardInterrupt:
-                logger.warning("\nTraining interrupted")
-            model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+
 
         elif args.model == "full_cnn":
             train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
@@ -245,25 +236,30 @@ if __name__ == "__main__":
             validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
                                                            os.path.join(properties["VAL_DIR"], "verify"))
             model = full_cnn.FullCNN(train_generator, validation_generator)
-            try:
-                model.train(not args.quiet)
-            except KeyboardInterrupt:
-                logger.warning("\nTraining interrupted")
-            model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+
+        try:
+            model.train(not args.quiet)
+        except KeyboardInterrupt:
+            logger.warning("\nTraining interrupted")
+        model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
     elif args.train_presume:
-        train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                   os.path.join(properties["TRAIN_DIR"], "verify"))
-        validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                        os.path.join(properties["VAL_DIR"], "verify"))
 
         model = None
         if args.model == "cnn_lr_d":
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                            os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_lr_d.CnnLrD(train_generator,
                                     validation_generator,
                                     path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
         elif args.model == "full_cnn":
+            train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                      os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                           os.path.join(properties["VAL_DIR"], "verify"))
             model = full_cnn.FullCNN(train_generator,
                                      validation_generator,
                                      path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
