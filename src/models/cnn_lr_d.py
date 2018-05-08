@@ -130,23 +130,18 @@ class CnnLrD(BaseModel):
                                                            embeddings_layer_names=None, embeddings_metadata=None)
 
         checkpoint_callback = keras.callbacks.ModelCheckpoint(
-            os.path.join(properties["OUTPUT_DIR"], 'model_cnn_lr_d.{epoch:02d}-{val_acc:.2f}.hdf5'),
-            monitor='val_loss', verbose=0, save_best_only=False,
+            os.path.join(properties["OUTPUT_DIR"], 'weights.h5'),
+            monitor='val_loss', verbose=0, save_best_only=True,
             save_weights_only=False, mode='auto', period=1)
 
-        try:
-            self.model.fit_generator(self.train_generator.generate_patch(),
-                                     steps_per_epoch=steps,
-                                     verbose=verbosity,
-                                     epochs=epochs,
-                                     callbacks=[lr_callback, stop_callback, tensorboard_callback,
-                                                checkpoint_callback],
-                                     validation_data=self.validation_generator.generate_patch(),
-                                     validation_steps=100)
-        except KeyboardInterrupt:
-            logger.warning("\nTraining interrupted")
-        else:
-            logger.info("Training completed")
+        self.model.fit_generator(self.train_generator.generate_patch(),
+                                 steps_per_epoch=steps,
+                                 verbose=verbosity,
+                                 epochs=epochs,
+                                 callbacks=[lr_callback, stop_callback, tensorboard_callback,
+                                            checkpoint_callback],
+                                 validation_data=self.validation_generator.generate_patch(),
+                                 validation_steps=100)
 
     def save(self, path):
         """Save the model of the trained model.
