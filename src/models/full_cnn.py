@@ -42,13 +42,13 @@ class FullCNN(BaseModel):
 
     def train(self, verbosity=None, epochs=150, steps=1000, print_at_end=True):
         self.model.fit_generator(
-            self.train_generator.generate_patch(batch_size=2),
+            self.train_generator.generate_patch(batch_size=8),
             steps_per_epoch=steps,
             epochs=epochs,
             callbacks=self.callbacks_list,
             verbose=1,
-            validation_data=self.validation_generator.generate_patch(batch_size=2),
-            validation_steps=1)
+            validation_data=self.validation_generator.generate_patch(batch_size=8),
+            validation_steps=5)
 
     def predict(self, test_generator):
         x_batch = next(test_generator.generate_patch_sequential())
