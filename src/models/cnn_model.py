@@ -6,6 +6,7 @@ import os
 from keras import callbacks
 
 from models.base_model import BaseModel
+from utils.commons import *
 
 logger = logging.getLogger("cil_project.src.models.cnn_model")
 
@@ -39,8 +40,6 @@ class CNN_keras(BaseModel):
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
         input_dim = self.train_generator.input_dim(four_dim=True)
-        print("input DMENSIONS")
-        print(self.train_generator.input_dim())
 
         """Applying conv3D focusing on the new 3-rd dimension (filters) of the previous conv3D which hopefully learns through time
            to attribute distinctive values to roads and not roads sub-filtered images. A way to think of it is that the first conv3D layer
@@ -104,7 +103,6 @@ class CNN_keras(BaseModel):
         self.model.add(keras.layers.Dense(units=2,
                                           kernel_regularizer=keras.regularizers.l2(1e-6),
                                           activation="softmax"))
-        print(self.model.summary())
 
     def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
         optimiser = keras.optimizers.Adam()
@@ -132,6 +130,15 @@ class CNN_keras(BaseModel):
                                  validation_data=self.validation_generator.generate_patch(four_dim=True),
                                  validation_steps=100
                                  )
+
+    def save(self, path):
+        """Save the model of the trained model.
+
+        Args:
+            path (path): path for the model file.
+        """
+        self.model.save(path)
+        logger.info("Model saved to {}".format(path))
 
 
 
