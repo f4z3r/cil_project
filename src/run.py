@@ -255,6 +255,15 @@ if __name__ == "__main__":
                                     validation_generator,
                                     path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
+        elif args.model == "cnn_model":
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                            os.path.join(properties["VAL_DIR"], "verify"))
+            model = cnn_model.CNN_keras(train_generator,
+                                        validation_generator,
+                                        path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+
         elif args.model == "full_cnn":
             train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
                                                       os.path.join(properties["TRAIN_DIR"], "verify"))

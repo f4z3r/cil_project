@@ -33,11 +33,16 @@ from keras.layers.core import Activation, Flatten, Reshape
 
 
 class CNN_keras(BaseModel):
-    def __init__(self, train_generator, validation_generator = []):
-
+    def __init__(self, train_generator, validation_generator = [], path=None):
         super().__init__(train_generator, validation_generator)
 
-        logger.info("Generating CNN model with leaky ReLU and dropouts ...")
+        logger.info("Generating 3D convolutional NN ...")
+
+        if path:
+            logger.info("Loading model from {}".format(path))
+            self.load(path)
+            logger.info("Finished loading model")
+            return
 
         input_dim = self.train_generator.input_dim(four_dim=True)
 
