@@ -109,7 +109,6 @@ class CNN_keras(BaseModel):
                                           kernel_regularizer=keras.regularizers.l2(1e-6),
                                           activation="softmax"))
 
-    def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
         optimiser = keras.optimizers.Adam()
         self.model.compile(loss=keras.losses.categorical_crossentropy,
                            optimizer=optimiser,
@@ -118,14 +117,16 @@ class CNN_keras(BaseModel):
         # print(training_set)
         # self.model.fit(training_set, epochs=10)
 
+    def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
+
         tensorboard_callback = callbacks.TensorBoard(log_dir=properties["LOG_DIR"], histogram_freq=0, batch_size=32,
                                                      write_graph=True,
                                                      write_grads=False, write_images=False, embeddings_freq=0,
                                                      embeddings_layer_names=None, embeddings_metadata=None)
 
         checkpoint_callback = callbacks.ModelCheckpoint(
-            os.path.join(properties["OUTPUT_DIR"], 'model_cnn_model.{epoch:02d}-{val_acc:.2f}.hdf5'),
-            monitor='val_loss', verbose=0, save_best_only=False,
+            os.path.join(properties["OUTPUT_DIR"], 'weights.h5'),
+            monitor='val_loss', verbose=0, save_best_only=True,
             save_weights_only=False, mode='auto', period=1)
 
         self.model.fit_generator(self.train_generator.generate_patch(four_dim=True),
