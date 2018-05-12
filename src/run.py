@@ -72,7 +72,7 @@ def _setup_argparser():
     parser.add_argument("-t", "--train",
                         help="train the given CNN",
                         action="store_true")
-    parser.add_argument("-tp", "--train_presume",
+    parser.add_argument("-tp", "--train_resume",
                         help="continue training the given CNN",
                         action="store_true")
     parser.add_argument("-p", "--predict",
@@ -185,7 +185,7 @@ if __name__ == "__main__":
             os.makedirs(properties["OUTPUT_DIR"])
         except OSError:
             pass
-    elif args.train_presume:
+    elif args.train_resume:
         properties["OUTPUT_DIR"] = get_latest_model()
         properties["LOG_DIR"] = os.path.join(properties["OUTPUT_DIR"], "logs")
     else:
@@ -243,7 +243,7 @@ if __name__ == "__main__":
             logger.warning("\nTraining interrupted")
         model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
-    elif args.train_presume:
+    elif args.train_resume:
 
         model = None
         if args.model == "cnn_lr_d":
@@ -269,6 +269,7 @@ if __name__ == "__main__":
                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
             validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
                                                            os.path.join(properties["VAL_DIR"], "verify"))
+            print("Path ",properties["OUTPUT_DIR"])
             model = full_cnn.FullCNN(train_generator,
                                      validation_generator,
                                      path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
@@ -318,8 +319,11 @@ if __name__ == "__main__":
                                                                                               "predictions"),
                                                            four_dim=True)
 
-            model_class = cnn_lr_d.CnnLrD(test_generator_class, path=path_model_to_restore)
+
+            model_class = cnn_model.CNN_keras(None, None)
             model = model_class.model
+            model.load_weights(path_model_to_restore)
+
 
             print("Model has been restored successfully")
             prediction_model = predict_on_tests.Prediction_model(test_generator_class=test_generator_class,

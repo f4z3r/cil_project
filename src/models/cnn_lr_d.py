@@ -90,6 +90,7 @@ class CnnLrD(BaseModel):
         self.model.compile(loss=keras.losses.categorical_crossentropy,
                            optimizer=optimiser,
                            metrics=["accuracy"])
+        print(self.model.summary())
 
         logger.info("Done")
 

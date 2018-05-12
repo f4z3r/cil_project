@@ -43,9 +43,10 @@ class CNN_keras(BaseModel):
             self.load(path)
             logger.info("Finished loading model")
             return
-
-        input_dim = self.train_generator.input_dim(four_dim=True)
-
+        if self.train_generator:
+            input_dim = self.train_generator.input_dim(four_dim=True)
+        else:
+            input_dim = 72, 72, 3, 1
         """Applying conv3D focusing on the new 3-rd dimension (filters) of the previous conv3D which hopefully learns through time
            to attribute distinctive values to roads and not roads sub-filtered images. A way to think of it is that the first conv3D layer
            learns to count roads sub image and not sub image looking at filters dimension |||||||||| -> layers depth (filters) -> what is road , what is not? """
