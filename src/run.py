@@ -72,7 +72,7 @@ def _setup_argparser():
     parser.add_argument("-t", "--train",
                         help="train the given CNN",
                         action="store_true")
-    parser.add_argument("-tp", "--train_resume",
+    parser.add_argument("-tr", "--train_resume",
                         help="continue training the given CNN",
                         action="store_true")
     parser.add_argument("-p", "--predict",
