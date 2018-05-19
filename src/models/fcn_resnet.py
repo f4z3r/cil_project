@@ -6,6 +6,8 @@ import os, sys
 import keras
 from keras import backend as K
 
+import numpy as np
+
 import tensorflow as tf
 
 from models.base_model import BaseModel
@@ -34,111 +36,86 @@ class FCNResNet(BaseModel):
 
         logger.info("Generating FCN model with ResNet-50 architecture...")
 
-        image_size = [400, 400]
+        num_classes = 1
+        image_size = [400, 400, 3]
+        inputs = keras.Input(shape=image_size)
 
         bn_axis = 3
 
         x = keras.layers.Conv2D(64, (7, 7), strides=(2, 2), padding='same', name='conv1',
-                                kernel_regularizer=keras.regularizers.l2(weight_decay),
-                                input_shape=train_generator.input_dim())
+                                kernel_regularizer=keras.regularizers.l2(weight_decay))(inputs)
         x = keras.layers.BatchNormalization(axis=bn_axis, name='bn_conv1', momentum=batch_momentum)(x)
         x = keras.layers.Activation('relu')(x)
         x = keras.layers.MaxPooling2D((3, 3), strides=(2, 2))(x)
 
-        x = self._conv_block(3, [64, 64, 256], stage=2, block='a', weight_decay=weight_decay, strides=(1, 1),
+        x = self._conv_block(3, filters=[64, 64, 256], stage=2, block='a', weight_decay=weight_decay, strides=(1, 1),
                              batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [64, 64, 256], stage=2, block='b', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[64, 64, 256], stage=2, block='b', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [64, 64, 256], stage=2, block='c', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[64, 64, 256], stage=2, block='c', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
 
-        x = self._conv_block(3, [128, 128, 512], stage=3, block='a', weight_decay=weight_decay,
+        x = self._conv_block(3, filters=[128, 128, 512], stage=3, block='a', weight_decay=weight_decay,
                              batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [128, 128, 512], stage=3, block='b', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[128, 128, 512], stage=3, block='b', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [128, 128, 512], stage=3, block='c', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[128, 128, 512], stage=3, block='c', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [128, 128, 512], stage=3, block='d', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[128, 128, 512], stage=3, block='d', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
 
-        x = self._conv_block(3, [256, 256, 1024], stage=4, block='a', weight_decay=weight_decay,
+        x = self._conv_block(3, filters=[256, 256, 1024], stage=4, block='a', weight_decay=weight_decay,
                              batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [256, 256, 1024], stage=4, block='b', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[256, 256, 1024], stage=4, block='b', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [256, 256, 1024], stage=4, block='c', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[256, 256, 1024], stage=4, block='c', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [256, 256, 1024], stage=4, block='d', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[256, 256, 1024], stage=4, block='d', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [256, 256, 1024], stage=4, block='e', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[256, 256, 1024], stage=4, block='e', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
-        x = self._identity_block(3, [256, 256, 1024], stage=4, block='f', weight_decay=weight_decay,
+        x = self._identity_block(3, filters=[256, 256, 1024], stage=4, block='f', weight_decay=weight_decay,
                                  batch_momentum=batch_momentum)(x)
 
-        x = self._atrous_conv_block(3, [512, 512, 2048], stage=5, block='a', weight_decay=weight_decay,
+        x = self._atrous_conv_block(3, filters=[512, 512, 2048], stage=5, block='a', weight_decay=weight_decay,
                                     atrous_rate=(2, 2), batch_momentum=batch_momentum)(x)
-        x = self._atrous_identity_block(3, [512, 512, 2048], stage=5, block='b', weight_decay=weight_decay,
+        x = self._atrous_identity_block(3, filters=[512, 512, 2048], stage=5, block='b', weight_decay=weight_decay,
                                         atrous_rate=(2, 2), batch_momentum=batch_momentum)(x)
-        x = self._atrous_identity_block(3, [512, 512, 2048], stage=5, block='c', weight_decay=weight_decay,
+        x = self._atrous_identity_block(3, filters=[512, 512, 2048], stage=5, block='c', weight_decay=weight_decay,
                                         atrous_rate=(2, 2), batch_momentum=batch_momentum)(x)
 
 
-        x = keras.layers.Conv2D(2, (1, 1), kernel_initializer='he_normal', activation='linear', padding='same',
-                   strides=(1, 1), kernel_regularizer=l2(weight_decay))(x)
+        x = keras.layers.Conv2D(num_classes, (1, 1), kernel_initializer='he_normal', activation='linear', padding='same',
+                                strides=(1, 1), kernel_regularizer=keras.regularizers.l2(weight_decay))(x)
         x = BilinearUpSampling2D(target_size=tuple(image_size))(x)
 
-        self.model = keras.models.Model(img_input, x)
+        self.model = keras.models.Model(inputs, x)
+
+        logger.info("Compiling model ...")
+
+        lr_base = 0.01
+        # optimiser = keras.optimizers.SGD(lr=lr_base, momentum=0.9)
+        optimiser = keras.optimizers.Adam(lr=1e-4)
+
+        self.model.compile(loss=self.bce_dice_loss, optimizer=optimiser, metrics=[self.dice_coef])
 
 
 
-    def _conv_block(kernel_size, filters, stage, block, weight_decay=0.0, strides=(2, 2), batch_momentum=0.99):
-        """conv_block is the block that has a conv layer at shortcut
+    def dice_coef(self, y_true, y_pred, smooth=1):
+        y_true_f = K.flatten(y_true)
+        y_pred_f = K.flatten(y_pred)
 
-        # Arguments
-            kernel_size: default 3, the kernel size of middle conv layer at main path
-            filters: list of integers, the nb_filters of 3 conv layer at main path
-            stage: integer, current stage label, used for generating layer names
-            block: 'a','b'..., current block label, used for generating layer names
+        intersection = K.sum(y_true_f * y_pred_f)
+        return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
 
-        Note that from stage 3, the first conv layer at main path is with strides=(2,2)
-        And the shortcut should have strides=(2,2) as well
-        """
-        def f(input_tensor):
-            nb_filter1, nb_filter2, nb_filter3 = filters
-            if K.image_data_format() == "channels_last":
-                bn_axis = 3
-            else:
-                bn_axis = 1
+    def dice_coef_loss(self, y_true, y_pred):
+        return 1 - self.dice_coef(y_true, y_pred)
 
-            conv_name_base = "res" + str(stage) + block + "_branch"
-            bn_name_base = "bn" + str(stage) + block + "_branch"
+    def bce_dice_loss(self, y_true, y_pred):
+        return K.binary_crossentropy(y_true, y_pred) + self.dice_coef_loss(y_true, y_pred)
 
-            x = keras.layers.Conv2D(nb_filter1, (1, 1), strides=strides, name=conv_name_base + "2a",
-                                    kernel_regularizer=keras.regularizers.l2(weight_decay))(input_tensor)
-            x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + "2a", momentum=batch_momentum)(x)
-            x = keras.layers.Activation("relu")(x)
 
-            x = keras.layer.Conv2D(nb_filter2, (kernel_size, kernel_size), padding="same",
-                                   name=conv_name_base + "2b",
-                                   kernel_regularizer=keras.regularizers.l2(weight_decay))(x)
-            x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + "2b", momentum=batch_momentum)(x)
-            x = keras.layers.Activation("relu")(x)
-
-            x = keras.layer.Conv2D(nb_filter3, (1, 1), name=conv_name_base + "2c",
-                                   kernel_regularizer=keras.regularizers.l2(weight_decay))(x)
-            x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + "2b", momentum=batch_momentum)(x)
-
-            shortcut = keras.layers.Conv2D(nb_filter3, (1, 1), strides=strides, name=conv_name_base + "1",
-                                           kernel_regularizer=keras.regularizers.l2(weight_decay))(input_tensor)
-            shortcut = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + "1",
-                                                       momentum=batch_momentum)(shortcut)
-
-            x = keras.layers.merge.Add()([x, shortcut])
-            x = keras.layers.Activation("relu")(x)
-
-            return x
-        return f
-
-    def train(self, verbosity, epochs=150, steps=5000):
+    def train(self, verbosity, epochs=150, steps=1000):
         """Train the model.
 
         Args:
@@ -177,14 +154,14 @@ class FCNResNet(BaseModel):
             monitor='val_loss', verbose=0, save_best_only=True,
             save_weights_only=False, mode='auto', period=1)
 
-        self.model.fit_generator(self.train_generator.generate_patch(),
-                                 steps_per_epoch=steps,
-                                 verbose=verbosity,
-                                 epochs=epochs,
-                                 callbacks=[lr_callback, stop_callback, tensorboard_callback,
-                                            checkpoint_callback],
-                                 validation_data=self.validation_generator.generate_patch(),
-                                 validation_steps=100)
+        self.model.fit_generator(
+            self.train_generator.generate_patch(batch_size=8),
+            steps_per_epoch=steps,
+            epochs=epochs,
+            callbacks=[lr_callback, stop_callback, tensorboard_callback, checkpoint_callback],
+            verbose=1,
+            validation_data=self.validation_generator.generate_patch(batch_size=8),
+            validation_steps=5)
 
     def save(self, path):
         """Save the model of the trained model.
@@ -196,7 +173,95 @@ class FCNResNet(BaseModel):
         logger.info("Model saved to {}".format(path))
 
 
-    def _atrous_identity_block(kernel_size, filters, stage, block, weight_decay=0., atrous_rate=(2, 2), batch_momentum=0.99):
+    def _conv_block(self, kernel_size, filters, stage, block, weight_decay=0.0, strides=(2, 2), batch_momentum=0.99):
+        """conv_block is the block that has a conv layer at shortcut
+
+        # Arguments
+            kernel_size: default 3, the kernel size of middle conv layer at main path
+            filters: list of integers, the nb_filters of 3 conv layer at main path
+            stage: integer, current stage label, used for generating layer names
+            block: 'a','b'..., current block label, used for generating layer names
+
+        Note that from stage 3, the first conv layer at main path is with strides=(2,2)
+        And the shortcut should have strides=(2,2) as well
+        """
+        def f(input_tensor):
+            nb_filter1, nb_filter2, nb_filter3 = filters
+            if K.image_data_format() == "channels_last":
+                bn_axis = 3
+            else:
+                bn_axis = 1
+
+            conv_name_base = "res" + str(stage) + block + "_branch"
+            bn_name_base = "bn" + str(stage) + block + "_branch"
+
+            x = keras.layers.Conv2D(nb_filter1, (1, 1), strides=strides, name=conv_name_base + "2a",
+                                    kernel_regularizer=keras.regularizers.l2(weight_decay))(input_tensor)
+            x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + "2a", momentum=batch_momentum)(x)
+            x = keras.layers.Activation("relu")(x)
+
+            x = keras.layers.Conv2D(nb_filter2, (kernel_size, kernel_size), padding="same",
+                                   name=conv_name_base + "2b",
+                                   kernel_regularizer=keras.regularizers.l2(weight_decay))(x)
+            x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + "2b", momentum=batch_momentum)(x)
+            x = keras.layers.Activation("relu")(x)
+
+            x = keras.layers.Conv2D(nb_filter3, (1, 1), name=conv_name_base + "2c",
+                                   kernel_regularizer=keras.regularizers.l2(weight_decay))(x)
+            x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + "2c", momentum=batch_momentum)(x)
+
+            shortcut = keras.layers.Conv2D(nb_filter3, (1, 1), strides=strides, name=conv_name_base + "1",
+                                           kernel_regularizer=keras.regularizers.l2(weight_decay))(input_tensor)
+            shortcut = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + "1",
+                                                       momentum=batch_momentum)(shortcut)
+
+            x = keras.layers.Add()([x, shortcut])
+            x = keras.layers.Activation("relu")(x)
+
+            return x
+        return f
+
+
+    def _identity_block(self, kernel_size, filters, stage, block, weight_decay=0., batch_momentum=0.99):
+        """The identity_block is the block that has no conv layer at shortcut
+
+        # Arguments
+            kernel_size: defualt 3, the kernel size of middle conv layer at main path
+            filters: list of integers, the nb_filters of 3 conv layer at main path
+            stage: integer, current stage label, used for generating layer names
+            block: 'a','b'..., current block label, used for generating layer names
+        """
+        def f(input_tensor):
+            nb_filter1, nb_filter2, nb_filter3 = filters
+            if K.image_data_format() == 'channels_last':
+                bn_axis = 3
+            else:
+                bn_axis = 1
+
+            conv_name_base = 'res' + str(stage) + block + '_branch'
+            bn_name_base = 'bn' + str(stage) + block + '_branch'
+
+            x = keras.layers.Conv2D(nb_filter1, (1, 1), name=conv_name_base + '2a',
+                                    kernel_regularizer=keras.regularizers.l2(weight_decay))(input_tensor)
+            x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + '2a', momentum=batch_momentum)(x)
+            x = keras.layers.Activation('relu')(x)
+
+            x = keras.layers.Conv2D(nb_filter2, (kernel_size, kernel_size), padding='same', name=conv_name_base + '2b',
+                                    kernel_regularizer=keras.regularizers.l2(weight_decay))(x)
+            x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + '2b', momentum=batch_momentum)(x)
+            x = keras.layers.Activation('relu')(x)
+
+            x = keras.layers.Conv2D(nb_filter3, (1, 1), name=conv_name_base + '2c',
+                                    kernel_regularizer=keras.regularizers.l2(weight_decay))(x)
+            x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + '2c', momentum=batch_momentum)(x)
+
+            x = keras.layers.Add()([x, input_tensor])
+            x = keras.layers.Activation('relu')(x)
+            return x
+        return f
+
+    def _atrous_identity_block(self, kernel_size, filters, stage, block, weight_decay=0., atrous_rate=(2, 2),
+                               batch_momentum=0.99):
         """The identity_block is the block that has no conv layer at shortcut
 
         # Arguments
@@ -231,13 +296,13 @@ class FCNResNet(BaseModel):
                                     kernel_regularizer=keras.regularizers.l2(weight_decay))(x)
             x = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + '2c', momentum=batch_momentum)(x)
 
-            x = keras.layers.merge.Add()([x, input_tensor])
+            x = keras.layers.Add()([x, input_tensor])
             x = keras.layers.Activation('relu')(x)
             return x
         return f
 
 
-    def _atrous_conv_block(kernel_size, filters, stage, block, weight_decay=0., strides=(1, 1), atrous_rate=(2, 2),
+    def _atrous_conv_block(self, kernel_size, filters, stage, block, weight_decay=0., strides=(1, 1), atrous_rate=(2, 2),
                            batch_momentum=0.99):
         """conv_block is the block that has a conv layer at shortcut
 
@@ -277,13 +342,13 @@ class FCNResNet(BaseModel):
                                      kernel_regularizer=keras.regularizers.l2(weight_decay))(input_tensor)
             shortcut = keras.layers.BatchNormalization(axis=bn_axis, name=bn_name_base + '1', momentum=batch_momentum)(shortcut)
 
-            x = keras.layers.merge.Add()([x, shortcut])
+            x = keras.layers.Add()([x, shortcut])
             x = keras.layers.Activation('relu')(x)
             return x
         return f
 
 
-class BilinearUpSampling2D(keras.layers.Layer):
+class BilinearUpSampling2D(keras.engine.topology.Layer):
     def __init__(self, size=(1, 1), target_size=None, data_format='default', **kwargs):
         if data_format == 'default':
             data_format = K.image_data_format()
@@ -343,7 +408,7 @@ class BilinearUpSampling2D(keras.layers.Layer):
         base_config = super(BilinearUpSampling2D, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
-    def resize_images_bilinear(X, height_factor=1, width_factor=1, target_height=None, target_width=None,
+    def resize_images_bilinear(self, X, height_factor=1, width_factor=1, target_height=None, target_width=None,
                                data_format='default'):
         """Resizes the images contained in a 4D tensor of shape
 

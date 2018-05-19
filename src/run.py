@@ -65,7 +65,7 @@ def _setup_argparser():
                           help="Pattern to match tests ('test*.py' default)")
 
     parser.add_argument("-m", "--model", action="store",
-                        choices=["cnn_lr_d", "cnn_model", "full_cnn"],
+                        choices=["cnn_lr_d", "cnn_model", "full_cnn", "fcn_resnet"],
                         default="cnn_lr_d",
                         type=str,
                         help="the CNN model to be used, defaults to cnn_lr_d")
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     from generators.FullTrainImageGenerator import FullTrainImageGenerator
     from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
     from generators.PatchTestImageGenerator import PatchTestImageGenerator
-    from models import cnn_lr_d, cnn_model, full_cnn
+    from models import cnn_lr_d, cnn_model, full_cnn, fcn_resnet
     from models import predict_on_tests
     import keras
     import tests
@@ -237,6 +237,14 @@ if __name__ == "__main__":
                                                            os.path.join(properties["VAL_DIR"], "verify"))
             model = full_cnn.FullCNN(train_generator, validation_generator)
 
+        elif args.model == "fcn_resnet":
+            train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                      os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                           os.path.join(properties["VAL_DIR"], "verify"))
+            model = fcn_resnet.FCNResNet(train_generator, validation_generator)
+
+
         try:
             model.train(not args.quiet)
         except KeyboardInterrupt:
@@ -272,6 +280,15 @@ if __name__ == "__main__":
             model = full_cnn.FullCNN(train_generator,
                                      validation_generator,
                                      path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+
+        elif args.model == "fcn_resnet":
+            train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
+                                                      os.path.join(properties["TRAIN_DIR"], "verify"))
+            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
+                                                           os.path.join(properties["VAL_DIR"], "verify"))
+            model = fcn_resnet.FCNResNet(train_generator,
+                                         validation_generator,
+                                         path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
 
 
         try:
