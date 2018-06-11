@@ -115,7 +115,6 @@ class CnnLrD(BaseModel):
                                                         factor=0.5,
                                                         patience=0.5,
                                                         verbose=0,
-                                                        min_delta=0.0001,
                                                         cooldown=0,
                                                         min_lr=0)
         stop_callback = keras.callbacks.EarlyStopping(monitor="acc",

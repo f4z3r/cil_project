@@ -8,6 +8,7 @@ import warnings
 import datetime
 import time
 
+from visualization import *
 from utils.commons import *
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -83,6 +84,9 @@ def _setup_argparser():
                         action="store",
                         default=os.path.join(properties["TEST_DIR"], "data"),
                         type=str)
+    parser.add_argument("-vis", "--visualize",
+                        help="visualize prediction of an image given its id",
+                        action="store")
     parser.add_argument("-r", "--run",
                         help="run a trained version of a given CNN",
                         action="store_true")
@@ -136,6 +140,28 @@ def _setup_logger(args=None):
     return logger
 
 
+def get_latest_submission():
+    path_submission = get_latest_model()
+    submissions = []
+    submissions += [each for each in os.listdir(path_submission) if each.endswith('.csv')]
+    
+    if not len(submissions) == 0:
+
+        timestamps = []
+        for sub_idx in range(len(submissions)):
+            end_ts = submissions[sub_idx].index(".csv") - 1
+            start_ts = [x.isdigit() for x in submissions[sub_idx]].index(True)
+            timestamps.append(int(submissions[sub_idx][start_ts:end_ts]))
+        max_ts_idx = timestamps.index(max(timestamps))
+        latest_submission = submissions[max_ts_idx]
+    else:
+        print("[INFO] No submission csv file for: ",path_submission)
+        sys.exit(1)
+
+    print("[INFO] Retrieving last submission in: ",os.path.join(path_submission, latest_submission))
+    
+    return os.path.join(path_submission, latest_submission)
+
 def get_latest_model():
     """Returns the latest directory of the model specified in the arguments.
 
@@ -143,7 +169,7 @@ def get_latest_model():
         (path) a path to the directory.
     """
     if not os.path.exists(os.path.join(properties["SRC_DIR"], "../trained_models", args.model)):
-        print("No trained model {} exists.".format(args.model))
+        print("[INFO] No trained model {} exists.".format(args.model))
         sys.exit(1)
 
     res = os.path.join(properties["SRC_DIR"], "../trained_models", args.model)
@@ -269,7 +295,7 @@ if __name__ == "__main__":
                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
             validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
                                                            os.path.join(properties["VAL_DIR"], "verify"))
-            print("Path ",properties["OUTPUT_DIR"])
+            print("[INFO] Path ",properties["OUTPUT_DIR"])
             model = full_cnn.FullCNN(train_generator,
                                      validation_generator,
                                      path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
@@ -293,7 +319,7 @@ if __name__ == "__main__":
         """Submission file"""
         submission_path_filename = get_submission_filename()
 
-        print("Loading the last checkpoint of the model ", args.model, " from: ", path_model_to_restore)
+        print("[INFO] Loading the last checkpoint of the model ", args.model, " from: ", path_model_to_restore)
 
         if args.model == "cnn_lr_d":
 
@@ -304,12 +330,12 @@ if __name__ == "__main__":
             model_class = cnn_lr_d.CnnLrD(test_generator_class, path=path_model_to_restore)
             model = model_class.model
 
-            print("Model has been restored successfully")
+            print("[INFO] Model has been restored successfully")
             prediction_model = predict_on_tests.Prediction_model(test_generator_class=test_generator_class,
                                                                  restored_model=model)
             predictions = prediction_model.prediction_given_model()
 
-            print("Writing predictions to: ", submission_path_filename)
+            print("[INFO] Writing predictions to: ", submission_path_filename)
             prediction_model.save_predictions_to_csv(predictions=predictions, submission_file=submission_path_filename)
 
         elif args.model == "cnn_model":
@@ -338,6 +364,13 @@ if __name__ == "__main__":
             model = full_cnn.FullCNN(None, None)
             model.load(os.path.join(get_latest_model(), "weights.h5"))
             model.predict(test_generator_class)
+
+
+    if args.visualize:
+
+        print("[INFO] Visualizing predictions of the model: ", args.model)
+        visualize(id_img = args.visualize, csv_file = get_latest_submission(), path_to_images = os.path.join(args.data), patch_size = 16)
+
 
     if args.run:
         # Test CNN model

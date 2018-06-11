@@ -17,6 +17,6 @@ report/*.log
 report/*.pdf
 report/*.synctex.gz
 
-/trained_models/
+/trained_models
 data/
 src/playground/
