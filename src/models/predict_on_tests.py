@@ -68,3 +68,40 @@ class Prediction_model():
             id_idx = id_idx + 1
 
         print("Submission csv file written to disk successfully!")
+
+"""def look_matching_pred(csv, id):
+    for row_csv2 in reader_csv2:
+        print("cy")
+        if str(row_csv2[0]) == str(row_csv1[0]):
+            new_submission_entries.append(row_csv2[1])"""
+def hashmap_given_csv(reader_csv1):
+    ids = []
+    for entry in reader_csv1:
+        ids.append(entry)
+
+def merge_predictions(csv1_path, csv2_path, submission_file):
+
+    #Naive way implementation, can be done in several ways : hash map, sorting ids..
+    reader_csv1 = csv.reader(open(csv1_path, 'r')) #, delimiter=",")
+    reader_csv2 = csv.reader(open(csv2_path, 'r'))#, delimiter=",")
+    
+    hashmap_csv1 = dict(list(reader_csv1))
+    hashmap_csv2 = dict(list(reader_csv2))
+
+    new_submission_entries = []
+    
+    #Copy csv1 as new submission to later integrate with csv2
+    new_submission_csv = dict(list(reader_csv1))
+
+    reader_csv1 = list(hashmap_csv1)[1:len(list(hashmap_csv1))]
+
+    for entry in reader_csv1:
+        if not hashmap_csv1[entry] == '1':
+            hashmap_csv1[entry] = hashmap_csv2[entry]
+
+    new_sub = list(hashmap_csv1)
+
+    writer = csv.writer(open(submission_file, 'w'), delimiter=",")
+
+    for key, value in hashmap_csv1.items():
+        writer.writerow([str(key), str(value)])
