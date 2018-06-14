@@ -173,26 +173,26 @@ if __name__ == "__main__":
 
     if args.train:
         if args.model == "cnn_lr_d":
-            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                            os.path.join(properties["VAL_DIR"], "verify"))
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR_400"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR_400"], "data"),
+                                                            os.path.join(properties["VAL_DIR_400"], "verify"))
             model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
             model.train()
 
         elif args.model == "cnn_model":
-            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                            os.path.join(properties["VAL_DIR"], "verify"))
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR_400"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR_400"], "data"),
+                                                            os.path.join(properties["VAL_DIR_400"], "verify"))
             model = cnn_model.CNN_keras(train_generator, validation_generator)
             model.train()
 
         elif args.model == "full_cnn":
-            train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                      os.path.join(properties["TRAIN_DIR"], "verify"))
-            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                           os.path.join(properties["VAL_DIR"], "verify"))
+            train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
+                                                      os.path.join(properties["TRAIN_DIR_400"], "verify"))
+            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR_400"], "data"),
+                                                           os.path.join(properties["VAL_DIR_400"], "verify"))
             model = full_cnn.FullCNN(train_generator, validation_generator)
             model.train()
 
@@ -201,30 +201,30 @@ if __name__ == "__main__":
 
         model = None
         if args.model == "cnn_lr_d":
-            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                            os.path.join(properties["VAL_DIR"], "verify"))
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR_400"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR_400"], "data"),
+                                                            os.path.join(properties["VAL_DIR_400"], "verify"))
             model = cnn_lr_d.CnnLrD(train_generator,
                                     validation_generator,
                                     path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
             model.train()
 
         elif args.model == "cnn_model":
-            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                            os.path.join(properties["VAL_DIR"], "verify"))
+            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
+                                                       os.path.join(properties["TRAIN_DIR_400"], "verify"))
+            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR_400"], "data"),
+                                                            os.path.join(properties["VAL_DIR_400"], "verify"))
             model = cnn_model.CNN_keras(train_generator,
                                         validation_generator,
                                         path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
             model.train()
 
         elif args.model == "full_cnn":
-            train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
-                                                      os.path.join(properties["TRAIN_DIR"], "verify"))
-            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
-                                                           os.path.join(properties["VAL_DIR"], "verify"))
+            train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
+                                                      os.path.join(properties["TRAIN_DIR_400"], "verify"))
+            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR_400"], "data"),
+                                                           os.path.join(properties["VAL_DIR_400"], "verify"))
             print("[INFO] Path ", properties["OUTPUT_DIR"])
             model = full_cnn.FullCNN(train_generator,
                                      validation_generator,
