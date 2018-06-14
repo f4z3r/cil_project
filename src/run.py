@@ -45,6 +45,11 @@ def _setup_argparser():
     parser.add_argument("-tr", "--train_resume",
                         help="continue training the given CNN",
                         action="store_true")
+    parser.add_argument("-d", "--data",
+                        help="path to the data to use (prediction)",
+                        action="store",
+                        default=os.path.join(properties["TEST_DIR"], "data"),
+                        type=str)
     parser.add_argument("-p", "--predict",
                         help="predict on a test set given the CNN",
                         action="store_true")
@@ -161,7 +166,7 @@ if __name__ == "__main__":
             os.makedirs(properties["OUTPUT_DIR"])
         except OSError:
             pass
-    elif args.train_resume:
+    elif args.train_resume or args.predict:
         properties["OUTPUT_DIR"] = get_latest_model()
         properties["LOG_DIR"] = os.path.join(properties["OUTPUT_DIR"], "logs")
     else:
@@ -302,7 +307,7 @@ if __name__ == "__main__":
 
             print("[INFO] Path ", properties["OUTPUT_DIR"])
             model = u_net_pixel_to_patch.UNet(generator, None, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
-            model.predict()
+            model.predict(os.path.join(properties["TEST_DIR"]), submission_path_filename)
 
     if args.visualize:
         print("[INFO] Visualizing predictions of the model: ", args.model)

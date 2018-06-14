@@ -1,8 +1,8 @@
 import logging
 import os
+import re
 
 import keras
-import matplotlib.pyplot as plt
 from keras import Input, Model
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, TensorBoard
@@ -11,6 +11,7 @@ from keras.layers import Conv2D, BatchNormalization, Activation, MaxPooling2D, U
 from keras.losses import binary_crossentropy
 from keras.optimizers import Adam, RMSprop
 from models.base_model import BaseModel
+from scipy import ndimage
 from utils.commons import properties
 
 HEIGHT = 400
@@ -27,7 +28,6 @@ class UNet(BaseModel):
         super().__init__(train_generator, _)
 
         checkpoint_loc = os.path.join(properties["OUTPUT_DIR"], 'weights.h5')
-
 
         self.validation_steps = 50
         self.batch_size = 4
@@ -56,24 +56,36 @@ class UNet(BaseModel):
 
     def train(self, epochs=100, steps=500, print_at_end=True):
         self.model.fit_generator(generator=self.train_generator.next_batch("train", batch_size=self.batch_size),
-                            steps_per_epoch=steps,
-                            epochs=epochs,
-                            callbacks=self.callbacks_list,
-                            validation_data=self.train_generator.next_batch("valid", batch_size=self.batch_size),
-                            validation_steps=self.validation_steps)
+                                 steps_per_epoch=steps,
+                                 epochs=epochs,
+                                 callbacks=self.callbacks_list,
+                                 validation_data=self.train_generator.next_batch("valid", batch_size=self.batch_size),
+                                 validation_steps=self.validation_steps)
 
-    def predict(self, test_generator):
-        x_batch = next(test_generator.generate_patch_sequential())
-        y_batch = self.model.predict(x_batch, batch_size=2)
-
-        img = y_batch[0, :, :].reshape(400, 400)
-
-        plt.imshow(img)
-        plt.show()
-        print()
+    def predict(self, path_images, submission_path_filename):
+        images_files = sorted(os.listdir(os.path.join(path_images, "data")))
+        with open(submission_path_filename, 'w') as f:
+            f.write('Id,Prediction\n')
+            for idx, name in enumerate(images_files):
+                image = ndimage.imread(os.path.join(path_images, "data", name)).reshape((1, 608, 608, 3)) / 255.0
+                # image = test_images[idx].reshape((1, 608, 608, 3)) / 255.
+                predicted_mask = self.model.predict(image)
+                predicted_mask = predicted_mask.reshape((38, 38))
+                submission_string = self.mask_to_submission_strings(name, predicted_mask)
+                f.writelines('{}\n'.format(s) for s in submission_string)
 
     def load(self, filename):
         self.model.load_weights(filename)
+
+    @staticmethod
+    def mask_to_submission_strings(image_filename, predicted_mask):
+        """Reads a single image and outputs the strings that should go into the submission file"""
+        img_number = int(re.search(r"\d+", image_filename).group(0))
+        for j in range(38):
+            for i in range(38):
+                patch = predicted_mask[i, j]
+                label = int(patch > 0.5)
+                yield ("{:03d}_{}_{},{}".format(img_number, j * 16, i * 16, label))
 
     @staticmethod
     def get_unet_layer_down(size, depth, inputs, activation="relu", dropout_rate=0.0):
@@ -146,6 +158,7 @@ class UNet(BaseModel):
         intersection = K.sum(y_true_f * y_pred_f)
         score = (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
         return score
+
     @staticmethod
     def dice_loss(y_true, y_pred):
         loss = 1 - UNet.dice_coeff(y_true, y_pred)
