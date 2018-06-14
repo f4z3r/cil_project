@@ -12,7 +12,8 @@ from generators.FullTestImageGenerator import FullTestImageGenerator
 from generators.FullTrainImageGenerator import FullTrainImageGenerator
 from generators.PatchTestImageGenerator import PatchTestImageGenerator
 from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
-from models import cnn_lr_d, cnn_model, full_cnn
+from generators.ImageToPatchGenerator import ImageToPatchGenerator
+from models import cnn_lr_d, cnn_model, full_cnn, u_net_pixel_to_patch
 from models import predict_on_tests
 from utils.commons import *
 from visualization import *
@@ -34,7 +35,7 @@ def _setup_argparser():
                                                  " this project.")
 
     parser.add_argument("-m", "--model", action="store",
-                        choices=["cnn_lr_d", "cnn_model", "full_cnn"],
+                        choices=["cnn_lr_d", "cnn_model", "full_cnn", "u_net"],
                         default="cnn_lr_d",
                         type=str,
                         help="the CNN model to be used, defaults to cnn_lr_d")
@@ -195,6 +196,10 @@ if __name__ == "__main__":
                                                            os.path.join(properties["VAL_DIR_400"], "verify"))
             model = full_cnn.FullCNN(train_generator, validation_generator)
             model.train()
+        elif args.model == "u_net":
+            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]), os.path.join(properties["TEST_DIR"]), 500, 200, True)
+            model = u_net_pixel_to_patch.UNet(generator, None)
+            model.train()
 
 
     elif args.train_resume:
@@ -229,6 +234,12 @@ if __name__ == "__main__":
             model = full_cnn.FullCNN(train_generator,
                                      validation_generator,
                                      path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model.train()
+        elif args.model == "u_net":
+            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]), os.path.join(properties["TEST_DIR"]), 500, 200, True)
+
+            print("[INFO] Path ", properties["OUTPUT_DIR"])
+            model = u_net_pixel_to_patch.UNet(generator, None, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
             model.train()
 
     if args.predict:
@@ -286,6 +297,12 @@ if __name__ == "__main__":
             model = full_cnn.FullCNN(None, None)
             model.load(os.path.join(get_latest_model(), "weights.h5"))
             model.predict(test_generator_class)
+        elif args.model == "u_net":
+            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]), os.path.join(properties["TEST_DIR"]), 500, 200, True)
+
+            print("[INFO] Path ", properties["OUTPUT_DIR"])
+            model = u_net_pixel_to_patch.UNet(generator, None, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model.predict()
 
     if args.visualize:
         print("[INFO] Visualizing predictions of the model: ", args.model)
