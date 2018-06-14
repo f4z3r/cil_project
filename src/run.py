@@ -1,23 +1,21 @@
 #!/usr/bin/env python3 -W ignore::DeprecationWarning
 
 import argparse
+import datetime
 import logging
 import os
 import sys
-import warnings
-import datetime
 import time
+import warnings
 
 from generators.FullTestImageGenerator import FullTestImageGenerator
 from generators.FullTrainImageGenerator import FullTrainImageGenerator
-from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
 from generators.PatchTestImageGenerator import PatchTestImageGenerator
+from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
 from models import cnn_lr_d, cnn_model, full_cnn
 from models import predict_on_tests
-import keras
-
-from visualization import *
 from utils.commons import *
+from visualization import *
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
@@ -49,21 +47,14 @@ def _setup_argparser():
     parser.add_argument("-p", "--predict",
                         help="predict on a test set given the CNN",
                         action="store_true")
-    parser.add_argument("-d", "--data",
-                        help="path to the data to use (prediction)",
-                        action="store",
-                        default=os.path.join(properties["TEST_DIR"], "data"),
-                        type=str)
     parser.add_argument("-vis", "--visualize",
                         help="visualize prediction of an image given its id",
                         action="store")
-    parser.add_argument("-r", "--run",
-                        help="run a trained version of a given CNN",
-                        action="store_true")
 
     args, unknown = parser.parse_known_args()
 
     return args
+
 
 def _setup_logger():
     """Set up the logger.
@@ -94,7 +85,6 @@ def _setup_logger():
 
     console.setLevel(logging.INFO)
 
-
     logger.addHandler(console)
     logger.addHandler(logfile)
 
@@ -105,7 +95,7 @@ def get_latest_submission():
     path_submission = get_latest_model()
     submissions = []
     submissions += [each for each in os.listdir(path_submission) if each.endswith('.csv')]
-    
+
     if not len(submissions) == 0:
 
         timestamps = []
@@ -116,12 +106,13 @@ def get_latest_submission():
         max_ts_idx = timestamps.index(max(timestamps))
         latest_submission = submissions[max_ts_idx]
     else:
-        print("[INFO] No submission csv file for: ",path_submission)
+        print("[INFO] No submission csv file for: ", path_submission)
         sys.exit(1)
 
-    print("[INFO] Retrieving last submission in: ",os.path.join(path_submission, latest_submission))
-    
+    print("[INFO] Retrieving last submission in: ", os.path.join(path_submission, latest_submission))
+
     return os.path.join(path_submission, latest_submission)
+
 
 def get_latest_model():
     """Returns the latest directory of the model specified in the arguments.
@@ -157,10 +148,7 @@ def get_submission_filename():
 ###########################################################################################
 if __name__ == "__main__":
     file_path = os.path.dirname(os.path.abspath(__file__))
-
     args = _setup_argparser()
-
-    from keras.models import load_model
 
     if args.train:
         properties["OUTPUT_DIR"] = os.path.normpath(
@@ -184,13 +172,13 @@ if __name__ == "__main__":
     logger = logging.getLogger("cil_project.src.run")
 
     if args.train:
-
         if args.model == "cnn_lr_d":
             train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
                                                        os.path.join(properties["TRAIN_DIR"], "verify"))
             validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
                                                             os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
+            model.train()
 
         elif args.model == "cnn_model":
             train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
@@ -198,7 +186,7 @@ if __name__ == "__main__":
             validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
                                                             os.path.join(properties["VAL_DIR"], "verify"))
             model = cnn_model.CNN_keras(train_generator, validation_generator)
-
+            model.train()
 
         elif args.model == "full_cnn":
             train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
@@ -206,12 +194,8 @@ if __name__ == "__main__":
             validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
                                                            os.path.join(properties["VAL_DIR"], "verify"))
             model = full_cnn.FullCNN(train_generator, validation_generator)
-
-        try:
             model.train()
-        except KeyboardInterrupt:
-            logger.warning("\nTraining interrupted")
-        model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+
 
     elif args.train_resume:
 
@@ -224,6 +208,7 @@ if __name__ == "__main__":
             model = cnn_lr_d.CnnLrD(train_generator,
                                     validation_generator,
                                     path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model.train()
 
         elif args.model == "cnn_model":
             train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
@@ -233,23 +218,18 @@ if __name__ == "__main__":
             model = cnn_model.CNN_keras(train_generator,
                                         validation_generator,
                                         path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model.train()
 
         elif args.model == "full_cnn":
             train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR"], "data"),
                                                       os.path.join(properties["TRAIN_DIR"], "verify"))
             validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR"], "data"),
                                                            os.path.join(properties["VAL_DIR"], "verify"))
-            print("[INFO] Path ",properties["OUTPUT_DIR"])
+            print("[INFO] Path ", properties["OUTPUT_DIR"])
             model = full_cnn.FullCNN(train_generator,
                                      validation_generator,
                                      path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
-
-
-        try:
-            model.train(not args.quiet)
-        except KeyboardInterrupt:
-            logger.warning("\nTraining interrupted")
-        model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model.train()
 
     if args.predict:
 
@@ -289,11 +269,9 @@ if __name__ == "__main__":
                                                                                               "predictions"),
                                                            four_dim=True)
 
-
             model_class = cnn_model.CNN_keras(None, None)
             model = model_class.model
             model.load_weights(path_model_to_restore)
-
 
             print("Model has been restored successfully")
             prediction_model = predict_on_tests.Prediction_model(test_generator_class=test_generator_class,
@@ -309,13 +287,7 @@ if __name__ == "__main__":
             model.load(os.path.join(get_latest_model(), "weights.h5"))
             model.predict(test_generator_class)
 
-
     if args.visualize:
-
         print("[INFO] Visualizing predictions of the model: ", args.model)
-        visualize(id_img = args.visualize, csv_file = get_latest_submission(), path_to_images = os.path.join(args.data), patch_size = 16)
-
-
-    if args.run:
-        # Test CNN model
-        logger.warning("Requires training or predicting")
+        visualize(id_img=args.visualize, csv_file=get_latest_submission(), path_to_images=os.path.join(args.data),
+                  patch_size=16)
