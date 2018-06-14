@@ -96,7 +96,7 @@ class CnnLrD(BaseModel):
 
 
 
-    def train(self, verbosity, epochs=150, steps=5000):
+    def train(self, epochs=150, steps=5000):
         """Train the model.
 
         Args:
@@ -106,10 +106,6 @@ class CnnLrD(BaseModel):
         """
 
         logger.info("Starting training ...")
-        if verbosity:
-            verbosity = 1
-        else:
-            verbosity = 0
 
         lr_callback = keras.callbacks.ReduceLROnPlateau(monitor="acc",
                                                         factor=0.5,
@@ -136,7 +132,6 @@ class CnnLrD(BaseModel):
 
         self.model.fit_generator(self.train_generator.generate_patch(),
                                  steps_per_epoch=steps,
-                                 verbose=verbosity,
                                  epochs=epochs,
                                  callbacks=[lr_callback, stop_callback, tensorboard_callback,
                                             checkpoint_callback],

@@ -118,7 +118,7 @@ class CNN_keras(BaseModel):
         # print(training_set)
         # self.model.fit(training_set, epochs=10)
 
-    def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
+    def train(self, epochs=150, steps=5000, print_at_end=True):
 
         tensorboard_callback = callbacks.TensorBoard(log_dir=properties["LOG_DIR"], histogram_freq=0, batch_size=32,
                                                      write_graph=True,

@@ -13,7 +13,7 @@ class BaseModel:
         self.train_generator = train_generator
         self.validation_generator = validation_generator
 
-    def train(self, verbosity, epochs=150, steps=5000, print_at_end=True):
+    def train(self, epochs=150, steps=5000, print_at_end=True):
         """Train the model.
 
         Args:

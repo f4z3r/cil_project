@@ -51,7 +51,7 @@ class FullCNN(BaseModel):
             logger.info("Finished loading weights")
             return
 
-    def train(self, verbosity=None, epochs=150, steps=1000, print_at_end=True):
+    def train(self, epochs=150, steps=1000, print_at_end=True):
         self.model.fit_generator(
             self.train_generator.generate_patch(batch_size=8),
             steps_per_epoch=steps,

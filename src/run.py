@@ -8,6 +8,14 @@ import warnings
 import datetime
 import time
 
+from generators.FullTestImageGenerator import FullTestImageGenerator
+from generators.FullTrainImageGenerator import FullTrainImageGenerator
+from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
+from generators.PatchTestImageGenerator import PatchTestImageGenerator
+from models import cnn_lr_d, cnn_model, full_cnn
+from models import predict_on_tests
+import keras
+
 from visualization import *
 from utils.commons import *
 
@@ -26,44 +34,6 @@ def _setup_argparser():
     """
     parser = argparse.ArgumentParser(description="Control program to launch all actions related to"
                                                  " this project.")
-
-    verbosity_group = parser.add_mutually_exclusive_group()
-    verbosity_group.add_argument("-v", "--verbose",
-                                 help="provide verbose output",
-                                 action="store_true")
-    verbosity_group.add_argument("-vv", "--very_verbose",
-                                 help="provide even more verbose output",
-                                 action="store_true")
-    verbosity_group.add_argument("-q", "--quiet",
-                                 help="provide next to no output to console",
-                                 action="store_true")
-
-    subparsers = parser.add_subparsers(dest="command", help="Test utilities")
-    parser_c = subparsers.add_parser("check",
-                                     help="Run unittest.main, accepts unittest options.")
-    parser_c.add_argument("tests",
-                          help="a list of any number of test modules, classes and test methods.",
-                          nargs="*")
-    parser_c.add_argument("-v", "--verbose",
-                          help="Verbose Output",
-                          action="store_true")
-    parser_c.add_argument("-q", "--quiet",
-                          help="Quiet Output",
-                          action="store_true")
-    parser_c.add_argument("--locals",
-                          help="Show local variables in tracebacks",
-                          action="store_true")
-    parser_c.add_argument("-f", "--failfast",
-                          help="Stop on first fail or error",
-                          action="store_true")
-    parser_c.add_argument("-c", "--catch",
-                          help="Catch Ctrl-C and display results so far",
-                          action="store_true")
-    parser_c.add_argument("-b", "--buffer",
-                          help="Buffer stdout and stderr during tests",
-                          action="store_true")
-    parser_c.add_argument("-p", "--pattern",
-                          help="Pattern to match tests ('test*.py' default)")
 
     parser.add_argument("-m", "--model", action="store",
                         choices=["cnn_lr_d", "cnn_model", "full_cnn"],
@@ -95,8 +65,7 @@ def _setup_argparser():
 
     return args
 
-
-def _setup_logger(args=None):
+def _setup_logger():
     """Set up the logger.
 
     Args:
@@ -105,7 +74,6 @@ def _setup_logger(args=None):
     Returns:
         logging.Logger: A logger.
     """
-    file_path = os.path.dirname(os.path.abspath(__file__))
 
     try:
         os.mkdir(properties["LOG_DIR"])
@@ -123,16 +91,9 @@ def _setup_logger(args=None):
     logfile.setFormatter(logfile_formatter)
 
     logfile.setLevel(logging.WARNING)
-    if args is None:
-        console.setLevel(logging.INFO)
-    elif args.very_verbose:
-        console.setLevel(logging.DEBUG)
-    elif args.verbose:
-        console.setLevel(logging.INFO)
-    elif not args.quiet:
-        console.setLevel(logging.WARNING)
-    else:
-        console.setLevel(logging.ERROR)
+
+    console.setLevel(logging.INFO)
+
 
     logger.addHandler(console)
     logger.addHandler(logfile)
@@ -219,25 +180,8 @@ if __name__ == "__main__":
 
     properties["LOG_DIR"] = os.path.join(properties["OUTPUT_DIR"], "logs")
 
-    _ = _setup_logger(args)
+    _ = _setup_logger()
     logger = logging.getLogger("cil_project.src.run")
-
-    from generators.FullTestImageGenerator import FullTestImageGenerator
-    from generators.FullTrainImageGenerator import FullTrainImageGenerator
-    from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
-    from generators.PatchTestImageGenerator import PatchTestImageGenerator
-    from models import cnn_lr_d, cnn_model, full_cnn
-    from models import predict_on_tests
-    import keras
-    import tests
-
-    if args.command == "check":
-        # Run code tests and exit
-        logger.info("Running tests ...")
-        logger.handlers[0].setLevel(logging.WARNING)
-        sys.argv[1:] = sys.argv[2:]
-        tests.run()
-        sys.exit(0)
 
     if args.train:
 
@@ -264,7 +208,7 @@ if __name__ == "__main__":
             model = full_cnn.FullCNN(train_generator, validation_generator)
 
         try:
-            model.train(not args.quiet)
+            model.train()
         except KeyboardInterrupt:
             logger.warning("\nTraining interrupted")
         model.save(os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
