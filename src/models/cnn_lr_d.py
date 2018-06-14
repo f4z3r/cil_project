@@ -4,8 +4,6 @@ import logging
 import os
 
 import keras
-from keras.models import load_model
-
 from models.base_model import BaseModel
 from utils.commons import *
 
@@ -17,7 +15,7 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 class CnnLrD(BaseModel):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
-    def __init__(self, train_generator, validation_generator = [], path=None):
+    def __init__(self, train_generator, validation_generator=[], path=None):
         """Initialise the model.
 
         If `path` is given, the model is loaded from memory instead of compiled.
@@ -29,7 +27,6 @@ class CnnLrD(BaseModel):
             self.load(path)
             logger.info("Finished loading model")
             return
-
 
         logger.info("Generating CNN model with leaky ReLU and dropouts ...")
 
@@ -94,8 +91,6 @@ class CnnLrD(BaseModel):
 
         logger.info("Done")
 
-
-
     def train(self, epochs=150, steps=5000):
         """Train the model.
 
@@ -119,8 +114,8 @@ class CnnLrD(BaseModel):
                                                       verbose=0,
                                                       mode="auto")
 
-
-        tensorboard_callback = keras.callbacks.TensorBoard(log_dir=properties["LOG_DIR"], histogram_freq=0, batch_size=32,
+        tensorboard_callback = keras.callbacks.TensorBoard(log_dir=properties["LOG_DIR"], histogram_freq=0,
+                                                           batch_size=32,
                                                            write_graph=True,
                                                            write_grads=False, write_images=False, embeddings_freq=0,
                                                            embeddings_layer_names=None, embeddings_metadata=None)

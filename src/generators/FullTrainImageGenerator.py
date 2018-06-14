@@ -33,7 +33,7 @@ class FullTrainImageGenerator:
 
         # Provide the same seed and keyword arguments to the fit and flow methods
         # seed = random.randint(0, 1000)
-        seed = 1 # TODO check if this should be static or random
+        seed = 1  # TODO check if this should be static or random
         self.image_datagen.fit(self.X, augment=augment, seed=seed)
         self.mask_datagen.fit(self.Y, augment=augment, seed=seed)
 

@@ -1,6 +1,5 @@
-import os
-import time
 import logging
+import os
 
 import matplotlib.pyplot as plt
 from keras import Input, Model
@@ -9,7 +8,6 @@ from keras.callbacks import ModelCheckpoint
 from keras.layers import Conv2D, BatchNormalization, Activation, MaxPooling2D, UpSampling2D, concatenate
 from keras.losses import binary_crossentropy
 from keras.optimizers import Adam
-
 from models.base_model import BaseModel
 from utils.commons import properties
 

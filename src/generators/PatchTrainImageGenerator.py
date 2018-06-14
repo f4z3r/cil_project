@@ -41,16 +41,16 @@ class PatchTrainImageGenerator:
 
         logger.info('PatchImageGenerator initialized with {} pictures'.format(image_count))
 
-    def check_ids_order(self,data_files, mask_files):
+    def check_ids_order(self, data_files, mask_files):
         total_files = len(data_files)
         for file_idx in range(total_files):
             image_file = data_files[file_idx]
-            image_file = image_file[image_file.index("_")+1:-1]
+            image_file = image_file[image_file.index("_") + 1:-1]
             image_id = image_file[0:image_file.index(".")]
             image_file_ver = mask_files[file_idx]
-            image_file_ver = image_file_ver[image_file_ver.index("_")+1: -1]
+            image_file_ver = image_file_ver[image_file_ver.index("_") + 1: -1]
             image_id_ver = image_file_ver[0:image_file_ver.index(".")]
-            if(image_id != image_id_ver):
+            if (image_id != image_id_ver):
                 print("Found wrong match between image and verifier")
 
         print("Matches completed END")
@@ -84,7 +84,6 @@ class PatchTrainImageGenerator:
                                center[1] - patch_size // 2:center[1] + patch_size // 2]
 
                 label = (np.array([np.mean(gt_sub_image)]) > self.threshold) * 1
-
 
                 if augmentation:
                     # Image augmentation

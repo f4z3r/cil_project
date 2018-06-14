@@ -2,7 +2,8 @@
 
 """Contains all the common data types used in the project."""
 
-import os, sys
+import os
+import sys
 
 properties = {
     "OUTPUT_DIR": None,

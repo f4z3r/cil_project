@@ -4,7 +4,6 @@ import logging
 import os
 
 from keras import callbacks
-
 from models.base_model import BaseModel
 from utils.commons import *
 
@@ -33,7 +32,7 @@ from keras.layers.core import Activation, Flatten, Reshape
 
 
 class CNN_keras(BaseModel):
-    def __init__(self, train_generator, validation_generator = [], path=None):
+    def __init__(self, train_generator, validation_generator=[], path=None):
         super().__init__(train_generator, validation_generator)
 
         logger.info("Generating 3D convolutional NN ...")
@@ -146,8 +145,6 @@ class CNN_keras(BaseModel):
         """
         self.model.save(path)
         logger.info("Model saved to {}".format(path))
-
-
 
 
 """from now on just copy pasted examples"""

@@ -2,6 +2,7 @@
 
 from keras.models import load_model
 
+
 class BaseModel:
     """A model template for all models used by this program."""
 

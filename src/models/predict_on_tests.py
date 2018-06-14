@@ -48,10 +48,10 @@ class Prediction_model():
         for prediction_batch in predictions:
             id_image = images_ids[id_idx]
             id_length = len(id_image)
-            #Padding with zeros the ids
-            if id_length<3:
-                zero_padding = 3-id_length
-                id_image = "0"*zero_padding+str(id_image)
+            # Padding with zeros the ids
+            if id_length < 3:
+                zero_padding = 3 - id_length
+                id_image = "0" * zero_padding + str(id_image)
 
             idx_row = 0
             idx_column = 0
@@ -69,28 +69,31 @@ class Prediction_model():
 
         print("Submission csv file written to disk successfully!")
 
+
 """def look_matching_pred(csv, id):
     for row_csv2 in reader_csv2:
         print("cy")
         if str(row_csv2[0]) == str(row_csv1[0]):
             new_submission_entries.append(row_csv2[1])"""
+
+
 def hashmap_given_csv(reader_csv1):
     ids = []
     for entry in reader_csv1:
         ids.append(entry)
 
-def merge_predictions(csv1_path, csv2_path, submission_file):
 
-    #Naive way implementation, can be done in several ways : hash map, sorting ids..
-    reader_csv1 = csv.reader(open(csv1_path, 'r')) #, delimiter=",")
-    reader_csv2 = csv.reader(open(csv2_path, 'r'))#, delimiter=",")
-    
+def merge_predictions(csv1_path, csv2_path, submission_file):
+    # Naive way implementation, can be done in several ways : hash map, sorting ids..
+    reader_csv1 = csv.reader(open(csv1_path, 'r'))  # , delimiter=",")
+    reader_csv2 = csv.reader(open(csv2_path, 'r'))  # , delimiter=",")
+
     hashmap_csv1 = dict(list(reader_csv1))
     hashmap_csv2 = dict(list(reader_csv2))
 
     new_submission_entries = []
-    
-    #Copy csv1 as new submission to later integrate with csv2
+
+    # Copy csv1 as new submission to later integrate with csv2
     new_submission_csv = dict(list(reader_csv1))
 
     reader_csv1 = list(hashmap_csv1)[1:len(list(hashmap_csv1))]
