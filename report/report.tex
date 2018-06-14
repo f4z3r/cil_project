@@ -1,0 +1,111 @@
+\documentclass[10pt,conference,compsocconf]{IEEEtran}
+
+%\usepackage{times}
+%\usepackage{balance}
+\usepackage{url}
+\usepackage{graphicx}	% For figure environment
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{array}
+
+
+\begin{document}
+\title{Road Segmentation from Aerial Images}
+
+\author{
+\begin{tabular}{*{3}{>{\centering}p{.33\textwidth}}}
+\large Francesco Saverio Varini & \large Robin Bader & \large Jakob Beckmann \tabularnewline
+Department of Computer Science, & Department of Computer Science, & Department of Computer Science, \tabularnewline
+ETH Zurich & ETH Zurich & ETH Zurich
+\end{tabular}
+}
+
+
+\maketitle
+
+\begin{abstract}
+  TODO
+\end{abstract}
+
+\section{Introduction}
+
+Understanding an image and extracting its information is an important area of application in computer vision. Image segmentation is the process of labeling parts of images according to given criteria. This paper focuses on the automatic segmentation of aerial images into \textit{road} or \textit{non-road} which has several application due to numerous real-world applications ranging from civil infrastructure~\cite{Radopoulou2016} to updating geographic information systems~\cite{Girres2010}.
+
+The most popular tool for that task is supervised machine learning and the recent increase in computing resources has led to the development of new techniques such as \textit{deep convolutional neural networks} (CNN) which are now top-performers for image segmentation. They have found broad attention in previous research of road segmentation~\cite{Kaiser2017,Saito2015} but focused on a prediction of per-pixel segmentations or multiple-class segmentation, where we examine the prediction on image patches.
+
+We adopt the \textit{U-Net}~\cite{Ronneberger2015} architecture which is a variant of the \textit{Fully Convolution Network} (FCN)~\cite{Long2014} which predicts pixel-to-pixel segmentations. Our contribution is an adapted architecture of U-Net which allows a pixel-to-patch segmentation and uses different activation functions as well as dropout to prevent overfitting while overcoming the sparsity of the data with image augmentation.
+
+We compare our approach to different baseline algorithms where...
+
+\section{Models and Methods}
+
+The contribution of this paper is a CNN architecture that allows as input an image and outputs the prediction of image-patches whether a certain area of this patch contains roads. This section describes the provided data, pre-processing techniques, the model’s architecture and the additional baseline settings.
+
+\subsection{Dataset}
+
+The dataset is provided by the Kaggle competition during the ETH Computational Intelligence Lab 2018 \cite{KaggleCompetition} and contains 100 training samples that consists of an input image and its pixelwise labeling with a resolution of 400x400 pixels. The competition’s goal is to predict 16x16 sized patches within an input image of resolution 608x608 where every patch is labeled as 1 if more than 25\% of the patch’s area is labeled as road and otherwise 0.
+
+\subsection{Image Augmentation}
+
+To overcome the limitation of the small training set we use data augmentation. The effectiveness of data augmentation was previously demonstrated \cite{Wang} for image classification. The first preprocessing task is to enlarge the input images of dimension 400x400 to resemble the dimensions of the target images with dimension 608x608. This is achieved by concatenating each image with its own mirrored projection while cropping the image to fit its dimensions.
+
+To  maintain the advantage of the U-Net architecture of its fast training time \cite{Ronneberger2015} the augmentation steps are split into two groups which differ from its execution time. The first group is only executed once for every epoch while the latter is applied to each training sample for each batch.
+
+The first group of augmentation steps applies randomly a zooming (range 0.8-1.2), shearing (range 0 - 0.1), rotation (0 – 360) and height as well as width shifting (range 0 - 0.1). Finally, before generating each batch as input for the model we apply additional a multiple of a 90-degree rotation as well as a random mirroring. This second step can be executed very fast during training time while the first step needs more time. This technique enables us to use the slowly produced augmentations from the first step several times during training.
+
+\subsection{CNN Architecture}
+
+To achieve the desired pixel to patch prediction of the model we adapted a truncated version of the U-Net \cite{Ronneberger2015} as presented in Table \ref{table:truncated_unet}. The original implementation of the U-Net uses the up-sampling layer (e.g. layer 7) as many times as the down-sampling layers (e.g. layer 1 – 4) to output the same dimensions as the input. In this project this isn't desired, and the model has been truncated to fit our needs where the dimension 38x38 corresponds to the desired path size $16 \cdot 38= 608$.
+
+To further accommodate arising overfitting of the training data a further adapted version with regularization is proposed as shown in Table \ref{table:truncated_regularized_unet}. These adaptions where influenced by \cite{Pavllo2017}. Instead of using \textit{rectified linear units} (ReLU) as activation function as proposed we replace them with \textit{Leaky ReLUs} to avoid the \textit{dead filter effect} which some units can experience. \textit{Leaky ReLUs} are defined as $f(x) = \max(\alpha x, x)$ where we found by experimentation the value $\alpha=0.1$ yields good results. Furthermore, to regularize the model we added after each level a dropout layer with a dropout rate of 0.25. The output layer is further controlled using a L2-regularizer.
+
+\begin{table}[]
+\centering
+\begin{tabular}{lll}
+\hline
+Level & Layer                                                                       & Dimension  \\ \hline
+0     & input                                                                       & 608x608x3  \\
+1     & \begin{tabular}[c]{@{}l@{}}2 x conv(3x3, ReLU)\\ maxpool(2x2)\end{tabular}  & 304x304x32 \\
+2     & \begin{tabular}[c]{@{}l@{}}2 x conv(3x3, ReLU)\\ maxpool(2x2)\end{tabular}  & 152x152x64 \\
+3     & \begin{tabular}[c]{@{}l@{}}2 x conv(3x3, ReLU)\\ maxpool(2x2)\end{tabular}  & 76x76x128  \\
+4     & \begin{tabular}[c]{@{}l@{}}2 x conv(3x3, ReLU)\\ maxpool(2x2)\end{tabular}  & 38x38x256  \\
+5     & 2 x conv(3x3, ReLU)                                                         & 19x19x512  \\
+6     & \begin{tabular}[c]{@{}l@{}}up-conv(2, 2)\\ 2 x conv(3x3, ReLU)\end{tabular} & 38x38x256  \\
+7     & conv(1x1, Sigmoid)                                                          & 38x38x1    \\ \hline
+\end{tabular}
+\caption{Truncated U-Net for Pixel to Patch prediction}
+\label{table:truncated_unet}
+\end{table}
+
+\begin{table}[]
+\centering
+\begin{tabular}{lll}
+\hline
+Level & Layer                                                                       & Dimension  \\ \hline
+0     & input                                                                       & 608x608x3  \\
+1     & \begin{tabular}[c]{@{}l@{}}2 x conv(3x3, Leaky ReLU)\\ maxpool(2x2) \\ dropout(0.25) \end{tabular}  & 304x304x32 \\
+2     & \begin{tabular}[c]{@{}l@{}}2 x conv(3x3, Leaky ReLU)\\ maxpool(2x2) \\ dropout(0.25) \end{tabular}  & 152x152x64 \\
+3     & \begin{tabular}[c]{@{}l@{}}2 x conv(3x3, Leaky ReLU)\\ maxpool(2x2) \\ dropout(0.25) \end{tabular}  & 76x76x128  \\
+4     & \begin{tabular}[c]{@{}l@{}}2 x conv(3x3, Leaky ReLU)\\ maxpool(2x2) \\ dropout(0.25) \end{tabular}  & 38x38x256  \\
+5     & \begin{tabular}[c]{@{}l@{}}2 x conv(3x3, Leaky ReLU)  \\ dropout(0.25)               \end{tabular}  & 19x19x512  \\
+6     & \begin{tabular}[c]{@{}l@{}}up-conv(2, 2)\\ 2 x conv(3x3, Leaky ReLU)                 \end{tabular}  & 38x38x256  \\
+7     & \begin{tabular}[c]{@{}l@{}}conv(1x1, Sigmoid)\\ L2(10E-6)                                 \end{tabular}  & 38x38x1    \\ \hline
+\end{tabular}
+\caption{Truncated and regularized U-Net}
+\label{table:truncated_regularized_unet}
+\end{table}
+
+\subsection{Loss function}
+
+The final score on the Kaggle competition \cite{KaggleCompetition} is calculated using the F1-Score which was used for the training the model as well.
+
+\section{Results}
+
+\section{Discussion}
+
+\section{Summary}
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
+\end{document}

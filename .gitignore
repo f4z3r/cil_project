@@ -16,7 +16,12 @@ report/*.blg
 report/*.log
 report/*.pdf
 report/*.synctex.gz
+report/*.fdb_latexmk
+report/*.fls
+report/*.out
+
 
 /trained_models
 data/
 src/playground/
+
