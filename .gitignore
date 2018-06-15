@@ -22,6 +22,5 @@ report/*.out
 
 
 /trained_models
-data/
 src/playground/
 
