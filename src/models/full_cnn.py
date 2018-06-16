@@ -79,13 +79,16 @@ class FullCNN(BaseModel):
         intersection = K.sum(y_true_f * y_pred_f)
         return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
 
-    def dice_coef_loss(self, y_true, y_pred):
-        return 1 - self.dice_coef(y_true, y_pred)
+    @staticmethod
+    def dice_coef_loss(y_true, y_pred):
+        return 1 - FullCNN.dice_coef(y_true, y_pred)
 
-    def bce_dice_loss(self, y_true, y_pred):
-        return binary_crossentropy(y_true, y_pred) + self.dice_coef_loss(y_true, y_pred)
+    @staticmethod
+    def bce_dice_loss(y_true, y_pred):
+        return binary_crossentropy(y_true, y_pred) + FullCNN.dice_coef_loss(y_true, y_pred)
 
-    def down(self, filters, input_):
+    @staticmethod
+    def down(filters, input_):
         down_ = Conv2D(filters, (3, 3), padding='same')(input_)
         down_ = BatchNormalization(epsilon=1e-4)(down_)
         down_ = Activation('relu')(down_)
@@ -95,7 +98,8 @@ class FullCNN(BaseModel):
         down_pool = MaxPooling2D((2, 2), strides=(2, 2))(down_)
         return down_pool, down_res
 
-    def up(self, filters, input_, down_):
+    @staticmethod
+    def up(filters, input_, down_):
         up_ = UpSampling2D((2, 2))(input_)
         up_ = concatenate([down_, up_], axis=3)
         up_ = Conv2D(filters, (3, 3), padding='same')(up_)

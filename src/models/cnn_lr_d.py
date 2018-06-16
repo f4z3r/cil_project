@@ -95,7 +95,6 @@ class CnnLrD(BaseModel):
         """Train the model.
 
         Args:
-            verbosity (bool): if the training should be verbose.
             epochs (int): default: 150 - epochs to train.
             steps (int): default: 5000 - batches per epoch to train.
         """

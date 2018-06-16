@@ -3,19 +3,16 @@
 import argparse
 import datetime
 import logging
-import os
-import sys
 import time
 import warnings
 
 from generators.FullTestImageGenerator import FullTestImageGenerator
 from generators.FullTrainImageGenerator import FullTrainImageGenerator
+from generators.ImageToPatchGenerator import ImageToPatchGenerator
 from generators.PatchTestImageGenerator import PatchTestImageGenerator
 from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
-from generators.ImageToPatchGenerator import ImageToPatchGenerator
 from models import cnn_lr_d, cnn_model, full_cnn, u_net_pixel_to_patch
 from models import predict_on_tests
-from utils.commons import *
 from visualization import *
 
 warnings.simplefilter(action='ignore', category=FutureWarning)

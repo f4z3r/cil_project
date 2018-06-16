@@ -1,9 +1,9 @@
 import os
-import sys
 
 import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
 from scipy.ndimage import imread
+
 
 class ImageToPatchGenerator(object):
     def __init__(self, path_to_data, path_to_test, steps_per_epoch, validation_steps, augmentation, train_valid_split=0.92):
