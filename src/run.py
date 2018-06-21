@@ -178,25 +178,19 @@ if __name__ == "__main__":
         if args.model == "cnn_lr_d":
             train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
                                                        os.path.join(properties["TRAIN_DIR_400"], "verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR_400"], "data"),
-                                                            os.path.join(properties["VAL_DIR_400"], "verify"))
-            model = cnn_lr_d.CnnLrD(train_generator, validation_generator)
+            model = cnn_lr_d.CnnLrD(train_generator)
             model.train()
 
         elif args.model == "cnn_model":
             train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
                                                        os.path.join(properties["TRAIN_DIR_400"], "verify"))
-            validation_generator = PatchTrainImageGenerator(os.path.join(properties["VAL_DIR_400"], "data"),
-                                                            os.path.join(properties["VAL_DIR_400"], "verify"))
-            model = cnn_model.CNN_keras(train_generator, validation_generator)
+            model = cnn_model.CNN_keras(train_generator)
             model.train()
 
         elif args.model == "full_cnn":
             train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
                                                       os.path.join(properties["TRAIN_DIR_400"], "verify"))
-            validation_generator = FullTrainImageGenerator(os.path.join(properties["VAL_DIR_400"], "data"),
-                                                           os.path.join(properties["VAL_DIR_400"], "verify"))
-            model = full_cnn.FullCNN(train_generator, validation_generator)
+            model = full_cnn.FullCNN(train_generator)
             model.train()
         elif args.model == "u_net":
             generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]), os.path.join(properties["TEST_DIR"]), 500, 200, True)

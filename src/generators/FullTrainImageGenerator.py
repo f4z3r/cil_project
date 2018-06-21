@@ -8,7 +8,7 @@ from keras.preprocessing.image import ImageDataGenerator
 
 
 class FullTrainImageGenerator:
-    def __init__(self, path_images, path_labels, augment=True):
+    def __init__(self, path_images, path_labels, augment=True, val_split=0.66):
         x_files = sorted(glob.glob(os.path.join(path_images, "*.png")))
         y_files = sorted(glob.glob(os.path.join(path_labels, "*.png")))
         self.x_shape = mpimg.imread(x_files[0]).shape
@@ -27,7 +27,8 @@ class FullTrainImageGenerator:
                              height_shift_range=0.1,
                              zoom_range=0.2,
                              shear_range=0.1,
-                             fill_mode="reflect")
+                             fill_mode="reflect",
+                             validation_split=val_split)
         self.image_datagen = ImageDataGenerator(**data_gen_args)
         self.mask_datagen = ImageDataGenerator(**data_gen_args)
 
@@ -39,8 +40,8 @@ class FullTrainImageGenerator:
 
         print('Generator initialized with {} pictures'.format(self.size))
 
-    def generate_patch(self, batch_size=5):
+    def generate_patch(self, batch_size=5, subset="training"):
         seed = random.randint(0, 100000)
-        x = self.image_datagen.flow(self.X, batch_size=batch_size, seed=seed)
-        y = self.mask_datagen.flow(self.Y, batch_size=batch_size, seed=seed)
+        x = self.image_datagen.flow(self.X, batch_size=batch_size, seed=seed, subset=subset)
+        y = self.mask_datagen.flow(self.Y, batch_size=batch_size, seed=seed, subset=subset)
         return zip(x, y)

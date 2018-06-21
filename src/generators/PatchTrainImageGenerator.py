@@ -50,21 +50,20 @@ class PatchTrainImageGenerator:
             image_file_ver = mask_files[file_idx]
             image_file_ver = image_file_ver[image_file_ver.index("_") + 1: -1]
             image_id_ver = image_file_ver[0:image_file_ver.index(".")]
-            if (image_id != image_id_ver):
+            if image_id != image_id_ver:
                 print("Found wrong match between image and verifier")
 
         print("Matches completed END")
 
-    def get_random_image_patch(self, data_img, verifier_img, size, stride):
-        h = (np.random.choice(verifier_img.shape[1]) // stride) * stride
-        w = (np.random.choice(verifier_img.shape[0]) // stride) * stride
+    def generate_patch(self, batch_size=100, four_dim=False, augmentation=True, type="train", train_split=0.66):
 
-        data_patch = data_img[h:h + size, w:w + size, :]
-        verifier_patch = verifier_img[h:h + stride, w:w + stride]
+        # used for train validation split
+        dataset_size = int(self.data_set.shape[0] * train_split)
+        if type is "train":
+            adder = 0
+        else:
+            adder = int((1 - train_split) * self.data_set.shape[0])
 
-        return data_patch, verifier_patch
-
-    def generate_patch(self, batch_size=100, four_dim=False, augmentation=True):
         window_size = self.window_size
         patch_size = self.patch_size
         while True:
@@ -72,7 +71,7 @@ class PatchTrainImageGenerator:
             batch_verifier = np.empty((batch_size, 2))
 
             for idx in range(batch_size):
-                img_num = np.random.choice(self.data_set.shape[0])
+                img_num = np.random.choice(dataset_size) + adder
                 image = self.data_set[img_num]
                 ground_truth = self.verifier_set[img_num]
 

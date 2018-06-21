@@ -15,12 +15,12 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 class CnnLrD(BaseModel):
     """CNN model implementing a classifier using leaky ReLU and dropouts."""
 
-    def __init__(self, train_generator, validation_generator=[], path=None):
+    def __init__(self, train_generator, path=None):
         """Initialise the model.
 
         If `path` is given, the model is loaded from memory instead of compiled.
         """
-        super().__init__(train_generator, validation_generator)
+        super().__init__(train_generator)
 
         if path:
             logger.info("Loading existing model from {}".format(path))
@@ -91,7 +91,7 @@ class CnnLrD(BaseModel):
 
         logger.info("Done")
 
-    def train(self, epochs=150, steps=5000):
+    def train(self, epochs=150, steps=5000, train_split=0.66):
         """Train the model.
 
         Args:
@@ -114,7 +114,7 @@ class CnnLrD(BaseModel):
                                                       mode="auto")
 
         tensorboard_callback = keras.callbacks.TensorBoard(log_dir=properties["LOG_DIR"], histogram_freq=0,
-                                                           batch_size=32,
+                                                           batch_size=128,
                                                            write_graph=True,
                                                            write_grads=False, write_images=False, embeddings_freq=0,
                                                            embeddings_layer_names=None, embeddings_metadata=None)
@@ -124,12 +124,12 @@ class CnnLrD(BaseModel):
             monitor='val_loss', verbose=0, save_best_only=True,
             save_weights_only=False, mode='auto', period=1)
 
-        self.model.fit_generator(self.train_generator.generate_patch(),
+        self.model.fit_generator(self.train_generator.generate_patch(type="train", train_split=train_split),
                                  steps_per_epoch=steps,
                                  epochs=epochs,
                                  callbacks=[lr_callback, stop_callback, tensorboard_callback,
                                             checkpoint_callback],
-                                 validation_data=self.validation_generator.generate_patch(),
+                                 validation_data=self.train_generator.generate_patch(type="valid", train_split=train_split),
                                  validation_steps=100)
 
     def save(self, path):

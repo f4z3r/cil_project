@@ -1,5 +1,6 @@
 import glob
 import os
+import re
 
 import matplotlib.image as mpimg
 import numpy as np
@@ -36,11 +37,9 @@ class PatchTestImageGenerator:
 
         images_ids = []
         for image_file in data_files:
-            image_file = image_file[image_file.index("/"):-1]
-            start_index = image_file.index("_") + 1
-            end_index = image_file.index(".")
-
-            images_ids.append(image_file[start_index:end_index])
+            filename = os.path.basename(image_file)
+            id = re.findall('\d+', filename)[0]
+            images_ids.append(id)
 
         self.images_ids = images_ids
 
@@ -83,9 +82,7 @@ class PatchTestImageGenerator:
 
         for patch_h_idx in range(patches_over_height):
 
-            total_height_patch_context = patch_size + context_padding * 2
             for patch_w_idx in range(patches_over_width):
-                total_width_patch_context = patch_size + context_padding * 2
 
                 start_w = patch_w_idx * patch_size
                 end_w = patch_w_idx * patch_size + patch_size + context_padding * 2
@@ -96,17 +93,14 @@ class PatchTestImageGenerator:
         print("Total patches: ", total_patches)
         return total_patches, np.asarray(img_patches)
 
-    def generate_test_patches(self, batch_size=100):
-        window_size = self.window_size
-        patch_size = self.patch_size
-        context_padding = self.context_padding
+    def generate_test_patches(self):
         while True:
             img_number = 1
             for img in self.data_set:
                 total_patches, img_patches = self.get_test_patches_from_image(img)
 
                 if self.four_dim:
-                    patch_idx = 0;
+                    patch_idx = 0
                     for patch in img_patches:
                         img_patches[patch_idx] = patch.reshape(total_patches, self.window_size, self.window_size, 3, 1)
                         patch_idx = patch_idx + 1

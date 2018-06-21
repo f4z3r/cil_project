@@ -32,8 +32,8 @@ from keras.layers.core import Activation, Flatten, Reshape
 
 
 class CNN_keras(BaseModel):
-    def __init__(self, train_generator, validation_generator=[], path=None):
-        super().__init__(train_generator, validation_generator)
+    def __init__(self, train_generator, path=None):
+        super().__init__(train_generator)
 
         logger.info("Generating 3D convolutional NN ...")
 
@@ -117,7 +117,7 @@ class CNN_keras(BaseModel):
         # print(training_set)
         # self.model.fit(training_set, epochs=10)
 
-    def train(self, epochs=150, steps=5000, print_at_end=True):
+    def train(self, epochs=150, steps=5000, val_split=0.66):
 
         tensorboard_callback = callbacks.TensorBoard(log_dir=properties["LOG_DIR"], histogram_freq=0, batch_size=32,
                                                      write_graph=True,
@@ -129,11 +129,11 @@ class CNN_keras(BaseModel):
             monitor='val_loss', verbose=0, save_best_only=True,
             save_weights_only=False, mode='auto', period=1)
 
-        self.model.fit_generator(self.train_generator.generate_patch(four_dim=True),
+        self.model.fit_generator(self.train_generator.generate_patch(four_dim=True, type="train", val_split=val_split),
                                  steps_per_epoch=steps,
                                  epochs=epochs,
                                  callbacks=[checkpoint_callback, tensorboard_callback],
-                                 validation_data=self.validation_generator.generate_patch(four_dim=True),
+                                 validation_data=self.train_generator.generate_patch(four_dim=True, type="train", val_split=val_split),
                                  validation_steps=100
                                  )
 

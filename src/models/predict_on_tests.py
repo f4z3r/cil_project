@@ -2,7 +2,7 @@
 
 import csv
 import logging
-
+import numpy as np
 import os
 
 logger = logging.getLogger("cil_project.models.cnn_model")
@@ -24,8 +24,14 @@ class Prediction_model():
 
         predictions = []
         for img_patches in test_generator:
-            img_predictions = model.predict_on_batch(img_patches)
-            predictions.append(img_predictions)
+
+            prediction = np.zeros((0, 2))
+            for i in range(4):
+                img_predictions = model.predict_on_batch(img_patches[i * 361:(i + 1) * 361])
+                prediction = np.concatenate((prediction, img_predictions))
+
+            predictions.append(prediction)
+
             # print("First 10 predictions are ",img_predictions[0:10])
             print("Done with prediction on the image")
 

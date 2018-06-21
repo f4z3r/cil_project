@@ -21,8 +21,8 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 
 
 class FullCNN(BaseModel):
-    def __init__(self, train_generator, validation_generator, path=None):
-        super().__init__(train_generator, validation_generator)
+    def __init__(self, train_generator, path=None):
+        super().__init__(train_generator)
 
         checkpoint_loc = os.path.join(properties["OUTPUT_DIR"], 'weights.h5')
 
@@ -51,12 +51,12 @@ class FullCNN(BaseModel):
 
     def train(self, epochs=150, steps=1000, print_at_end=True):
         self.model.fit_generator(
-            self.train_generator.generate_patch(batch_size=8),
+            self.train_generator.generate_patch(batch_size=8, subset="training"),
             steps_per_epoch=steps,
             epochs=epochs,
             callbacks=self.callbacks_list,
             verbose=1,
-            validation_data=self.validation_generator.generate_patch(batch_size=8),
+            validation_data=self.train_generator.generate_patch(batch_size=8, subset="validation"),
             validation_steps=5)
 
     def predict(self, test_generator):

@@ -6,13 +6,12 @@ from keras.models import load_model
 class BaseModel:
     """A model template for all models used by this program."""
 
-    def __init__(self, train_generator, validation_generator):
+    def __init__(self, train_generator):
         """Initialise the model.
            Remark: the validation generator feeded is empty if the model is predicting,
            it is not empty otherwise
         """
         self.train_generator = train_generator
-        self.validation_generator = validation_generator
 
     def train(self, epochs=150, steps=5000, print_at_end=True):
         """Train the model.

@@ -6,7 +6,7 @@ from scipy.ndimage import imread
 
 
 class ImageToPatchGenerator(object):
-    def __init__(self, path_to_data, path_to_test, steps_per_epoch, validation_steps, augmentation, train_valid_split=0.92):
+    def __init__(self, path_to_data, path_to_test, steps_per_epoch, validation_steps, augmentation, train_valid_split=0.66):
         self.input_size = 608
         self.patch_size = 16
         self.foreground_threshold = 0.25
