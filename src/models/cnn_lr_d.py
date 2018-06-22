@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import logging
-import os
 
 import keras
+
 from models.base_model import BaseModel
 from utils.commons import *
 

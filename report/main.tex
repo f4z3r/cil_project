@@ -117,6 +117,8 @@ We compare the two proposed methods from section \ref{architectures} with two ba
 
 The results are presented in Table \ref{results-list} where the train- and validation-score are obtained during the end of training. The test-score was found based on the results on the Kaggle competition \cite{KaggleCompetition}. For the CNN model proposed in \cite{Pavllo2017} and the all zero prediction there are no train- and validation-score available. Based on the test set we can conclude that the proposed methods based on U-Net outperform the CNN model based on patches. Comparing the models presented in section \ref{architectures} we obtain the expected result that the additional regularization with dropout lead to a closer training/validation difference and finally to a better score on the test set.
 
+Interesting is the fact that the all background baseline where each patch is set to non-road obtains an already high test result.
+
 The final prediction using U-Net, truncated, dropout \& LeakyRelu which performed best is shown in Figure \ref{fig:result} which was the final submission to the Kaggle competition and was trained with all provided training data and no validation-set. The obtained score for the Kaggle competition is $0.90242$.
 
 \begin{table}[]
@@ -141,9 +143,9 @@ U-Net, truncated, dropout     & 0.94                 & 0.86                     
 
 \section{Discussion}
 
-All background is hard to beat
-More training data as proposed in ETH paper
-Postprocessing
+Even for a human it is not always possible to correctly classify a patch into road or non-road. This shows the difficulty of obtaining a perfect predictor for this task. Visually analazing the prediction in Figure \ref{fig:result} show that the predictions of the network closely resemble the expected result by a human. Examining the top border we can see some discontinuities. A proposal for additional work could be to either find a way to penalize discontinuities or alternatively correct them in a post-processing step.
+
+To further improve the result we propose to train the model on more data. In \cite{Kaiser2017} it was shown that training data from other data sources of aerial images can improve the prediction. Additional training data for this task is greatly available (e.g. Google Maps, OpenStreetMap). Further work could be done in obtaining and preprocessing this data to be advantageous for the prediction.
 
 \section{Summary}
 
