@@ -1,87 +1,85 @@
-# `CIL_project`
+# Road Segmentation from Aerial images
 
-## Implementation Details
-The currently required libraries are the following:
+This is the projects source code of Robin Bader, Francesco Saverio Varini and Jakob Beckmann which is part of a Kaggle competition that is available under this link [this link](https://www.kaggle.com/c/cil-road-segmentation-2018/).
+
+## Quick start
+
+To quickly get started and train and predict the final submission obtained in the Kaggle competition executed following code in the command line assuming that \<project-root>  refers to this projects root directory.
+
+```
+cd <project-root>
+python ./src/run.py -t -m u_net
+### Wait for training to finish
+python ./src/run.py -p -m u_net
+### File csv output will be available under: ./trained_models/u_net/<last-entry>/submission_u_net_<timestamp>.csv
+```
+
+In case this does not run, please read further details below.
+
+## Project structure
+
+Following list describes the directories and their use:
+
+| Folder          | Description                                                  |
+| --------------- | ------------------------------------------------------------ |
+| assets          | This folder contains all the data needed to train and test the model. |
+| report          | Contains the code to generate the projects report.           |
+| src             | This folder contains the projects source code.               |
+| trained_model   | This folder is automatically generated during the training of the model and will contain the projects checkpoints and the final submission.csv |
+| \<project-root> | Contains this README file. All code needs to be executed based on this path. |
+
+## Prerequisites
+
+In order to run this project following requirements need to be met.
+
+## Environment Setup
+
+This project is based on Python 3.6 and Tensorflow (tested with version 1.7 and 1.8). Therefore the environment needs to be set up with following packages:
 
 - `numpy`
 - `matplotlib`
 - `keras` (dependent on `tensorflow` and `h5py`)
+- `tensorflow` (tested with version 1.8)
+- `pandas` 
 - Pillow for `PIL`
 
-### Project Structure
-```
-- assets
-  | - testing
-  |   | all data required for testing
-  | - training
-  |   | - data      -> all training imagery
-  |   | - verify    -> verification images for training
-  | - validation
-  |   | - data      -> all validation imagery
-  |   | - verify    -> verification images for validation
-  | - tests
-  |   | all test cases used to check performance of solution
-- logs
-  | run.log         -> log file for warning detection
-- papers
-  | all relevant papers for this project
-- src
-  | test.py         -> contains all unit tests
-  | utility.py      -> contains all utility functions
-  | run.py          -> control file used to launch the application
-  | - models        -> all CNN models implemented
-  |   | cnn_model.py
-- README.md         -> this file
-```
+# Training the model
+
+The score on Kaggle was achieved by training the model until the project automatically finished improving the validation error.
 
 ### Usage
 ```
-usage: run.py [-h] [-v | -vv | -q] [-m {cnn_lr_d,cnn_model}] [-t] [-tp] [-p]
-              [-d DATA] [-r]
-              {check} ...
+usage: run.py [-h] [-m {cnn_lr_d,cnn_model,full_cnn,u_net}] [-t] [-tr]
+              [-d DATA] [-p] [-vis VISUALIZE]
 
 Control program to launch all actions related to this project.
 
-positional arguments:
-  {check}               Test utilities
-    check               Run unittest.main, accepts unittest options.
-
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --verbose         provide verbose output
-  -vv, --very_verbose   provide even more verbose output
-  -q, --quiet           provide next to no output to console
-  -m {cnn_lr_d,cnn_model}, --model {cnn_lr_d,cnn_model}
+  -m {cnn_lr_d,cnn_model,full_cnn,u_net}, --model {cnn_lr_d,cnn_model,full_cnn,u_net}
                         the CNN model to be used, defaults to cnn_lr_d
   -t, --train           train the given CNN
-  -tp, --train_presume  continue training the given CNN
-  -p, --predict         predict on a test set given the CNN
+  -tr, --train_resume   continue training the given CNN
   -d DATA, --data DATA  path to the data to use (prediction)
-  -r, --run             run a trained version of a given CNN
+  -p, --predict         predict on a test set given the CNN
+  -vis VISUALIZE, --visualize VISUALIZE
+                        visualize prediction of an image given its id
 ```
 
-#### `unittest` usage
-```
-usage: run.py check [-h] [-v] [-q] [--locals] [-f] [-c] [-b] [-p PATTERN]
-                    [tests [tests ...]]
+## Executing the training
 
-positional arguments:
-  tests                 a list of any number of test modules, classes and test
-                        methods.
+To start the training execute following command:
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -v, --verbose         Verbose Output
-  -q, --quiet           Quiet Output
-  --locals              Show local variables in tracebacks
-  -f, --failfast        Stop on first fail or error
-  -c, --catch           Catch Ctrl-C and display results so far
-  -b, --buffer          Buffer stdout and stderr during tests
-  -p PATTERN, --pattern PATTERN
-                        Pattern to match tests ('test*.py' default)
-```
+``` python <project-root>/src/run.py -t -m u_net  ``` 
 
-Note that running the CNN on a test image set is not yet supported.
+**<span style="color:red">Important: The project needs to be executed out of the project-root folder. E.g. the current directory must be the project-root!</span>**
 
-### Discussions
-Please check the project and the issues for discussions.
+## Executing the prediction
+
+To start the prediction, execute following command:
+
+``` python <project-root>/src/run.py -p -m u_net ```
+
+The output is generated under:
+
+\<project-root>/trained_models/u_net/\<start time training>/submission_u_net_\<timestamp>.csv

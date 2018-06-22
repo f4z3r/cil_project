@@ -25,9 +25,9 @@ def _setup_argparser():
 
     parser.add_argument("-m", "--model", action="store",
                         choices=["cnn_lr_d", "cnn_model", "full_cnn", "u_net"],
-                        default="cnn_lr_d",
+                        default="u_net",
                         type=str,
-                        help="the CNN model to be used, defaults to cnn_lr_d")
+                        help="the CNN model to be used, defaults to u_net")
     parser.add_argument("-t", "--train",
                         help="train the given CNN",
                         action="store_true")
