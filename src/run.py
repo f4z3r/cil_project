@@ -226,10 +226,10 @@ if __name__ == "__main__":
             generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]), os.path.join(properties["TEST_DIR"]), 500, 200, True)
 
             print("[INFO] Path ", properties["OUTPUT_DIR"])
-            model = u_net_pixel_to_patch.UNet(generator, None, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model = u_net_pixel_to_patch.UNet(generator, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
             model.train()
 
-    if args.predict:
+    elif args.predict:
 
         """
            Path to data to predict on,
@@ -288,10 +288,10 @@ if __name__ == "__main__":
             generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]), os.path.join(properties["TEST_DIR"]), 500, 200, True)
 
             print("[INFO] Path ", properties["OUTPUT_DIR"])
-            model = u_net_pixel_to_patch.UNet(generator, None, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model = u_net_pixel_to_patch.UNet(generator, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
             model.predict(os.path.join(properties["TEST_DIR"]), submission_path_filename)
 
-    if args.visualize:
+    elif args.visualize:
         print("[INFO] Visualizing predictions of the model: ", args.model)
         visualize(id_img=args.visualize, csv_file=get_latest_submission(), path_to_images=os.path.join(args.data),
                   patch_size=16)

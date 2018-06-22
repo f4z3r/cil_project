@@ -14,18 +14,14 @@ from models.base_model import BaseModel
 from scipy import ndimage
 from utils.commons import properties
 
-HEIGHT = 400
-WIDTH = 400
-CHANNELS = 3
-
 logger = logging.getLogger("cil_project.src.models.u_net_pixel_to_patch")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
 
 class UNet(BaseModel):
-    def __init__(self, train_generator, _, path=None):
-        super().__init__(train_generator, _)
+    def __init__(self, train_generator, path=None):
+        super().__init__(train_generator)
 
         checkpoint_loc = os.path.join(properties["OUTPUT_DIR"], 'weights.h5')
 
