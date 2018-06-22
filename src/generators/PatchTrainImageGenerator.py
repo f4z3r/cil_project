@@ -1,12 +1,9 @@
 import glob
-import logging
 import os
 
 import keras
 import matplotlib.image as mpimg
 import numpy as np
-
-logger = logging.getLogger("cil_project.src.generators.PatchTrainImageGenerator")
 
 
 class PatchTrainImageGenerator:
@@ -39,7 +36,7 @@ class PatchTrainImageGenerator:
         self.padding = padding
         self.threshold = threshold
 
-        logger.info('PatchImageGenerator initialized with {} pictures'.format(image_count))
+        print('PatchImageGenerator initialized with {} pictures'.format(image_count))
 
     def check_ids_order(self, data_files, mask_files):
         total_files = len(data_files)

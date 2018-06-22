@@ -1,4 +1,3 @@
-import logging
 import os
 import re
 
@@ -10,11 +9,10 @@ from keras.layers import Conv2D, BatchNormalization, Activation, MaxPooling2D, U
     LeakyReLU
 from keras.losses import binary_crossentropy
 from keras.optimizers import Adam, RMSprop
-from models.base_model import BaseModel
 from scipy import ndimage
-from utils.commons import properties
 
-logger = logging.getLogger("cil_project.src.models.u_net_pixel_to_patch")
+from models.base_model import BaseModel
+from utils.commons import properties
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 

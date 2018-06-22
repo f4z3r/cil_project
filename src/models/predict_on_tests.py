@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
 import csv
-import logging
 import numpy as np
 import os
 
-logger = logging.getLogger("cil_project.models.cnn_model")
 file_path = os.path.dirname(os.path.abspath(__file__))
 
 os.environ["MKL_THREADING_LAYER"] = "GNU"

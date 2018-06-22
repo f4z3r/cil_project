@@ -1,4 +1,3 @@
-import logging
 import os
 
 import matplotlib.pyplot as plt
@@ -14,8 +13,6 @@ from utils.commons import properties
 HEIGHT = 400
 WIDTH = 400
 CHANNELS = 3
-
-logger = logging.getLogger("cil_project.src.models.full_cnn")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -44,9 +41,9 @@ class FullCNN(BaseModel):
         self.model.compile(loss=self.bce_dice_loss, optimizer=Adam(lr=1e-4), metrics=[self.dice_coef])
 
         if path:
-            logger.info("Loading weights from {}".format(path))
+            print("Loading weights from {}".format(path))
             self.load(path)
-            logger.info("Finished loading weights")
+            print("Finished loading weights")
             return
 
     def train(self, epochs=150, steps=1000, print_at_end=True):
@@ -147,4 +144,4 @@ class FullCNN(BaseModel):
             path (path): path for the model file.
         """
         self.model.save(path)
-        logger.info("Model saved to {}".format(path))
+        print("Model saved to {}".format(path))

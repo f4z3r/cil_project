@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 
-import logging
-
 import keras
 
 from models.base_model import BaseModel
 from utils.commons import *
-
-logger = logging.getLogger("cil_project.src.models.cnn_lr_d")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,12 +19,12 @@ class CnnLrD(BaseModel):
         super().__init__(train_generator)
 
         if path:
-            logger.info("Loading existing model from {}".format(path))
+            print("Loading existing model from {}".format(path))
             self.load(path)
-            logger.info("Finished loading model")
+            print("Finished loading model")
             return
 
-        logger.info("Generating CNN model with leaky ReLU and dropouts ...")
+        print("Generating CNN model with leaky ReLU and dropouts ...")
 
         # Define the model
         self.model = keras.models.Sequential()
@@ -81,7 +77,7 @@ class CnnLrD(BaseModel):
                                           kernel_regularizer=keras.regularizers.l2(1e-6),
                                           activation="softmax"))
 
-        logger.info("Compiling model ...")
+        print("Compiling model ...")
 
         optimiser = keras.optimizers.Adam()
         self.model.compile(loss=keras.losses.categorical_crossentropy,
@@ -89,7 +85,7 @@ class CnnLrD(BaseModel):
                            metrics=["accuracy"])
         print(self.model.summary())
 
-        logger.info("Done")
+        print("Done")
 
     def train(self, epochs=150, steps=5000, train_split=0.66):
         """Train the model.
@@ -99,7 +95,7 @@ class CnnLrD(BaseModel):
             steps (int): default: 5000 - batches per epoch to train.
         """
 
-        logger.info("Starting training ...")
+        print("Starting training ...")
 
         lr_callback = keras.callbacks.ReduceLROnPlateau(monitor="acc",
                                                         factor=0.5,
@@ -139,4 +135,4 @@ class CnnLrD(BaseModel):
             path (path): path for the model file.
         """
         self.model.save(path)
-        logger.info("Model saved to {}".format(path))
+        print("Model saved to {}".format(path))

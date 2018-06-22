@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import logging
+
 import os
 
 from keras import callbacks
 from models.base_model import BaseModel
 from utils.commons import *
 
-logger = logging.getLogger("cil_project.src.models.cnn_model")
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -35,12 +34,12 @@ class CNN_keras(BaseModel):
     def __init__(self, train_generator, path=None):
         super().__init__(train_generator)
 
-        logger.info("Generating 3D convolutional NN ...")
+        print("Generating 3D convolutional NN ...")
 
         if path:
-            logger.info("Loading model from {}".format(path))
+            print("Loading model from {}".format(path))
             self.load(path)
-            logger.info("Finished loading model")
+            print("Finished loading model")
             return
         if self.train_generator:
             input_dim = self.train_generator.input_dim(four_dim=True)
@@ -144,7 +143,7 @@ class CNN_keras(BaseModel):
             path (path): path for the model file.
         """
         self.model.save(path)
-        logger.info("Model saved to {}".format(path))
+        print("Model saved to {}".format(path))
 
 
 """from now on just copy pasted examples"""

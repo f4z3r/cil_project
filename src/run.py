@@ -1,10 +1,8 @@
-#!/usr/bin/env python3 -W ignore::DeprecationWarning
+#!/usr/bin/env python3
 
 import argparse
 import datetime
-import logging
 import time
-import warnings
 
 from generators.FullTestImageGenerator import FullTestImageGenerator
 from generators.FullTrainImageGenerator import FullTrainImageGenerator
@@ -14,12 +12,6 @@ from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
 from models import cnn_lr_d, cnn_model, full_cnn, u_net_pixel_to_patch
 from models import predict_on_tests
 from visualization import *
-
-warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.simplefilter(action='ignore', category=DeprecationWarning)
-
-# Remove tensorflow CPU instruction information.
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 def _setup_argparser():
@@ -57,41 +49,6 @@ def _setup_argparser():
     args, unknown = parser.parse_known_args()
 
     return args
-
-
-def _setup_logger():
-    """Set up the logger.
-
-    Args:
-        args (argparse.Namespace): the command line arguments from runnning the file.
-
-    Returns:
-        logging.Logger: A logger.
-    """
-
-    try:
-        os.mkdir(properties["LOG_DIR"])
-    except OSError:
-        pass
-
-    logger = logging.getLogger("cil_project")
-    logger.setLevel(logging.DEBUG)
-    console = logging.StreamHandler()
-    logfile = logging.FileHandler(os.path.join(properties["LOG_DIR"], "run.log"), 'a')
-    console_formatter = logging.Formatter("%(message)s")
-    logfile_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-
-    console.setFormatter(console_formatter)
-    logfile.setFormatter(logfile_formatter)
-
-    logfile.setLevel(logging.WARNING)
-
-    console.setLevel(logging.INFO)
-
-    logger.addHandler(console)
-    logger.addHandler(logfile)
-
-    return logger
 
 
 def get_latest_submission():
@@ -171,9 +128,6 @@ if __name__ == "__main__":
 
     properties["LOG_DIR"] = os.path.join(properties["OUTPUT_DIR"], "logs")
 
-    _ = _setup_logger()
-    logger = logging.getLogger("cil_project.src.run")
-
     if args.train:
         if args.model == "cnn_lr_d":
             train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
@@ -193,7 +147,8 @@ if __name__ == "__main__":
             model = full_cnn.FullCNN(train_generator)
             model.train()
         elif args.model == "u_net":
-            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]), os.path.join(properties["TEST_DIR"]), 500, 200, True)
+            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]),
+                                              os.path.join(properties["TEST_DIR"]), 500, 200, True)
             model = u_net_pixel_to_patch.UNet(generator, None)
             model.train()
 
@@ -223,7 +178,8 @@ if __name__ == "__main__":
                                      path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
             model.train()
         elif args.model == "u_net":
-            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]), os.path.join(properties["TEST_DIR"]), 500, 200, True)
+            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]),
+                                              os.path.join(properties["TEST_DIR"]), 500, 200, True)
 
             print("[INFO] Path ", properties["OUTPUT_DIR"])
             model = u_net_pixel_to_patch.UNet(generator, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
@@ -285,7 +241,8 @@ if __name__ == "__main__":
             model.load(os.path.join(get_latest_model(), "weights.h5"))
             model.predict(test_generator_class)
         elif args.model == "u_net":
-            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]), os.path.join(properties["TEST_DIR"]), 500, 200, True)
+            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]),
+                                              os.path.join(properties["TEST_DIR"]), 500, 200, True)
 
             print("[INFO] Path ", properties["OUTPUT_DIR"])
             model = u_net_pixel_to_patch.UNet(generator, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))

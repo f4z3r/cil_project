@@ -1,9 +1,9 @@
 import csv
 import glob
-import sys
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+
 from utils.commons import *
 
 
