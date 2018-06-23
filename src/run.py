@@ -9,7 +9,7 @@ from generators.FullTrainImageGenerator import FullTrainImageGenerator
 from generators.ImageToPatchGenerator import ImageToPatchGenerator
 from generators.PatchTestImageGenerator import PatchTestImageGenerator
 from generators.PatchTrainImageGenerator import PatchTrainImageGenerator
-from models import cnn_lr_d, cnn_model, full_cnn, u_net_pixel_to_patch
+from models import cnn_lr_d, full_cnn, u_net_pixel_to_patch
 from models import predict_on_tests
 from visualization import *
 
@@ -24,7 +24,7 @@ def _setup_argparser():
                                                  " this project.")
 
     parser.add_argument("-m", "--model", action="store",
-                        choices=["cnn_lr_d", "cnn_model", "full_cnn", "u_net"],
+                        choices=["cnn_lr_d", "full_cnn", "u_net"],
                         default="u_net",
                         type=str,
                         help="the CNN model to be used, defaults to u_net")
@@ -134,13 +134,6 @@ if __name__ == "__main__":
                                                        os.path.join(properties["TRAIN_DIR_400"], "verify"))
             model = cnn_lr_d.CnnLrD(train_generator)
             model.train()
-
-        elif args.model == "cnn_model":
-            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
-                                                       os.path.join(properties["TRAIN_DIR_400"], "verify"))
-            model = cnn_model.CNN_keras(train_generator)
-            model.train()
-
         elif args.model == "full_cnn":
             train_generator = FullTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
                                                       os.path.join(properties["TRAIN_DIR_400"], "verify"))
@@ -161,13 +154,6 @@ if __name__ == "__main__":
                                                        os.path.join(properties["TRAIN_DIR_400"], "verify"))
             model = cnn_lr_d.CnnLrD(train_generator,
                                     path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
-            model.train()
-
-        elif args.model == "cnn_model":
-            train_generator = PatchTrainImageGenerator(os.path.join(properties["TRAIN_DIR_400"], "data"),
-                                                       os.path.join(properties["TRAIN_DIR_400"], "verify"))
-            model = cnn_model.CNN_keras(train_generator,
-                                        path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
             model.train()
 
         elif args.model == "full_cnn":
@@ -214,25 +200,6 @@ if __name__ == "__main__":
             predictions = prediction_model.prediction_given_model()
 
             print("[INFO] Writing predictions to: ", submission_path_filename)
-            prediction_model.save_predictions_to_csv(predictions=predictions, submission_file=submission_path_filename)
-
-        elif args.model == "cnn_model":
-            # TODO error in the training -> to be fixed later on by the person who is responsible for the training part
-            test_generator_class = PatchTestImageGenerator(path_to_images=os.path.join(data_path),
-                                                           save_predictions_path=os.path.join(properties["OUTPUT_DIR"],
-                                                                                              "predictions"),
-                                                           four_dim=True)
-
-            model_class = cnn_model.CNN_keras(None, None)
-            model = model_class.model
-            model.load_weights(path_model_to_restore)
-
-            print("Model has been restored successfully")
-            prediction_model = predict_on_tests.Prediction_model(test_generator_class=test_generator_class,
-                                                                 restored_model=model)
-            predictions = prediction_model.prediction_given_model()
-
-            print("Writing predictions to: ", submission_path_filename)
             prediction_model.save_predictions_to_csv(predictions=predictions, submission_file=submission_path_filename)
 
         elif args.model == "full_cnn":
