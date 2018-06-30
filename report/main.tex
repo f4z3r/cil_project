@@ -146,12 +146,11 @@ U-Net, truncated, dropout     & 0.94                 & 0.86                     
 
 Even for a human it is not always possible to correctly classify a patch into road or non-road. This shows the difficulty of obtaining a perfect predictor for this task. Visually analazing the prediction in figure \ref{fig:result}, the predictions of the network closely resemble the expected result by a human. Examining the top horizontal street some road prediction discontinuities are evident. A proposal for additional work could be to either find a way to penalize discontinuities or, alternatively, correct them in a post-processing step.
 
-To further improve the result we propose to train the model on more data. In \cite{Kaiser2017} it was shown that training on datesets from other data sources of aerial images can improve the prediction. Additional training data for this task is indeed available (e.g. Google Maps, OpenStreetMap). Therefore, additional work could be done in obtaining and preprocessing the new data in order to be advantageous for better predictions on test.
+To further improve the result we propose to train the model with more data. In \cite{Kaiser2017} it was shown that training on datasets from other data sources of aerial images can improve the prediction. Additional training data for this task is indeed available (e.g. Google Maps, OpenStreetMap). Therefore, additional work could be done in obtaining and preprocessing the new data in order to be advantageous for better predictions.
 
 \section{Summary}
 
 We proposed an image-to-patch prediction using the U-Net architecture which is based on a CNN model. This enabled us to predict if a given patch of an aerial image is occupied by a certain threshold area of road or not. To permit the U-Net architecture to predict on images-to-patches it was necessary to truncate the end of the original network architecture and to directly predict to the 38x38 output labels. The final proposed model adds dropout layers to counteract overfitting. Some attempts to overcome the problem of a small training dataset by using image augmentation were performed. A comparison of our method to the two baselines suggests that the proposed model surpasses them.
-
 
 
 
