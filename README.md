@@ -49,15 +49,15 @@ The score on Kaggle was achieved by training the model until the project automat
 
 ### Usage
 ```
-usage: run.py [-h] [-m {cnn_lr_d,cnn_model,full_cnn,u_net}] [-t] [-tr]
+usage: run.py [-h] [-m {cnn_lr_d,u_net,u_net_dropout}] [-t] [-tr]
               [-d DATA] [-p] [-vis VISUALIZE]
 
 Control program to launch all actions related to this project.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -m {cnn_lr_d,cnn_model,full_cnn,u_net}, --model {cnn_lr_d,cnn_model,full_cnn,u_net}
-                        the CNN model to be used, defaults to cnn_lr_d
+  -m {cnn_lr_d,u_net,u_net_dropout}, --model {cnn_lr_d,u_net,u_net_dropout}
+                        the CNN model to be used, defaults to u_net_dropout
   -t, --train           train the given CNN
   -tr, --train_resume   continue training the given CNN
   -d DATA, --data DATA  path to the data to use (prediction)

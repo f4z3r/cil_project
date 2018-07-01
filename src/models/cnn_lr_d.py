@@ -9,7 +9,8 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 
 
 class CnnLrD(BaseModel):
-    """CNN model implementing a classifier using leaky ReLU and dropouts."""
+    """CNN model implementing a classifier using leaky ReLU and dropouts. Used as baseline in our project. Code based on
+       https://github.com/dariopavllo/road-segmentation."""
 
     def __init__(self, train_generator, path=None):
         """Initialise the model.

@@ -22,8 +22,8 @@ def _setup_argparser():
                                                  " this project.")
 
     parser.add_argument("-m", "--model", action="store",
-                        choices=["cnn_lr_d", "u_net"],
-                        default="u_net",
+                        choices=["cnn_lr_d", "u_net", "u_net_dropout"],
+                        default="u_net_dropout",
                         type=str,
                         help="the CNN model to be used, defaults to u_net")
     parser.add_argument("-t", "--train",
@@ -137,6 +137,11 @@ if __name__ == "__main__":
                                               os.path.join(properties["TEST_DIR"]), 500, 200, True)
             model = u_net_pixel_to_patch.UNet(generator, None)
             model.train()
+        elif args.model == "u_net_dropout":
+            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]),
+                                              os.path.join(properties["TEST_DIR"]), 500, 200, True)
+            model = u_net_pixel_to_patch.UNet(generator, None, type="dropout")
+            model.train()
 
     elif args.train_resume:
 
@@ -154,6 +159,13 @@ if __name__ == "__main__":
 
             print("[INFO] Path ", properties["OUTPUT_DIR"])
             model = u_net_pixel_to_patch.UNet(generator, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model.train()
+        elif args.model == "u_net_dropout":
+            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]),
+                                              os.path.join(properties["TEST_DIR"]), 500, 200, True)
+
+            print("[INFO] Path ", properties["OUTPUT_DIR"])
+            model = u_net_pixel_to_patch.UNet(generator, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"), type="dropout")
             model.train()
 
     elif args.predict:
@@ -193,6 +205,14 @@ if __name__ == "__main__":
 
             print("[INFO] Path ", properties["OUTPUT_DIR"])
             model = u_net_pixel_to_patch.UNet(generator, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"))
+            model.predict(os.path.join(properties["TEST_DIR"]), submission_path_filename)
+
+        elif args.model == "u_net_dropout":
+            generator = ImageToPatchGenerator(os.path.join(properties["TRAIN_DIR_608"]),
+                                              os.path.join(properties["TEST_DIR"]), 500, 200, True)
+
+            print("[INFO] Path ", properties["OUTPUT_DIR"])
+            model = u_net_pixel_to_patch.UNet(generator, path=os.path.join(properties["OUTPUT_DIR"], "weights.h5"), type="dropout")
             model.predict(os.path.join(properties["TEST_DIR"]), submission_path_filename)
 
     elif args.visualize:

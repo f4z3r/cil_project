@@ -18,14 +18,19 @@ file_path = os.path.dirname(os.path.abspath(__file__))
 
 
 class UNet(BaseModel):
-    def __init__(self, train_generator, path=None):
+    """Implementation of the U-Net architecture with a truncated end to directly predict an image to patches.
+       Optional addition to add leakyrelu and dropout to the classifier."""
+    def __init__(self, train_generator, path=None, type="normal"):
         super().__init__(train_generator)
 
         checkpoint_loc = os.path.join(properties["OUTPUT_DIR"], 'weights.h5')
 
         self.validation_steps = 50
         self.batch_size = 4
-        self.model = UNet.get_unet_downsampling(activation="leakyrelu", regularizer=1e-6, dropout_rate=0.25)
+        if type is "normal":
+            self.model = UNet.get_unet_downsampling(activation="relu", regularizer=1e-6, dropout_rate=0.0)
+        else:
+            self.model = UNet.get_unet_downsampling(activation="leakyrelu", regularizer=1e-6, dropout_rate=0.25)
         self.model.summary()
 
         self.callbacks_list = [EarlyStopping(monitor='val_loss',
@@ -44,9 +49,9 @@ class UNet(BaseModel):
                                TensorBoard(log_dir=properties["OUTPUT_DIR"])]
 
         if path:
-            logger.info("Loading weights from {}".format(path))
+            print("Loading weights from {}".format(path))
             self.load(path)
-            logger.info("Finished loading weights")
+            print("Finished loading weights")
 
     def train(self, epochs=100, steps=500, print_at_end=True):
         self.model.fit_generator(generator=self.train_generator.next_batch("train", batch_size=self.batch_size),
@@ -170,4 +175,4 @@ class UNet(BaseModel):
             path (path): path for the model file.
         """
         self.model.save(path)
-        logger.info("Model saved to {}".format(path))
+        print("Model saved to {}".format(path))
