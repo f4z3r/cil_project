@@ -88,4 +88,4 @@ The output is generated under:
 
 In order to visualize the predictions, please first make sure to have first generated the submission.csv. Then, just digit:
 
-``` python <project-root>/src/run.py -v <id-number-test-image> -m u_net ```
+``` python <project-root>/src/run.py -vis <id-number-test-image> -m u_net ```
