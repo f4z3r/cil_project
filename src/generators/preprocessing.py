@@ -61,29 +61,10 @@ def filter_and_normalize(image, kernel):
     image = np.absolute(image)
 
     normalizer = np.amax(image)
-    """
-    normalizer_R = np.amax(image[:,:,0])
-    normalizer_G = np.amax(image[:,:,1])
-    normalizer_B = np.amax(image[:,:,2])
-
-    image[:,:,0] = image[:,:,0]/normalizer_R
-    image[:,:,1] = image[:,:,1]/normalizer_G
-    image[:,:,2] = image[:,:,2]/normalizer_B
-    """
     image[:, :, 0] = image[:, :, 0] / normalizer
     image[:, :, 1] = image[:, :, 1] / normalizer
     image[:, :, 2] = image[:, :, 2] / normalizer
     return image
-
-
-def show_image(image):
-    plt.imshow(image)
-    plt.show()
-
-
-def image_to_grayscale(image):
-    # TODO
-    return 0
 
 
 def augment_constrast(image_path):
@@ -101,10 +82,7 @@ def augment_constrast(image_path):
     lab = cv2.merge((l2, a, b))  # merge channels
     img2 = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)  # convert from LAB to BGR
     cv2.imshow(image_path, img2)
-    # cv2.imwrite('sunset_modified.jpg', img2)
 
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
     return img2
 
 
@@ -120,7 +98,6 @@ def main():
                         [-1, 8, -1],
                         [-1, -1, -1]]])
 
-    # kernel_3D = [kernel,kernel,kernel]
     # 400x400x3 training images size
     image_training = mpimg.imread('../../assets/training/data/satImage_003.png')
     # 608x608x3
@@ -131,40 +108,21 @@ def main():
     print(kernel)
     print(kernel.shape)
     print(image_training.shape)
-    # image_training = drop_channels(image_training, R = False, G = True, B = True)
-    # image_testing = drop_channels(image_testing, R = True, G = False, B = False)
 
-    # plot(image_training, 'Red image')
-
-    # print(image_training)
-    # show_image(image_training)
-    show_image(image_testing)
+    plt.imshow(image_training)
+    plt.show()
 
     image_training = filter_and_normalize(image=image_training, kernel=kernel)
 
     image_testing = filter_and_normalize(image=image_testing, kernel=kernel)
 
-    show_image(image_training)
-    show_image(image_testing)
+    plt.imshow(image_training)
+    plt.show()
+    plt.imshow(image_testing)
+    plt.show()
 
     print("Done")
-    """
-    # A slightly "wider", but sill very simple highpass filter 
-    kernel = np.array([[-1, -1, -1, -1, -1],
-                       [-1,  1,  2,  1, -1],
-                       [-1,  2,  4,  2, -1],
-                       [-1,  1,  2,  1, -1],
-                       [-1, -1, -1, -1, -1]])
-    highpass_5x5 = ndimage.convolve(data, kernel)
-    plot(highpass_5x5, 'Simple 5x5 Highpass')
-
-    # Another way of making a highpass filter is to simply subtract a lowpass
-    # filtered image from the original. Here, we'll use a simple gaussian filter
-    # to "blur" (i.e. a lowpass filter) the original.
-    lowpass = ndimage.gaussian_filter(data, 3)
-    gauss_highpass = data - lowpass
-    plot(gauss_highpass, r'Gaussian Highpass, $\sigma = 3 pixels$')
-    """
 
 
-main()
+if __name__ == "__main__":
+    main()

@@ -11,14 +11,8 @@ class ImageToPatchGenerator(object):
         self.patch_size = 16
         self.foreground_threshold = 0.25
 
-        # path_train = os.path.join(path_to_data, train_valid_split, "train")
-        # path_valid = os.path.join(path_to_data, train_valid_split, "valid")
-        # path_test = os.path.join(path_to_test, "test")
-
         self.images_train, self.masks_train = self.load_images(path_to_data, self.input_size, "train", train_valid_split)
         self.images_valid, self.masks_valid = self.load_images(path_to_data, self.input_size, "valid", train_valid_split)
-        # self.images_test, _ = self.load_images(path_to_test, self.input_size, "test", 0)
-        # self.images_test_names = sorted(os.listdir(os.path.join(path_to_test, 'data')))
 
         if augmentation:
             self.images_train_pre, self.masks_train_pre = self.augment(self.images_train, self.masks_train, augmentation)
