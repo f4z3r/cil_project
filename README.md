@@ -83,3 +83,9 @@ To start the prediction, execute following command:
 The output is generated under:
 
 \<project-root>/trained_models/u_net/\<start time training>/submission_u_net_\<timestamp>.csv
+
+## Visualizing the predictions
+
+In order to visualize the predictions, please first make sure to have first generated the submission.csv. Then, just digit:
+
+``` python <project-root>/src/run.py -v <id-number-test-image> -m u_net ```
