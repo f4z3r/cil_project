@@ -7,11 +7,6 @@ import matplotlib.pyplot as plt
 from utils.commons import *
 
 
-def show_image(image):
-    plt.imshow(image)
-    plt.show()
-
-
 def filter_id_entries(id_img, csv_file):
     x_entries_roads = []
     y_entries_roads = []
@@ -22,7 +17,6 @@ def filter_id_entries(id_img, csv_file):
             if int(id_img) == int(row['Id'][0:row['Id'].index("_")]):
                 if int(row["Prediction"]) == 1:
                     id_y_x = row["Id"].split("_")
-                    # print(id_y_x)
                     y_entries_roads.append(int(id_y_x[1]))
                     x_entries_roads.append(int(id_y_x[2]))
 
@@ -51,14 +45,11 @@ def visualize(id_img, csv_file, path_to_images, patch_size):
     images_ids = get_image_ids(images)
 
     img = mpimg.imread(images[images_ids.index(id_img)])
-    img1 = mpimg.imread(images[images_ids.index(id_img)])
 
     total_entries = len(x)
 
     print("[INFO] Total predicted road patches: ", total_entries)
     for idx in range(total_entries):
         img[x[idx]:x[idx] + patch_size, y[idx]:y[idx] + patch_size, 0] = 0
-    show_image(img)
-
-# def compare_csvs(csv_file1, csv_file2):
-#    x1, y1 = filter_id_entries(id_img, csv_file1)
+    plt.imshow(img)
+    plt.show()
