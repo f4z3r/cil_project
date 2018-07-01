@@ -26,7 +26,7 @@ Following list describes the directories and their use:
 | report          | Contains the code to generate the projects report.           |
 | src             | This folder contains the projects source code.               |
 | trained_model   | This folder is automatically generated during the training of the model and will contain the projects checkpoints and the final submission.csv |
-| \<project-root> | Contains this README file. All code needs to be executed based on this path. |
+| \<project-root> | Contains this README file. All code needs to be executed based on this path.<br />Additionally holds the report.pdf and the declaration_of_originality.pdf |
 
 ## Prerequisites
 
